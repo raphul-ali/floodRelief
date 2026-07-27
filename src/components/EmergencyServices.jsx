@@ -70,8 +70,15 @@ export default function EmergencyServices() {
       }
     } catch (_) {}
 
+    // 3. Fallback to Assam Emergency HQ location if GPS & IP lookup are blocked
+    const fallbackLoc = {
+      lat: 26.1400,
+      lng: 91.7900,
+      label: 'Assam State Emergency Center (Default Location)'
+    };
+    setUserLocation(fallbackLoc);
     setIsLocating(false);
-    setLocError('Could not detect your location. Please allow location access in your browser settings.');
+    doFetch(fallbackLoc, radiusKm);
   };
 
   // ─── Fetch services from OpenStreetMap ───────────────────────────────────────

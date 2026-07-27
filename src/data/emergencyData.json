@@ -1,0 +1,3243 @@
+[
+  {
+    "id": "ps-1",
+    "name": "Panbazar Police Thana & Control Room",
+    "category": "Police Thana",
+    "phone": "+91 361 2540138",
+    "district": "Kamrup Metro (Guwahati)",
+    "address": "Panbazar Overbridge, Guwahati, Assam 781001",
+    "latitude": 26.1855,
+    "longitude": 91.7475,
+    "services": [
+      "24x7 Control Room",
+      "Law & Order",
+      "Disaster Patrol"
+    ]
+  },
+  {
+    "id": "ps-2",
+    "name": "Dispur Police Station",
+    "category": "Police Thana",
+    "phone": "+91 361 2261510",
+    "district": "Kamrup Metro (Guwahati)",
+    "address": "G.S. Road, Dispur, Guwahati, Assam 781006",
+    "latitude": 26.142,
+    "longitude": 91.789,
+    "services": [
+      "State Capital Security",
+      "Emergency Helpline 112"
+    ]
+  },
+  {
+    "id": "ps-3",
+    "name": "Jalukbari Police Station",
+    "category": "Police Thana",
+    "phone": "+91 361 2570522",
+    "district": "Kamrup Metro (Guwahati)",
+    "address": "NH-37 Junction, Jalukbari, Guwahati 781014",
+    "latitude": 26.156,
+    "longitude": 91.663,
+    "services": [
+      "Highway Patrol",
+      "Riverine Border Patrol"
+    ]
+  },
+  {
+    "id": "ps-4",
+    "name": "Chandmari Police Station",
+    "category": "Police Thana",
+    "phone": "+91 361 2660204",
+    "district": "Kamrup Metro (Guwahati)",
+    "address": "Chandmari Colony, Guwahati, Assam 781003",
+    "latitude": 26.183,
+    "longitude": 91.771,
+    "services": [
+      "Urban Rescue Patrol",
+      "Helpline 112"
+    ]
+  },
+  {
+    "id": "ps-5",
+    "name": "Jorhat Police Station (Sadar)",
+    "category": "Police Thana",
+    "phone": "+91 376 2320022",
+    "district": "Jorhat",
+    "address": "A.T. Road, Jorhat Town, Assam 785001",
+    "latitude": 26.7575,
+    "longitude": 94.204,
+    "services": [
+      "District Control Room",
+      "Flood Patrol"
+    ]
+  },
+  {
+    "id": "ps-6",
+    "name": "Dibrugarh Sadar Police Station",
+    "category": "Police Thana",
+    "phone": "+91 373 2322999",
+    "district": "Dibrugarh",
+    "address": "Thana Chariali, Dibrugarh, Assam 786001",
+    "latitude": 27.4735,
+    "longitude": 94.9125,
+    "services": [
+      "Brahmaputra Flood Patrol",
+      "24x7 Control Room"
+    ]
+  },
+  {
+    "id": "ps-7",
+    "name": "Silchar Sadar Police Station",
+    "category": "Police Thana",
+    "phone": "+91 3842 245834",
+    "district": "Cachar (Silchar)",
+    "address": "Park Road, Silchar, Assam 788001",
+    "latitude": 24.8245,
+    "longitude": 92.7975,
+    "services": [
+      "Barak Valley Control Room",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "ps-8",
+    "name": "Tezpur Sadar Police Station",
+    "category": "Police Thana",
+    "phone": "+91 3712 220024",
+    "district": "Sonitpur (Tezpur)",
+    "address": "Court Road, Tezpur, Assam 784001",
+    "latitude": 26.633,
+    "longitude": 92.798,
+    "services": [
+      "Sonitpur Emergency Patrol",
+      "Law & Order"
+    ]
+  },
+  {
+    "id": "ps-9",
+    "name": "Nagaon Sadar Police Station",
+    "category": "Police Thana",
+    "phone": "+91 3672 233222",
+    "district": "Nagaon",
+    "address": "M.G. Road, Nagaon, Assam 782001",
+    "latitude": 26.348,
+    "longitude": 92.684,
+    "services": [
+      "Central Assam Control Room",
+      "Helpline 112"
+    ]
+  },
+  {
+    "id": "fire-1",
+    "name": "Guwahati Central Fire & Emergency Station",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Kamrup Metro (Guwahati)",
+    "address": "Panbazar, Guwahati, Assam 781001",
+    "latitude": 26.185,
+    "longitude": 91.748,
+    "services": [
+      "Water Pumping",
+      "Fire & Rescue",
+      "Submersible Pumps"
+    ]
+  },
+  {
+    "id": "fire-2",
+    "name": "Dispur Fire & Rescue Station",
+    "category": "Fire Dept",
+    "phone": "+91 361 2260201",
+    "district": "Kamrup Metro (Guwahati)",
+    "address": "Dispur Last Gate, Guwahati, Assam 781006",
+    "latitude": 26.139,
+    "longitude": 91.792,
+    "services": [
+      "Capital Emergency Rescue",
+      "High Capacity Pumps"
+    ]
+  },
+  {
+    "id": "fire-3",
+    "name": "Jorhat Fire & Emergency Station",
+    "category": "Fire Dept",
+    "phone": "+91 376 2320101",
+    "district": "Jorhat",
+    "address": "Gar-Ali, Jorhat, Assam 785001",
+    "latitude": 26.757,
+    "longitude": 94.203,
+    "services": [
+      "Motorboat Rescue Unit",
+      "Flood Dewatering"
+    ]
+  },
+  {
+    "id": "fire-4",
+    "name": "Dibrugarh Main Fire Station",
+    "category": "Fire Dept",
+    "phone": "+91 373 2320101",
+    "district": "Dibrugarh",
+    "address": "R.K.B. Path, Dibrugarh, Assam 786001",
+    "latitude": 27.475,
+    "longitude": 94.909,
+    "services": [
+      "Brahmaputra Rescue Boat",
+      "Emergency Dewatering"
+    ]
+  },
+  {
+    "id": "fire-5",
+    "name": "Silchar Fire & Disaster Station",
+    "category": "Fire Dept",
+    "phone": "+91 3842 245101",
+    "district": "Cachar (Silchar)",
+    "address": "Tarapur, Silchar, Assam 788003",
+    "latitude": 24.831,
+    "longitude": 92.784,
+    "services": [
+      "Water Evacuation",
+      "Flood Relief Rescue"
+    ]
+  },
+  {
+    "id": "sdrf-1",
+    "name": "NDRF 1st Battalion Headquarters",
+    "category": "Rescue Squad",
+    "phone": "+91 361 2840008",
+    "district": "Kamrup Metro",
+    "address": "Patgaon, Rani, Guwahati, Assam 781017",
+    "latitude": 26.0825,
+    "longitude": 91.5975,
+    "services": [
+      "Deep Water Rescue",
+      "Motorboat Fleet",
+      "Air Drop Logistics"
+    ]
+  },
+  {
+    "id": "sdrf-2",
+    "name": "State Disaster Response Force (SDRF HQ)",
+    "category": "Rescue Squad",
+    "phone": "1070",
+    "district": "Kamrup Metro",
+    "address": "ASDMA HQ, Dispur, Guwahati 781006",
+    "latitude": 26.14,
+    "longitude": 91.79,
+    "services": [
+      "24x7 Flood Control Room",
+      "Inflatable Boats",
+      "Life Jackets"
+    ]
+  },
+  {
+    "id": "sdrf-3",
+    "name": "Dibrugarh SDRF Water Rescue Base",
+    "category": "Rescue Squad",
+    "phone": "+91 373 2322999",
+    "district": "Dibrugarh",
+    "address": "DC Office Complex, Dibrugarh 786001",
+    "latitude": 27.4728,
+    "longitude": 94.912,
+    "services": [
+      "Upper Assam Rescue Operations",
+      "Riverine Search"
+    ]
+  },
+  {
+    "id": "sdrf-4",
+    "name": "Majuli Island SDRF Emergency Outpost",
+    "category": "Rescue Squad",
+    "phone": "+91 3775 274244",
+    "district": "Majuli Island",
+    "address": "Garamur Ghat, Majuli, Assam 785104",
+    "latitude": 26.96,
+    "longitude": 94.17,
+    "services": [
+      "Island Speedboat Ambulance",
+      "Flood Evacuation Fleet"
+    ]
+  },
+  {
+    "id": "hosp-1",
+    "name": "Gauhati Medical College & Hospital (GMCH)",
+    "category": "Hospital",
+    "phone": "+91 361 2529457",
+    "district": "Kamrup Metro (Guwahati)",
+    "address": "Bhangagarh, Guwahati, Assam 781032",
+    "latitude": 26.155,
+    "longitude": 91.77,
+    "services": [
+      "24x7 Emergency Trauma",
+      "Antivenom",
+      "ICU Beds"
+    ]
+  },
+  {
+    "id": "hosp-2",
+    "name": "Jorhat Medical College & Hospital (JMCH)",
+    "category": "Hospital",
+    "phone": "+91 376 2370107",
+    "district": "Jorhat",
+    "address": "Jail Road, Jorhat, Assam 785001",
+    "latitude": 26.745,
+    "longitude": 94.2,
+    "services": [
+      "Emergency Trauma Ward",
+      "Waterborne Illness Isolation"
+    ]
+  },
+  {
+    "id": "hosp-3",
+    "name": "Assam Medical College & Hospital (AMCH)",
+    "category": "Hospital",
+    "phone": "+91 373 2300080",
+    "district": "Dibrugarh",
+    "address": "Barbari, Dibrugarh, Assam 786002",
+    "latitude": 27.461,
+    "longitude": 94.921,
+    "services": [
+      "Upper Assam Super Specialty",
+      "24x7 Disaster Emergency"
+    ]
+  },
+  {
+    "id": "hosp-4",
+    "name": "Silchar Medical College & Hospital (SMCH)",
+    "category": "Hospital",
+    "phone": "+91 3842 240102",
+    "district": "Cachar (Silchar)",
+    "address": "Ghungoor, Silchar, Assam 788014",
+    "latitude": 24.786,
+    "longitude": 92.793,
+    "services": [
+      "Barak Region Emergency Trauma",
+      "Antivenom",
+      "ICU"
+    ]
+  },
+  {
+    "id": "hosp-5",
+    "name": "Tezpur Medical College & Hospital (TMCH)",
+    "category": "Hospital",
+    "phone": "+91 3712 240000",
+    "district": "Sonitpur (Tezpur)",
+    "address": "Bihaguri, Tezpur, Assam 784010",
+    "latitude": 26.658,
+    "longitude": 92.685,
+    "services": [
+      "Emergency Ward",
+      "24x7 Ambulance",
+      "Disaster ICU"
+    ]
+  },
+  {
+    "id": "osm-imported-11116277110",
+    "name": "Raha Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.2293, 92.5208",
+    "latitude": 26.2292919,
+    "longitude": 92.5207528,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6230350030",
+    "name": "RBP",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "27.4373, 91.5785",
+    "latitude": 27.4373458,
+    "longitude": 91.5785497,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-9748715673",
+    "name": "police colony",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "27.5045, 90.5040",
+    "latitude": 27.5045112,
+    "longitude": 90.5039948,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-4905334117",
+    "name": "Khanapara Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.1167, 91.8315",
+    "latitude": 26.1166579,
+    "longitude": 91.8314579,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10243766509",
+    "name": "police station dagana",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "27.0719, 89.8815",
+    "latitude": 27.0719497,
+    "longitude": 89.8815224,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10243715009",
+    "name": "Local Fire & Emergency Station",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "27.0726, 89.8794",
+    "latitude": 27.0725569,
+    "longitude": 89.8794141,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-4612201889",
+    "name": "Burha Police Outpost",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.4517, 91.7878",
+    "latitude": 26.4516961,
+    "longitude": 91.7878252,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2383182545",
+    "name": "IMSR",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "26.7491, 94.1775",
+    "latitude": 26.7490914,
+    "longitude": 94.1774577,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-4089848038",
+    "name": "Baghchung Police station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.7158, 94.2128",
+    "latitude": 26.7157686,
+    "longitude": 94.2127683,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-4704698014",
+    "name": "Local Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.8727, 91.9262",
+    "latitude": 24.872695,
+    "longitude": 91.9261742,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-7385965799",
+    "name": "Dipshikha Infertility Center",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.3107, 91.7336",
+    "latitude": 24.3107297,
+    "longitude": 91.7335547,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-4871970248",
+    "name": "Fire Service and Civil Defence",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "24.3092, 91.7264",
+    "latitude": 24.3092241,
+    "longitude": 91.7263998,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-4376993579",
+    "name": "Royal Bhutan Police",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.7946, 91.5038",
+    "latitude": 26.7945994,
+    "longitude": 91.5037985,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2689917278",
+    "name": "Doctor's Clinic & Mediciner",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "26.3244, 94.5177",
+    "latitude": 26.3243522,
+    "longitude": 94.5177439,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2686563541",
+    "name": "Modern Clinic",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "26.3241, 94.5218",
+    "latitude": 26.3240761,
+    "longitude": 94.5217855,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2717151882",
+    "name": "Fire Station",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "26.3297, 94.5316",
+    "latitude": 26.3297468,
+    "longitude": 94.5315681,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-4101022014",
+    "name": "Govt Dispensary",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "26.5069, 94.4131",
+    "latitude": 26.5068894,
+    "longitude": 94.4130927,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6959899656",
+    "name": "Rynjah Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.5683, 91.9134",
+    "latitude": 25.568294,
+    "longitude": 91.9134234,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6255339638",
+    "name": "CRPF Camp",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.7064, 94.1080",
+    "latitude": 25.7063586,
+    "longitude": 94.107951,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6255335872",
+    "name": "Fire Brigade",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "25.7135, 94.1041",
+    "latitude": 25.7135089,
+    "longitude": 94.1040787,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-8148438002",
+    "name": "Zhadima IRB",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.8456, 94.0517",
+    "latitude": 25.845613,
+    "longitude": 94.051732,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5166969488",
+    "name": "Osmani Nogor Fire Station",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "24.7207, 91.7512",
+    "latitude": 24.7206658,
+    "longitude": 91.7511771,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-4595997864",
+    "name": "Moulvibazar Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.4795, 91.7658",
+    "latitude": 24.4794993,
+    "longitude": 91.7657941,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-8064477261",
+    "name": "Mamun Private Hospital",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.4771, 91.7656",
+    "latitude": 24.4770905,
+    "longitude": 91.7656209,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5879361134",
+    "name": "Police BOx",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.4148, 90.6427",
+    "latitude": 24.4147913,
+    "longitude": 90.6426675,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5742032730",
+    "name": "Goforgoan Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.4520, 90.5542",
+    "latitude": 24.4519652,
+    "longitude": 90.5541893,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-8677986393",
+    "name": "Mawsynram Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.2940, 91.5778",
+    "latitude": 25.2940296,
+    "longitude": 91.5777919,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-7577517041",
+    "name": "Rasongsli Nursing Home",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "25.2874, 92.0969",
+    "latitude": 25.2873638,
+    "longitude": 92.0968584,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6255305453",
+    "name": "South Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.6531, 94.1016",
+    "latitude": 25.6531047,
+    "longitude": 94.101648,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5025639061",
+    "name": "Saikul Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.0594, 94.0259",
+    "latitude": 25.0594075,
+    "longitude": 94.0259444,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-7274014785",
+    "name": "Rani Gaidinliu Dwar",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.8427, 93.6278",
+    "latitude": 24.8427199,
+    "longitude": 93.6278182,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5896872874",
+    "name": "Barhatta Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.8982, 90.8882",
+    "latitude": 24.8981917,
+    "longitude": 90.8882014,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2409429493",
+    "name": "Mohangonj Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.8744, 90.9815",
+    "latitude": 24.8744054,
+    "longitude": 90.9814683,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5743011174",
+    "name": "Netrokona Police Lines",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.8673, 90.7255",
+    "latitude": 24.867291,
+    "longitude": 90.7254624,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-3562915793",
+    "name": "Netrokona Sadar Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.8724, 90.7283",
+    "latitude": 24.8724,
+    "longitude": 90.7282748,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5739429210",
+    "name": "BGB Camp",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.8688, 90.7076",
+    "latitude": 24.868829,
+    "longitude": 90.7075547,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2797968811",
+    "name": "Nakla Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.9689, 90.1790",
+    "latitude": 24.9688831,
+    "longitude": 90.1790297,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6255324389",
+    "name": "North Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.6758, 94.1093",
+    "latitude": 25.6757672,
+    "longitude": 94.1093023,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6763195716",
+    "name": "Oking Hospital And Research Clinic Pvt Ltd",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "25.6689, 94.1057",
+    "latitude": 25.6688782,
+    "longitude": 94.1056576,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-3921091034",
+    "name": "Malugram Police Outpost",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.8398, 92.8075",
+    "latitude": 24.8397832,
+    "longitude": 92.8074628,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6387635527",
+    "name": "Kwakeithel Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.7868, 93.9212",
+    "latitude": 24.7868004,
+    "longitude": 93.9211534,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-3778748287",
+    "name": "Irilbung police station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.7552, 93.9801",
+    "latitude": 24.7551637,
+    "longitude": 93.9801317,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6387635522",
+    "name": "Bishnupur Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.6190, 93.7618",
+    "latitude": 24.6189982,
+    "longitude": 93.7617655,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-7274014285",
+    "name": "Kaimai Checkpoint",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.7200, 93.2601",
+    "latitude": 24.7199998,
+    "longitude": 93.2600972,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5211894390",
+    "name": "Mawna Highway Police Station মাওনা হাইওয়ে থানা",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.2172, 90.4139",
+    "latitude": 24.2171503,
+    "longitude": 90.4139061,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6164254514",
+    "name": "Mithamoin Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.4175, 91.0541",
+    "latitude": 24.4174846,
+    "longitude": 91.0540632,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-4610106101",
+    "name": "Sarishabari Fire Service And Civil Defence Station",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "24.7701, 89.8436",
+    "latitude": 24.7700878,
+    "longitude": 89.843626,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-8042827935",
+    "name": "Jamalpur Fire Service & Civil Defense",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "24.9213, 89.9513",
+    "latitude": 24.9213043,
+    "longitude": 89.9513439,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-3718770651",
+    "name": "Police Lines, Sylhet Range",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.8991, 91.8611",
+    "latitude": 24.8990917,
+    "longitude": 91.861124,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5703017503",
+    "name": "Kotiyadi Model Thana",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.2443, 90.7983",
+    "latitude": 24.244316,
+    "longitude": 90.7982576,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5673120079",
+    "name": "Pakundia Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.3282, 90.6806",
+    "latitude": 24.3281776,
+    "longitude": 90.6806454,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2818634401",
+    "name": "Kotwali Thana",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.7576, 90.4123",
+    "latitude": 24.7576475,
+    "longitude": 90.4123025,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-7037458773",
+    "name": "Golaghat Fire Brigade",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "26.4983, 93.9610",
+    "latitude": 26.498313,
+    "longitude": 93.9610084,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2799212594",
+    "name": "Tangail Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.2468, 89.9137",
+    "latitude": 24.246758,
+    "longitude": 89.9137336,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-4920050258",
+    "name": "hatigaon police station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.1266, 91.7868",
+    "latitude": 26.1266082,
+    "longitude": 91.7868419,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-3555178742",
+    "name": "Tezpur Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.6231, 92.7970",
+    "latitude": 26.6230515,
+    "longitude": 92.7969708,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5843503271",
+    "name": "Laimekuri Police Outpost",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "27.7513, 95.0743",
+    "latitude": 27.7513277,
+    "longitude": 95.0743345,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-3546863557",
+    "name": "Jonai Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "27.8228, 95.2297",
+    "latitude": 27.822811,
+    "longitude": 95.2297032,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-11285583169",
+    "name": "Hollongi Police Checkpoint",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.9591, 93.5903",
+    "latitude": 26.9590547,
+    "longitude": 93.5902534,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6938944733",
+    "name": "Bomdila Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "27.2654, 92.4221",
+    "latitude": 27.2653513,
+    "longitude": 92.4220829,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-13958505401",
+    "name": "Morigaon Police Station (মৰিগাওঁ আৰক্ষী নিৱেশ)",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.2504, 92.3411",
+    "latitude": 26.2503662,
+    "longitude": 92.3410649,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-13958510201",
+    "name": "Morigaon Police Reserve (মৰিগাওঁ আৰক্ষী চকী)",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.2539, 92.3560",
+    "latitude": 26.2539351,
+    "longitude": 92.3559713,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-3546863558",
+    "name": "Jonai Fire Service Station",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "27.8224, 95.2300",
+    "latitude": 27.8224397,
+    "longitude": 95.2300422,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6132273487",
+    "name": "4th APBn",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.1429, 91.7549",
+    "latitude": 26.1428801,
+    "longitude": 91.7548577,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-13522423677",
+    "name": "Fancy bazaar police out post",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.1826, 91.7373",
+    "latitude": 26.1825586,
+    "longitude": 91.7372664,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-13511238160",
+    "name": "Latasil Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.1899, 91.7519",
+    "latitude": 26.1899395,
+    "longitude": 91.7519146,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-1014526717",
+    "name": "Tinsukia Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "27.4879, 95.3569",
+    "latitude": 27.4879061,
+    "longitude": 95.3569119,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-1739986507",
+    "name": "Hijapuri Police",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "27.4820, 95.3391",
+    "latitude": 27.4819529,
+    "longitude": 95.3390824,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5224761462",
+    "name": "সিরাজগঞ্জ থানা",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.4581, 89.7009",
+    "latitude": 24.45805,
+    "longitude": 89.7008562,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12558481702",
+    "name": "Tourist Registration Checkpoint",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.5145, 94.1361",
+    "latitude": 25.5145013,
+    "longitude": 94.1360744,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-11133587107",
+    "name": "Fire and Emergency Services Station, Raha",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "26.2340, 92.5260",
+    "latitude": 26.2340279,
+    "longitude": 92.5260134,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5868212538",
+    "name": "Kendua Upazila Fire Service",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "24.6553, 90.8264",
+    "latitude": 24.65528,
+    "longitude": 90.8263859,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-9692896252",
+    "name": "Balaganj Upazila Health Complex",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.6550, 91.8365",
+    "latitude": 24.6549969,
+    "longitude": 91.8365116,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12973082004",
+    "name": "state police accountability commission, assam",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.1729, 91.7634",
+    "latitude": 26.1728706,
+    "longitude": 91.7633521,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12595553359",
+    "name": "Tangail Sadar Thana, State police",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.2464, 89.9140",
+    "latitude": 24.2464231,
+    "longitude": 89.913974,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12473296804",
+    "name": "Yaingangpokpi PS",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.9137, 94.1291",
+    "latitude": 24.9136989,
+    "longitude": 94.1290783,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2332872340",
+    "name": "Zakiganj Upazila Health Complex",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.8843, 92.3642",
+    "latitude": 24.8842777,
+    "longitude": 92.3642292,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-3720274144",
+    "name": "IBN SINA Hospital",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.8918, 91.8777",
+    "latitude": 24.8918061,
+    "longitude": 91.8777267,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5158255558",
+    "name": "Tamabil Immigration Office",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.1833, 92.0319",
+    "latitude": 25.1832719,
+    "longitude": 92.0319385,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12800196247",
+    "name": "Jhenaigati Police Station, Police station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.1880, 90.0620",
+    "latitude": 25.1880249,
+    "longitude": 90.061962,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-4855461193",
+    "name": "Community Police Center",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "27.2796, 91.5113",
+    "latitude": 27.2795834,
+    "longitude": 91.511283,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10807361351",
+    "name": "Sakawrdai Police  Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.2220, 92.9532",
+    "latitude": 24.2219719,
+    "longitude": 92.9532294,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6959528088",
+    "name": "Nongmensong Police Outpost",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.5827, 91.9074",
+    "latitude": 25.5826709,
+    "longitude": 91.9073519,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-3715197755",
+    "name": "Police Lines Hospital",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.8996, 91.8593",
+    "latitude": 24.899578,
+    "longitude": 91.8592555,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6255099036",
+    "name": "Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.7207, 94.0424",
+    "latitude": 25.7207227,
+    "longitude": 94.0424353,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-3940943314",
+    "name": "Monohardi Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.1416, 90.6968",
+    "latitude": 24.1415653,
+    "longitude": 90.6968468,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-13450247297",
+    "name": "Shantipur Police Outpost",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "27.9676, 95.7542",
+    "latitude": 27.9676052,
+    "longitude": 95.7541968,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6833668135",
+    "name": "Ishwarganj Upazila Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.6842, 90.5928",
+    "latitude": 24.6842107,
+    "longitude": 90.5927561,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2389291420",
+    "name": "Emanuel Hospital, Pailapool",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.8245, 93.0153",
+    "latitude": 24.8244991,
+    "longitude": 93.0153112,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12782546756",
+    "name": "Nakla Upzilla Fire Station, Fire station",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "24.9658, 90.1854",
+    "latitude": 24.9657896,
+    "longitude": 90.185374,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12738884044",
+    "name": "District Special Branch, Federal police",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.0211, 90.0148",
+    "latitude": 25.0210917,
+    "longitude": 90.0148283,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2332856895",
+    "name": "উপজেলা স্বাস্থ্য কমপ্লেক্স, ঝিনাইগাতী",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "25.1825, 90.0660",
+    "latitude": 25.182485,
+    "longitude": 90.0659935,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12350533316",
+    "name": "police reserve playground",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.8347, 93.4309",
+    "latitude": 25.8347299,
+    "longitude": 93.4308905,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6656666615",
+    "name": "Baniachang Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.5218, 91.3688",
+    "latitude": 24.5217895,
+    "longitude": 91.3687608,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-4084387138",
+    "name": "Gopalpur Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.5621, 89.9286",
+    "latitude": 24.562116,
+    "longitude": 89.9285976,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6960053164",
+    "name": "Lumdiengjri Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.5803, 91.8729",
+    "latitude": 25.5803352,
+    "longitude": 91.8728956,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12692495931",
+    "name": "Jamalpur Fire Service And Civil Defense Station, Fire station",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "24.9212, 89.9512",
+    "latitude": 24.9211663,
+    "longitude": 89.9512086,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-11027613505",
+    "name": "5th Assam Police Battalion",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.2151, 93.0165",
+    "latitude": 25.2150877,
+    "longitude": 93.0164726,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-7021302540",
+    "name": "Check post - foreigners registration",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.8076, 93.1118",
+    "latitude": 24.8076074,
+    "longitude": 93.111759,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-13176643020",
+    "name": "Barlekha Police Station, Police station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.6942, 92.1841",
+    "latitude": 24.6941558,
+    "longitude": 92.1841499,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-13844383501",
+    "name": "Fire Service and Civil Defense ফায়ার সার্ভিস অ্যান্ড সিভিল ডিফেন্স",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "24.4362, 90.7788",
+    "latitude": 24.436166,
+    "longitude": 90.7787831,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-13844424501",
+    "name": "Kishoreganj Model Police Station কিশোরগঞ্জ মডেল থানা",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.4380, 90.7803",
+    "latitude": 24.4379908,
+    "longitude": 90.7803243,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-7138559487",
+    "name": "Badarpur Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.8696, 92.5570",
+    "latitude": 24.8695991,
+    "longitude": 92.5570273,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5464021858",
+    "name": "Office of the Superintendent of Police",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "27.5028, 95.3282",
+    "latitude": 27.5027858,
+    "longitude": 95.3282384,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-3921090343",
+    "name": "Ghungoor Police Outpost",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.7791, 92.7939",
+    "latitude": 24.7790861,
+    "longitude": 92.7939251,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-9603054353",
+    "name": "Oyesis Hospital",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.8878, 91.8802",
+    "latitude": 24.8878229,
+    "longitude": 91.8801888,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10221832524",
+    "name": "Haflong Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.1681, 93.0191",
+    "latitude": 25.1680766,
+    "longitude": 93.0190969,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12155192511",
+    "name": "Mawna Highway Police Station, Police station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.2172, 90.4137",
+    "latitude": 24.217231,
+    "longitude": 90.4137388,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10807458265",
+    "name": "Kanhmun Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.2349, 92.2986",
+    "latitude": 24.2349439,
+    "longitude": 92.2985903,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10807442736",
+    "name": "Zawlnuam Police Out post",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.1417, 92.3385",
+    "latitude": 24.1417277,
+    "longitude": 92.3384619,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10807411702",
+    "name": "Bairabi Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.1929, 92.5388",
+    "latitude": 24.1929086,
+    "longitude": 92.5388363,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12211527599",
+    "name": "Fire Service and Civil Defence Training Center",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "24.7222, 90.4007",
+    "latitude": 24.722179,
+    "longitude": 90.4006641,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-3921090342",
+    "name": "Rangirkhari Police Outpost",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.8057, 92.8004",
+    "latitude": 24.8056687,
+    "longitude": 92.800414,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-7418693090",
+    "name": "Medilab Diagnostic & Consultation Ltd.",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.7372, 90.5081",
+    "latitude": 24.7371926,
+    "longitude": 90.5081042,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-7274014688",
+    "name": "Kaiphundai Post",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.7893, 93.2230",
+    "latitude": 24.7893443,
+    "longitude": 93.2230207,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-11998862676",
+    "name": "Leingangpokpi outpost",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.7955, 93.1715",
+    "latitude": 24.7955159,
+    "longitude": 93.1714959,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6063404097",
+    "name": "সিলেট র‍্যাব-৯ প্রধান কার্যালয়",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.9009, 91.9095",
+    "latitude": 24.9009367,
+    "longitude": 91.9094941,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6611291463",
+    "name": "আটপাড়া থানা",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.8130, 90.8574",
+    "latitude": 24.8129932,
+    "longitude": 90.8574311,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-8042755602",
+    "name": "Ruma Dental Care (রুমা ডেন্টাল কেয়ার)",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.9199, 89.9450",
+    "latitude": 24.9198859,
+    "longitude": 89.9449522,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6063402777",
+    "name": "Jalalabad Eye Hospital",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.8993, 91.9096",
+    "latitude": 24.8993354,
+    "longitude": 91.9095547,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10287023194",
+    "name": "Barlekha POLICE STATION",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.6943, 92.1844",
+    "latitude": 24.694284,
+    "longitude": 92.1843631,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-4830025634",
+    "name": "Beanibazar Fire Station",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "24.8353, 92.1615",
+    "latitude": 24.8353107,
+    "longitude": 92.1614536,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10947499224",
+    "name": "Imphal Fire Station",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "24.8049, 93.9354",
+    "latitude": 24.8049422,
+    "longitude": 93.9353772,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12655243937",
+    "name": "Narayanpur Police Investigation Centre, Police station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.8167, 89.9374",
+    "latitude": 24.8167263,
+    "longitude": 89.9374304,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12638189267",
+    "name": "Dhanbari Fire Service, Fire station",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "24.6658, 89.9572",
+    "latitude": 24.6657824,
+    "longitude": 89.9572274,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-8502276814",
+    "name": "Sarishabari Thana",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.7699, 89.8428",
+    "latitude": 24.7698799,
+    "longitude": 89.8427929,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10791274805",
+    "name": "Local Medical Unit",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.8908, 91.8627",
+    "latitude": 24.8907868,
+    "longitude": 91.8626941,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-3715212193",
+    "name": "Trust Medical Services",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.8984, 91.8601",
+    "latitude": 24.8983946,
+    "longitude": 91.8601202,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5741986297",
+    "name": "কেন্দুয়া পুলিশ স্টেশন",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.6630, 90.8426",
+    "latitude": 24.6630041,
+    "longitude": 90.842628,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6643465653",
+    "name": "পুলিশ বক্স",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.6930, 90.8775",
+    "latitude": 24.6929597,
+    "longitude": 90.8775233,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12334028339",
+    "name": "Borobekra police station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.6108, 93.0915",
+    "latitude": 24.6108239,
+    "longitude": 93.0914785,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10807450362",
+    "name": "Vairengte Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.4918, 92.7592",
+    "latitude": 24.4917701,
+    "longitude": 92.75921,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6514727868",
+    "name": "Lamka Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.3463, 93.6998",
+    "latitude": 24.346327,
+    "longitude": 93.6998479,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12237142002",
+    "name": "ဗန်းမောက်မြို့နယ်ရဲတပ်ဖွဲ့မှူးရုံး",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.3973, 95.8536",
+    "latitude": 24.3973045,
+    "longitude": 95.8535795,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2332892999",
+    "name": "Moulvibaza Sadar Hospital",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.4811, 91.7663",
+    "latitude": 24.4811474,
+    "longitude": 91.7662744,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10222755917",
+    "name": "SP Office",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.1635, 93.0198",
+    "latitude": 25.1634969,
+    "longitude": 93.0198074,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10222875718",
+    "name": "Sarkari Bhagan Police OutPost",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.1832, 93.0140",
+    "latitude": 25.1832152,
+    "longitude": 93.0140168,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12273265178",
+    "name": "Haluaghat Police Station (Mymensingh)",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.1205, 90.3404",
+    "latitude": 25.12048,
+    "longitude": 90.3403533,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12819301737",
+    "name": "Fire Service and Civil Defense Station, Fire station",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "25.0188, 90.0249",
+    "latitude": 25.0187558,
+    "longitude": 90.024894,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2311234700",
+    "name": "Dewangonj Upazilla Health Complex",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "25.1621, 89.7589",
+    "latitude": 25.1620877,
+    "longitude": 89.7589438,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-4977329873",
+    "name": "Beanibazar Cancer Hospital",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.8222, 92.1503",
+    "latitude": 24.8221819,
+    "longitude": 92.1502707,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-4873554657",
+    "name": "Sreemangal Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.3107, 91.7322",
+    "latitude": 24.3106668,
+    "longitude": 91.7322448,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-4689339043",
+    "name": "GU Hospital",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "26.1548, 91.6660",
+    "latitude": 26.1548233,
+    "longitude": 91.6660347,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2311119551",
+    "name": "Dewanjgonj Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.1642, 89.7650",
+    "latitude": 25.1641658,
+    "longitude": 89.7649895,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12649316129",
+    "name": "Dhanbari Model Thana, Civil police",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.6692, 89.9574",
+    "latitude": 24.6692212,
+    "longitude": 89.9573817,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-13370683984",
+    "name": "Sugnu Subdivisional Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.2930, 93.8772",
+    "latitude": 24.2929714,
+    "longitude": 93.8771735,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10807414430",
+    "name": "New Vervek Police Out Post",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.1753, 92.9447",
+    "latitude": 24.1753261,
+    "longitude": 92.944674,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10807417226",
+    "name": "Kolasib Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.2340, 92.6750",
+    "latitude": 24.2339647,
+    "longitude": 92.6749651,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10807425688",
+    "name": "Bilkhawthlir Police Outpost",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.3349, 92.7168",
+    "latitude": 24.3349237,
+    "longitude": 92.7168013,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-7443180258",
+    "name": "বাসাইল থানা",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.2298, 90.0527",
+    "latitude": 24.2298242,
+    "longitude": 90.0526595,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6574122504",
+    "name": "খালিয়াজুরী থানা",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.6890, 91.1389",
+    "latitude": 24.6889959,
+    "longitude": 91.138935,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12511401694",
+    "name": "Mount Adora Hospital",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.9001, 91.8739",
+    "latitude": 24.9001442,
+    "longitude": 91.8739425,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-7092835178",
+    "name": "Shayestaganj Fire Service & Civil Defence Station",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "24.2682, 91.4525",
+    "latitude": 24.2681795,
+    "longitude": 91.4524698,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5587529963",
+    "name": "Rapid Action Battalion (RAB) 9",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.3085, 91.7252",
+    "latitude": 24.30851,
+    "longitude": 91.7251863,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5170946325",
+    "name": "Shaistaganj Police Fari",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.2756, 91.4810",
+    "latitude": 24.2755694,
+    "longitude": 91.481017,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12468242767",
+    "name": "Bangladesh Police, CID District Office",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.7662, 90.3933",
+    "latitude": 24.7661684,
+    "longitude": 90.393277,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12452909501",
+    "name": "Muktagacha Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.7642, 90.2570",
+    "latitude": 24.7642019,
+    "longitude": 90.2569874,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2332680745",
+    "name": "Tangail Medical College and Hospital",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.2640, 89.9253",
+    "latitude": 24.2639698,
+    "longitude": 89.9252633,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10824034339",
+    "name": "Merapani Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.3228, 94.0898",
+    "latitude": 26.3227932,
+    "longitude": 94.089834,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-11916249590",
+    "name": "Police Quarter 1",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "27.2764, 91.2394",
+    "latitude": 27.2764309,
+    "longitude": 91.2394118,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-11916249591",
+    "name": "Police Quarter 2",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "27.2761, 91.2394",
+    "latitude": 27.2761171,
+    "longitude": 91.2393514,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-11637764211",
+    "name": "Royal Bhutan Police Office",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "27.6670, 91.1841",
+    "latitude": 27.6669637,
+    "longitude": 91.184061,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-11637764224",
+    "name": "Police Quarter",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "27.6663, 91.1841",
+    "latitude": 27.6663452,
+    "longitude": 91.1841136,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-1739986509",
+    "name": "Panitola Police",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "27.4929, 95.2686",
+    "latitude": 27.4929462,
+    "longitude": 95.2685732,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-3780974361",
+    "name": "Agarwal Hospital and Research Centre",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "27.4861, 95.3797",
+    "latitude": 27.4860869,
+    "longitude": 95.3797308,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-13328594151",
+    "name": "Leitanpokpi police station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.0066, 94.0206",
+    "latitude": 25.0066271,
+    "longitude": 94.0205624,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-13874710311",
+    "name": "Litan Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.9515, 94.2029",
+    "latitude": 24.9514629,
+    "longitude": 94.2029407,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2319238560",
+    "name": "Bashistha Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.1126, 91.7949",
+    "latitude": 26.1126488,
+    "longitude": 91.7948727,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10208904329",
+    "name": "Nanong BHU",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "27.1208, 91.4587",
+    "latitude": 27.1207672,
+    "longitude": 91.4586879,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6156178612",
+    "name": "Bhagaduttapur Police station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.1339, 91.7666",
+    "latitude": 26.1338779,
+    "longitude": 91.7666261,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6913054937",
+    "name": "KGMT Multispeciality Hospital, Hatigarh",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "26.1720, 91.7814",
+    "latitude": 26.1719851,
+    "longitude": 91.7814441,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-7018601750",
+    "name": "Tulsibari Police Out Post",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.5043, 91.5962",
+    "latitude": 26.5042854,
+    "longitude": 91.5962308,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5265565022",
+    "name": "Garamur fire & emergency services station",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "26.9748, 94.1579",
+    "latitude": 26.9747805,
+    "longitude": 94.1579109,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6163500163",
+    "name": "Kuliarchar Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.1537, 90.9323",
+    "latitude": 24.1537264,
+    "longitude": 90.9322581,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6162797416",
+    "name": "Tarail Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.5499, 90.8925",
+    "latitude": 24.5499002,
+    "longitude": 90.8924501,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-13848514559",
+    "name": "Karimganj Model Police Station করিমগঞ্জ মডেল থানা",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.4706, 90.8691",
+    "latitude": 24.4706036,
+    "longitude": 90.8691169,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-11976551293",
+    "name": "Leishabithol police outpost",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.7422, 93.1547",
+    "latitude": 24.7421722,
+    "longitude": 93.154748,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-3559113603",
+    "name": "মদন থানা",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.7180, 90.9608",
+    "latitude": 24.71802,
+    "longitude": 90.9607867,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6875219312",
+    "name": "Madan Fire Service",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "24.7196, 90.9349",
+    "latitude": 24.7195634,
+    "longitude": 90.9348614,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2332679009",
+    "name": "Trishal Upazilla Health Complex",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.5765, 90.3948",
+    "latitude": 24.5764913,
+    "longitude": 90.3948003,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6979404985",
+    "name": "Majuli Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.9447, 94.1646",
+    "latitude": 26.9447337,
+    "longitude": 94.1645906,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12397559755",
+    "name": "Kalihati Fire Station, Fire station",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "24.3819, 89.9826",
+    "latitude": 24.381928,
+    "longitude": 89.9826179,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12395788155",
+    "name": "Kalihati Police Station, Police station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.3845, 89.9898",
+    "latitude": 24.3845307,
+    "longitude": 89.9898174,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-3643359269",
+    "name": "Jorhat Fire Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.7548, 94.2114",
+    "latitude": 26.7548007,
+    "longitude": 94.2114172,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-3637659886",
+    "name": "Jorhat Main Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.7550, 94.2114",
+    "latitude": 26.7549643,
+    "longitude": 94.2113717,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6913288176",
+    "name": "Lifeline Hospital and Research Centre",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "26.5160, 93.9748",
+    "latitude": 26.5159925,
+    "longitude": 93.9748279,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2332679001",
+    "name": "Gafargaon Upazilla Health Complex",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "24.4627, 90.5452",
+    "latitude": 24.462716,
+    "longitude": 90.5451623,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5642624801",
+    "name": "Borober Dushmara Temporary Police Camp",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.4276, 89.7193",
+    "latitude": 25.4275859,
+    "longitude": 89.7193243,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10807455195",
+    "name": "Saiphai Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "24.4128, 92.7972",
+    "latitude": 24.4128141,
+    "longitude": 92.7972247,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-1375751934",
+    "name": "Civil Hospital Shillong",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "25.5680, 91.8807",
+    "latitude": 25.5679611,
+    "longitude": 91.8807062,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5894834896",
+    "name": "Rowmai Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.5774, 89.8330",
+    "latitude": 25.577414,
+    "longitude": 89.8329675,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-11357461274",
+    "name": "Arogyao clinic",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "26.1057, 93.0283",
+    "latitude": 26.1056779,
+    "longitude": 93.0282789,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-11356011425",
+    "name": "SPK.PS",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "27.0998, 95.1605",
+    "latitude": 27.0997556,
+    "longitude": 95.160483,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-11907782293",
+    "name": "မီးသတ်",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "26.3246, 95.4389",
+    "latitude": 26.3246281,
+    "longitude": 95.4389384,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-12350533310",
+    "name": "diphu police thana",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.8400, 93.4286",
+    "latitude": 25.8399514,
+    "longitude": 93.4286056,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-5596194223",
+    "name": "Udalguri Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.7490, 92.0978",
+    "latitude": 26.7490438,
+    "longitude": 92.0978302,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-11357598691",
+    "name": "Amguri Police Station",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.8123, 94.5209",
+    "latitude": 26.8122906,
+    "longitude": 94.5208764,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-1690134377",
+    "name": "NERIST Medical Unit",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "27.1299, 93.7366",
+    "latitude": 27.1298566,
+    "longitude": 93.7365723,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-13312469701",
+    "name": "Khelmati Town Police Outpost",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "27.2282, 94.0942",
+    "latitude": 27.2282284,
+    "longitude": 94.0941769,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-10697365682",
+    "name": "Central Reserve Police Force B/67",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.5591, 91.9032",
+    "latitude": 25.5591086,
+    "longitude": 91.9031841,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6902810705",
+    "name": "Rahman Hospitals Private Limited",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "26.1350, 91.8095",
+    "latitude": 26.1350283,
+    "longitude": 91.8095034,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6888435232",
+    "name": "Kushal Konwar (KK) Civil Hospital & Blood Bank",
+    "category": "Rescue Squad",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "26.5102, 93.9650",
+    "latitude": 26.5101566,
+    "longitude": 93.9649969,
+    "services": [
+      "Rescue Squad",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-13160145332",
+    "name": "Kokrajhar Fire Station",
+    "category": "Fire Dept",
+    "phone": "101",
+    "district": "Assam / Region",
+    "address": "26.3929, 90.3022",
+    "latitude": 26.3928882,
+    "longitude": 90.302215,
+    "services": [
+      "Fire Dept",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-4869717739",
+    "name": "Bethany Hospital Outreach OPD Services",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "25.7556, 91.8857",
+    "latitude": 25.7556131,
+    "longitude": 91.8856792,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-2696256995",
+    "name": "Impur Mission Hospital Clinic",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "26.3254, 94.5224",
+    "latitude": 26.3253666,
+    "longitude": 94.5224108,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-4377010747",
+    "name": "Samdrup Jongkhar Hospital",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "26.8003, 91.5087",
+    "latitude": 26.8002591,
+    "longitude": 91.5086783,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-6913038500",
+    "name": "HGM Nursing Home",
+    "category": "Hospital",
+    "phone": "108",
+    "district": "Assam / Region",
+    "address": "26.5106, 93.9658",
+    "latitude": 26.5106294,
+    "longitude": 93.965819,
+    "services": [
+      "Hospital",
+      "Emergency Response"
+    ]
+  },
+  {
+    "id": "osm-imported-7040439285",
+    "name": "Border, no acces for foreigners",
+    "category": "Police Thana",
+    "phone": "112",
+    "district": "Assam / Region",
+    "address": "25.1746, 90.5216",
+    "latitude": 25.1746253,
+    "longitude": 90.5215882,
+    "services": [
+      "Police Thana",
+      "Emergency Response"
+    ]
+  }
+]
