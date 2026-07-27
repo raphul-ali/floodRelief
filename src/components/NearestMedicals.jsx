@@ -19,30 +19,47 @@ export default function NearestMedicals() {
 
   // Auto-detect GPS location on mount
   const handleDetectGPS = (isAuto = false) => {
-    if (!navigator.geolocation) {
-      setLocationStatus('Geolocation is not supported by your browser.');
-      return;
-    }
-
     setIsLocating(true);
     setLocationStatus(isAuto ? 'Auto-detecting your live GPS coordinates...' : 'Acquiring your exact GPS coordinates...');
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        setUserLocation({ lat: latitude, lng: longitude });
-        setIsLocating(false);
-        setLocationStatus(`📍 Live GPS Detected: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
-        loadMedicals(latitude, longitude, selectedCategory);
-      },
-      (error) => {
-        setIsLocating(false);
-        console.warn("GPS acquire error:", error);
-        setLocationStatus('⚠️ Permission denied or GPS unavailable. Please click "Detect Live GPS" or select a district.');
-        loadMedicals(null, null, selectedCategory);
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserLocation({ lat: latitude, lng: longitude });
+          setIsLocating(false);
+          setLocationStatus(`📍 Live GPS Active: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+          loadMedicals(latitude, longitude, selectedCategory);
+        },
+        async (error) => {
+          console.warn("Browser GPS unavailable/denied. Trying IP Geolocation fallback...", error);
+          try {
+            const res = await fetch('https://ipapi.co/json/');
+            if (res.ok) {
+              const ipData = await res.json();
+              if (ipData.latitude && ipData.longitude) {
+                setUserLocation({ lat: ipData.latitude, lng: ipData.longitude });
+                setLocationStatus(`📍 Live IP Location (${ipData.city || 'Assam'}): ${ipData.latitude.toFixed(4)}, ${ipData.longitude.toFixed(4)}`);
+                loadMedicals(ipData.latitude, ipData.longitude, selectedCategory);
+                setIsLocating(false);
+                return;
+              }
+            }
+          } catch (e) {
+            console.warn("IP Geolocation fallback failed:", e);
+          }
+
+          setIsLocating(false);
+          setLocationStatus('⚠️ Click "Detect Live GPS" to pin your location or select your District.');
+          loadMedicals(null, null, selectedCategory);
+        },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+      );
+    } else {
+      setIsLocating(false);
+      setLocationStatus('⚠️ Geolocation not supported by browser. Select your District below.');
+      loadMedicals(null, null, selectedCategory);
+    }
   };
 
   const loadMedicals = async (lat = null, lng = null, cat = 'ALL') => {

@@ -128,46 +128,47 @@ export default function Header({
 
         </div>
 
-        {/* 100% Screen-Fitted 3-Tab Navigation Bar */}
-        <nav className="flex items-center justify-between gap-1 py-1.5 border-t border-slate-800/80 text-[11px] sm:text-xs font-black w-full max-w-full overflow-x-auto no-scrollbar">
+        {/* 100% Screen-Fitted Multi-Line Navigation Bar for Mobile */}
+        <nav className="flex flex-col sm:flex-row items-center gap-1.5 py-1.5 border-t border-slate-800/80 text-[11px] sm:text-xs font-black w-full max-w-full">
           
-          {/* Tab 1: Relief Queue */}
-          <button
-            onClick={() => setActiveTab('dashboard')}
-            className={`flex-1 min-w-[95px] flex items-center justify-center gap-1 px-2 py-1.5 rounded-xl transition-all truncate text-center ${
-              activeTab === 'dashboard'
-                ? 'bg-amber-500 text-slate-950 font-black shadow-md border border-amber-400'
-                : 'text-amber-300 bg-amber-950/40 hover:bg-amber-900/60 border border-amber-900/40'
-            }`}
-          >
-            <Package className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">📦 RELIEF QUEUE</span>
-          </button>
+          {/* Line 1 on Mobile: Relief Queue & NGO Directory */}
+          <div className="flex items-center gap-1.5 w-full sm:w-auto sm:flex-1">
+            <button
+              onClick={() => setActiveTab('dashboard')}
+              className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all truncate text-center min-h-[38px] ${
+                activeTab === 'dashboard'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-md border border-amber-400'
+                  : 'text-amber-300 bg-amber-950/40 hover:bg-amber-900/60 border border-amber-900/40'
+              }`}
+            >
+              <Package className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">📦 RELIEF QUEUE</span>
+            </button>
 
-          {/* Tab 2: Merged NGO & Volunteers Directory */}
-          <button
-            onClick={() => setActiveTab('ngos')}
-            className={`flex-1 min-w-[110px] flex items-center justify-center gap-1 px-2 py-1.5 rounded-xl transition-all truncate text-center ${
-              activeTab === 'ngos'
-                ? 'bg-slate-800 text-amber-400 border border-amber-500/40 shadow-md'
-                : 'text-slate-300 bg-slate-900/80 hover:bg-slate-800 border border-slate-800'
-            }`}
-          >
-            <HeartHandshake className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-            <span className="truncate">🤝 NGO & VOLUNTEERS</span>
-          </button>
+            <button
+              onClick={() => setActiveTab('ngos')}
+              className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all truncate text-center min-h-[38px] ${
+                activeTab === 'ngos'
+                  ? 'bg-slate-800 text-amber-400 border border-amber-500/40 shadow-md'
+                  : 'text-slate-300 bg-slate-900/80 hover:bg-slate-800 border border-slate-800'
+              }`}
+            >
+              <HeartHandshake className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="truncate">🤝 NGO & VOLUNTEERS</span>
+            </button>
+          </div>
 
-          {/* Tab 3: Emergency Responders & Hospitals */}
+          {/* Line 2 on Mobile (100% Full Width), Row Item on Desktop */}
           <button
             onClick={() => setActiveTab('responders')}
-            className={`flex-1 min-w-[110px] flex items-center justify-center gap-1 px-2 py-1.5 rounded-xl transition-all truncate text-center ${
+            className={`w-full sm:w-auto sm:flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl transition-all text-center min-h-[40px] ${
               activeTab === 'responders' || activeTab === 'medicals'
-                ? 'bg-red-600 text-white shadow-md border border-red-400'
-                : 'text-red-200 bg-red-950/40 hover:bg-red-900/60 border border-red-900/40'
+                ? 'bg-gradient-to-r from-red-600 via-rose-600 to-red-600 text-white shadow-md border border-red-400 font-black'
+                : 'text-red-200 bg-red-950/40 hover:bg-red-900/60 border border-red-900/40 font-bold'
             }`}
           >
-            <Siren className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">🚨 RESPONDERS</span>
+            <Siren className="w-4 h-4 shrink-0 text-white animate-pulse" />
+            <span className="uppercase tracking-tight">🚨 NEARBY EMERGENCY SERVICES</span>
           </button>
 
         </nav>

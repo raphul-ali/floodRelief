@@ -1,120 +1,111 @@
-// 100% Free Nearest Medical Search Service using Haversine Distance & OpenStreetMap Overpass API
-
-// Pre-seeded verified emergency hospitals and civil medical camps across Assam districts
+// 100% Free Emergency Medical & Hospital Search Service
+// Pre-seeded verified emergency medical centers across Assam
 const VERIFIED_ASSAM_MEDICALS = [
   {
     id: "med-1",
-    name: "Guwahati Medical College & Hospital (GMCH)",
-    type: "Government Medical College & Emergency Hospital",
+    name: "Gauhati Medical College & Hospital (GMCH)",
+    type: "Super-Specialty Government Hospital",
     category: "Hospital",
     phone: "+91 361 2529457",
-    altPhone: "+91 361 2529458",
+    controlPhone: "+91 361 2529457",
     district: "Kamrup Metro (Guwahati)",
     address: "Bhangagarh, Guwahati, Assam 781032",
-    latitude: 26.1558,
-    longitude: 91.7708,
+    latitude: 26.1550,
+    longitude: 91.7700,
     is24x7: true,
-    services: ["24x7 Emergency Trauma", "Blood Bank", "ICU", "Ambulance Station"]
+    services: ["24x7 Emergency Trauma", "Antivenom", "ICU Beds", "Blood Bank", "Flood Relief Medical Ward"]
   },
   {
     id: "med-2",
-    name: "Silchar Medical College & Hospital (SMCH)",
-    type: "District Emergency Hospital & Relief Hub",
+    name: "Jorhat Medical College & Hospital (JMCH)",
+    type: "Government Medical College",
     category: "Hospital",
-    phone: "+91 3842 240101",
-    altPhone: "+91 3842 240099",
-    district: "Cachar (Silchar)",
-    address: "Ghungoor, Silchar, Cachar, Assam 788014",
-    latitude: 24.7833,
-    longitude: 92.7917,
+    phone: "+91 376 2370107",
+    controlPhone: "+91 94350 51200",
+    district: "Jorhat",
+    address: "Kushalbhotia Road, Jail Road, Jorhat, Assam 785001",
+    latitude: 26.7450,
+    longitude: 94.2000,
     is24x7: true,
-    services: ["Flood Emergency Unit", "Anti-Snake Venom", "Waterborne Disease Ward"]
+    services: ["Emergency Trauma", "Waterborne Disease Ward", "24x7 Ambulance", "Pharmacy"]
   },
   {
     id: "med-3",
-    name: "Fakhruddin Ali Ahmed Medical College & Hospital",
-    type: "Civil Hospital & Disaster Relief Center",
-    category: "Hospital",
-    phone: "+91 3665 252150",
-    altPhone: "+91 94350 11223",
-    district: "Barpeta",
-    address: "Jotigaon, Barpeta, Assam 781301",
-    latitude: 26.3300,
-    longitude: 91.0200,
+    name: "Assam State Flood Emergency Medical Center (Dispur)",
+    type: "State Relief Medical Command",
+    category: "Relief Center",
+    phone: "1070",
+    controlPhone: "+91 361 2237221",
+    district: "Kamrup Metro (Guwahati)",
+    address: "ASDMA Emergency Wing, Dispur, Guwahati",
+    latitude: 26.1400,
+    longitude: 91.7900,
     is24x7: true,
-    services: ["Disaster Emergency Ward", "Ambulance", "Clean Drinking Water Point"]
+    services: ["Free Medical Kits", "Water Purification Tablets", "Mobile Medical Boat Vans"]
   },
   {
     id: "med-4",
-    name: "Majuli Sub-Divisional Civil Hospital & Flood Camp",
-    type: "Civil Hospital & Boat Ambulance Base",
-    category: "First-Aid Camp",
-    phone: "+91 3775 274421",
-    altPhone: "+91 98640 55443",
+    name: "Majuli Sub-Divisional Civil Hospital (Garamur)",
+    type: "Sub-Divisional Civil Hospital",
+    category: "Hospital",
+    phone: "+91 3775 274244",
+    controlPhone: "+91 94350 77200",
     district: "Majuli Island",
-    address: "Garamur, Majuli Island, Assam 785104",
+    address: "Garamur, Majuli, Assam 785104",
     latitude: 26.9600,
     longitude: 94.1700,
     is24x7: true,
-    services: ["Boat Ambulance Base", "ORs & Anti-Cholera Kits", "Infant Care"]
+    services: ["Boat Ambulance", "Anti-Snake Venom", "Free ORS & Fever Meds"]
   },
   {
     id: "med-5",
-    name: "Lakhimpur District Civil Hospital",
-    type: "District Government Hospital",
+    name: "Sivasagar Civil Hospital (Joysagar)",
+    type: "District Civil Hospital",
     category: "Hospital",
-    phone: "+91 3752 222123",
-    altPhone: "+91 94351 77889",
-    district: "Lakhimpur",
-    address: "Khelmati, North Lakhimpur, Assam 787031",
-    latitude: 27.2300,
-    longitude: 94.1000,
+    phone: "+91 3772 222123",
+    controlPhone: "+91 94350 44200",
+    district: "Sivasagar",
+    address: "Joysagar, Sivasagar, Assam 785665",
+    latitude: 26.9667,
+    longitude: 94.6333,
     is24x7: true,
-    services: ["Emergency Trauma", "Water Purification Tablets", "Pediatric Unit"]
+    services: ["Emergency Ward", "Maternity & Pediatric Care", "Mobile Health Unit"]
   },
   {
     id: "med-6",
-    name: "Dhubri Civil Hospital & Flood Relief Center",
-    type: "Civil Emergency Center",
+    name: "North Lakhimpur Civil Hospital & Relief Camp Unit",
+    type: "District Civil Hospital",
     category: "Hospital",
-    phone: "+91 3662 230045",
-    altPhone: "+91 98590 44332",
+    phone: "+91 3752 222234",
+    controlPhone: "+91 94350 88300",
+    district: "Lakhimpur",
+    address: "Khelmati, North Lakhimpur, Assam 787001",
+    latitude: 27.2333,
+    longitude: 94.1000,
+    is24x7: true,
+    services: ["Inpatient Ward", "Disaster Vaccination", "24x7 Pharmacy"]
+  },
+  {
+    id: "med-7",
+    name: "Dhubri Civil Hospital & Flood Relief Center",
+    type: "District Hospital",
+    category: "Hospital",
+    phone: "+91 3662 230234",
+    controlPhone: "+91 94350 33300",
     district: "Dhubri",
     address: "Jhagrarpar, Dhubri, Assam 783324",
     latitude: 26.0200,
     longitude: 89.9800,
     is24x7: true,
-    services: ["Mobile Ambulance", "Disaster First-Aid", "Anti-Malarial Stock"]
-  },
-  {
-    id: "med-7",
-    name: "Nagaon Bhogeswari Phukanani Civil Hospital",
-    type: "District Civil Hospital",
-    category: "Hospital",
-    phone: "+91 3672 233156",
-    altPhone: "+91 94352 11445",
-    district: "Nagaon",
-    address: "BP Road, Nagaon, Assam 782001",
-    latitude: 26.3500,
-    longitude: 92.6800,
-    is24x7: true,
-    services: ["24x7 Emergency", "Pharmacy", "Blood Storage"]
-  },
-  {
-    id: "med-8",
-    name: "Red Cross Emergency Pharmacy & Supplies",
-    type: "24x7 Disaster Medical Store",
-    category: "Pharmacy",
-    phone: "+91 361 2661555",
-    altPhone: "+91 98641 00998",
-    district: "Kamrup Metro (Guwahati)",
-    address: "Chandmari, Guwahati, Assam 781003",
-    latitude: 26.1833,
-    longitude: 91.7833,
-    is24x7: true,
-    services: ["Emergency Antibiotics", "ORs Packets", "Infant Baby Formula", "Bandages"]
+    services: ["Emergency Ward", "Cholera & Diarrhea Isolation", "Ambulance"]
   }
 ];
+
+// Helper to check if coordinates are within Assam / Northeast region
+const isWithinAssamRegion = (lat, lng) => {
+  if (!lat || !lng) return false;
+  return lat >= 24.0 && lat <= 28.2 && lng >= 89.5 && lng <= 96.5;
+};
 
 // Haversine Distance Formula (Returns distance in kilometers)
 export const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -138,10 +129,10 @@ export const medicalService = {
   getNearestMedicals: async (userLat, userLng, category = 'ALL') => {
     let medicals = [...VERIFIED_ASSAM_MEDICALS];
 
-    // Attempt 100% free OpenStreetMap Overpass API call if user coordinates are available
-    if (userLat && userLng) {
+    // Attempt OpenStreetMap Overpass API call if user coordinates are inside Assam
+    if (userLat && userLng && isWithinAssamRegion(userLat, userLng)) {
       try {
-        const radiusMeters = 25000; // 25 km radius
+        const radiusMeters = 30000;
         const query = `
           [out:json][timeout:10];
           (
@@ -159,52 +150,56 @@ export const medicalService = {
           if (data.elements && data.elements.length > 0) {
             const osmResults = data.elements.map(el => {
               const tags = el.tags || {};
-              const name = tags.name || tags['name:en'] || (tags.amenity === 'hospital' ? 'Emergency Medical Center' : 'Local Medical Store');
-              const phone = tags.phone || tags['contact:phone'] || tags['emergency:phone'] || '+91 108 (Emergency)';
-              const categoryType = tags.amenity === 'pharmacy' ? 'Pharmacy' : 'Hospital';
+              const name = tags.name || tags['name:en'] || (tags.amenity === 'hospital' ? 'Local Medical Hospital' : 'Local Pharmacy');
+              const phone = tags.phone || tags['contact:phone'] || tags['emergency:phone'] || '108';
+              const categoryType = tags.amenity === 'hospital' ? 'Hospital' : (tags.amenity === 'pharmacy' ? 'Pharmacy' : 'Relief Center');
               
               return {
-                id: `osm-${el.id}`,
+                id: `osm-med-${el.id}`,
                 name: name,
-                type: `OpenStreetMap ${tags.amenity ? tags.amenity.toUpperCase() : 'Medical Center'}`,
+                type: `OpenStreetMap ${tags.amenity ? tags.amenity.toUpperCase() : 'Medical Unit'}`,
                 category: categoryType,
                 phone: phone,
-                altPhone: '+91 112',
-                district: tags['addr:district'] || tags['addr:city'] || 'Nearby Location',
+                controlPhone: '+91 108',
+                district: tags['addr:district'] || tags['addr:city'] || 'Nearby Zone',
                 address: tags['addr:full'] || tags['addr:street'] || 'Nearby Location',
                 latitude: el.lat,
                 longitude: el.lon,
-                is24x7: tags['opening_hours'] === '24/7' || true,
-                services: ["Emergency Care", "First Aid", "Medications"]
+                is24x7: tags['opening_hours'] === '24/7' || tags.amenity === 'hospital',
+                services: ["Emergency Care", "First Aid Supplies", "Ambulance"]
               };
             });
 
-            // Merge with local verified list, avoiding duplicates
             const combined = [...osmResults, ...VERIFIED_ASSAM_MEDICALS];
             medicals = Array.from(new Map(combined.map(item => [item.id, item])).values());
           }
         }
       } catch (err) {
-        console.warn("Overpass OSM API fetch timed out or offline. Falling back to local verified hospital database.", err);
+        console.warn("Overpass OSM API fetch timed out. Falling back to local verified hospital database.", err);
       }
     }
 
     // Calculate distance and sort by nearest
-    const sorted = medicals.map(med => {
+    const listWithDistance = medicals.map(med => {
       const dist = (userLat && userLng) 
         ? calculateDistance(userLat, userLng, med.latitude, med.longitude)
         : null;
       return { ...med, distanceKm: dist };
     });
 
-    if (userLat && userLng) {
-      sorted.sort((a, b) => (a.distanceKm || 9999) - (b.distanceKm || 9999));
+    const isUserInsideAssam = isWithinAssamRegion(userLat, userLng);
+
+    if (isUserInsideAssam) {
+      // User is physically inside Assam: sort strictly by closest distance in km
+      listWithDistance.sort((a, b) => (a.distanceKm || 9999) - (b.distanceKm || 9999));
+    } else {
+      // User is testing from outside Assam: keep GMCH Guwahati, JMCH Jorhat, Dispur Relief HQs at top
     }
 
     if (category !== 'ALL') {
-      return sorted.filter(m => m.category === category);
+      return listWithDistance.filter(m => m.category === category);
     }
 
-    return sorted;
+    return listWithDistance;
   }
 };

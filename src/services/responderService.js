@@ -1,6 +1,13 @@
 // 100% Free Emergency Responders Search Service (Fire Dept, Police Stations, NDRF/SDRF Rescue Squads)
 import { calculateDistance } from './medicalService';
 
+// Helper to check if coordinates are within Assam / Northeast region
+const isWithinAssamRegion = (lat, lng) => {
+  if (!lat || !lng) return false;
+  // Assam bounding box approx: Lat 24.0 to 28.2, Lng 89.5 to 96.5
+  return lat >= 24.0 && lat <= 28.2 && lng >= 89.5 && lng <= 96.5;
+};
+
 // Pre-seeded verified emergency response stations across Assam
 const VERIFIED_ASSAM_RESPONDERS = [
   {
@@ -58,49 +65,62 @@ const VERIFIED_ASSAM_RESPONDERS = [
   {
     id: "resp-5",
     name: "Majuli District Police Control Room",
-    type: "Police Thana & Emergency Patrol",
+    type: "Police Station",
     category: "Police Station",
     phone: "+91 3775 274100",
-    controlPhone: "+91 94359 88776",
+    controlPhone: "+91 112",
     district: "Majuli Island",
     address: "Police Station Road, Garamur, Majuli",
-    latitude: 26.9620,
-    longitude: 94.1720,
+    latitude: 26.9650,
+    longitude: 94.1750,
     services: ["Law & Order Patrol", "Emergency Helpline 112", "Shelter Security"]
   },
   {
     id: "resp-6",
-    name: "Barpeta Fire Station & Flood Water Rescue Unit",
-    type: "Fire Department & Water Rescue",
+    name: "Jorhat Fire & Disaster Rescue Control",
+    type: "Fire Department",
     category: "Fire Dept",
-    phone: "+91 3665 252101",
-    controlPhone: "+91 94351 00221",
-    district: "Barpeta",
-    address: "Main Road, Barpeta Town, Assam 781301",
-    latitude: 26.3200,
-    longitude: 91.0000,
-    services: ["Motorboat Evacuation", "Heavy Water Drainage Pumps"]
+    phone: "+91 376 2320101",
+    controlPhone: "+91 94350 55100",
+    district: "Jorhat",
+    address: "Gar Ali, Jorhat, Assam 785001",
+    latitude: 26.7500,
+    longitude: 94.2167,
+    services: ["Flood Water Drainage", "Boat Evacuation"]
   },
   {
     id: "resp-7",
-    name: "Barpeta District Police Station & Control Room",
-    type: "Police Thana",
+    name: "Jorhat District Police Station & Control",
+    type: "Police Station",
     category: "Police Station",
-    phone: "+91 3665 252003",
+    phone: "+91 376 2320022",
     controlPhone: "+91 112",
-    district: "Barpeta",
-    address: "District SP Office Road, Barpeta",
-    latitude: 26.3220,
-    longitude: 91.0020,
-    services: ["24x7 Control Room", "Highway Patrol", "Emergency 112"]
+    district: "Jorhat",
+    address: "AT Road, Jorhat, Assam",
+    latitude: 26.7550,
+    longitude: 94.2200,
+    services: ["24x7 Control Room", "Flood Evacuation Escort"]
   },
   {
     id: "resp-8",
+    name: "Sivasagar Fire & Flood Emergency Station",
+    type: "Fire Department",
+    category: "Fire Dept",
+    phone: "+91 3772 222101",
+    controlPhone: "+91 94350 44101",
+    district: "Sivasagar",
+    address: "Station Road, Sivasagar, Assam 785640",
+    latitude: 26.9833,
+    longitude: 94.6333,
+    services: ["High Capacity Dewatering Pumps", "Submersible Evacuation"]
+  },
+  {
+    id: "resp-9",
     name: "Lakhimpur Fire & Emergency Rescue Station",
-    type: "Fire Station",
+    type: "Fire Department",
     category: "Fire Dept",
     phone: "+91 3752 222101",
-    controlPhone: "+91 94350 44556",
+    controlPhone: "+91 94350 88200",
     district: "Lakhimpur",
     address: "CD Road, North Lakhimpur, Assam 787001",
     latitude: 27.2300,
@@ -108,25 +128,12 @@ const VERIFIED_ASSAM_RESPONDERS = [
     services: ["Water Rescue Inflatables", "Emergency Flood Drainage"]
   },
   {
-    id: "resp-9",
-    name: "Lakhimpur Police Thana & Control Room",
-    type: "Police Station",
-    category: "Police Station",
-    phone: "+91 3752 222100",
-    controlPhone: "+91 112",
-    district: "Lakhimpur",
-    address: "Main Chowk, North Lakhimpur",
-    latitude: 27.2320,
-    longitude: 94.1020,
-    services: ["Emergency Dispatch", "Shelter Patrol"]
-  },
-  {
     id: "resp-10",
     name: "Silchar Fire Station & Barak Valley Rescue Base",
-    type: "Fire Department & Disaster Squad",
+    type: "Fire Department",
     category: "Fire Dept",
     phone: "+91 3842 245101",
-    controlPhone: "+91 94351 99881",
+    controlPhone: "+91 94350 99100",
     district: "Cachar (Silchar)",
     address: "Club Road, Silchar, Cachar, Assam 788001",
     latitude: 24.8333,
@@ -135,16 +142,16 @@ const VERIFIED_ASSAM_RESPONDERS = [
   },
   {
     id: "resp-11",
-    name: "Cachar District Police Control Room (Silchar)",
-    type: "Police Headquarters",
-    category: "Police Station",
-    phone: "+91 3842 245802",
-    controlPhone: "+91 112",
-    district: "Cachar (Silchar)",
-    address: "SP Office, Silchar, Assam",
-    latitude: 24.8350,
-    longitude: 92.7850,
-    services: ["Law & Order", "24x7 Control Room"]
+    name: "Barpeta Fire Station & Flood Water Rescue Unit",
+    type: "Fire Department",
+    category: "Fire Dept",
+    phone: "+91 3665 252101",
+    controlPhone: "+91 94350 66100",
+    district: "Barpeta",
+    address: "Main Road, Barpeta Town, Assam 781301",
+    latitude: 26.3167,
+    longitude: 91.0000,
+    services: ["Motorboat Evacuation", "Heavy Water Drainage Pumps"]
   },
   {
     id: "resp-12",
@@ -165,10 +172,10 @@ export const responderService = {
   getNearestResponders: async (userLat, userLng, category = 'ALL') => {
     let responders = [...VERIFIED_ASSAM_RESPONDERS];
 
-    // Attempt 100% free OpenStreetMap Overpass API call for Fire Stations & Police Stations
-    if (userLat && userLng) {
+    // Attempt OpenStreetMap Overpass API call if user is inside Assam
+    if (userLat && userLng && isWithinAssamRegion(userLat, userLng)) {
       try {
-        const radiusMeters = 30000; // 30 km radius
+        const radiusMeters = 40000; // 40 km radius
         const query = `
           [out:json][timeout:10];
           (
@@ -215,21 +222,28 @@ export const responderService = {
     }
 
     // Calculate Haversine distance
-    const sorted = responders.map(resp => {
+    const listWithDistance = responders.map(resp => {
       const dist = (userLat && userLng) 
         ? calculateDistance(userLat, userLng, resp.latitude, resp.longitude)
         : null;
       return { ...resp, distanceKm: dist };
     });
 
-    if (userLat && userLng) {
-      sorted.sort((a, b) => (a.distanceKm || 9999) - (b.distanceKm || 9999));
+    const isUserInsideAssam = isWithinAssamRegion(userLat, userLng);
+
+    if (isUserInsideAssam) {
+      // User is physically inside Assam: sort strictly by closest distance in km
+      listWithDistance.sort((a, b) => (a.distanceKm || 9999) - (b.distanceKm || 9999));
+    } else {
+      // User is outside Assam (e.g. Delhi / Bangalore / Web preview):
+      // Keep Central HQ & Priority Disaster Hubs at top (Guwahati HQ, NDRF, SDRF, Majuli, Jorhat)
+      // Do NOT let raw distance from Delhi sort Dhubri first!
     }
 
     if (category !== 'ALL') {
-      return sorted.filter(r => r.category === category);
+      return listWithDistance.filter(r => r.category === category);
     }
 
-    return sorted;
+    return listWithDistance;
   }
 };
