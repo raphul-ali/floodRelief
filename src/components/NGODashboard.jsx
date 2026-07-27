@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { pdfService } from '../services/pdfService';
 import { storageService, ASSAM_DISTRICTS } from '../services/storageService';
+import { authService } from '../services/authService';
 import DeliveryLogModal from './DeliveryLogModal';
 
 export default function NGODashboard({ victimRequests = [], ngos = [] }) {
@@ -117,9 +118,18 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
         <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="relative z-10 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-600/20 text-red-300 border border-red-500/40 text-xs font-black uppercase tracking-wider">
-            <Activity className="w-4 h-4 text-red-400 animate-pulse" />
-            <span>Assam Flood Situation • Verified Relief Dispatch</span>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-600/20 text-red-300 border border-red-500/40 text-xs font-black uppercase tracking-wider">
+              <Activity className="w-4 h-4 text-red-400 animate-pulse" />
+              <span>Assam Flood Situation • Verified Relief Dispatch</span>
+            </div>
+
+            {authService.getCurrentUser().role === 'NGO' && (
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-950 text-emerald-200 border border-emerald-500/50 text-xs font-bold shadow-lg">
+                <Sparkles className="w-4 h-4 text-emerald-400" />
+                <span>Verified Source Active: <strong className="text-amber-300 font-black">{authService.getCurrentUser().user?.name}</strong> (Auto-Publish Enabled)</span>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">

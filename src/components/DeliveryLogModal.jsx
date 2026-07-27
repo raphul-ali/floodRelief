@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
-import { Package, X, CheckCircle2, AlertTriangle, Send, Phone, MessageSquare, ShieldCheck } from 'lucide-react';
+import { Package, X, CheckCircle2, AlertTriangle, Send, Phone, MessageSquare, ShieldCheck, Sparkles } from 'lucide-react';
 import { storageService } from '../services/storageService';
+import { authService } from '../services/authService';
 
 export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmitted }) {
-  const [deliveredBy, setDeliveredBy] = useState(ngos[0]?.name || '');
-  const [volunteerPhone, setVolunteerPhone] = useState('');
+  const currentUser = authService.getCurrentUser();
+  const isNgoAuthenticated = currentUser.role === 'NGO' && currentUser.user;
+
+  const [deliveredBy, setDeliveredBy] = useState(
+    isNgoAuthenticated ? currentUser.user.name : (ngos[0]?.name || '')
+  );
+  const [volunteerPhone, setVolunteerPhone] = useState(
+    isNgoAuthenticated ? (currentUser.user.phone || '') : ''
+  );
   const [itemsDelivered, setItemsDelivered] = useState('');
   const [deliveryNotes, setDeliveryNotes] = useState('');
   const [statusUpdate, setStatusUpdate] = useState('In Progress');
@@ -31,6 +39,10 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
 
     try {
       setIsSubmitting(true);
+
+      // If authenticated NGO, pass isAutoVerified = true for trusted auto-verification!
+      const isAutoVerified = isNgoAuthenticated;
+
       storageService.submitDeliveryLog({
         requestId: request.id,
         recipientName: request.name,
@@ -39,10 +51,16 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
         volunteerPhone,
         itemsDelivered,
         deliveryNotes,
-        statusUpdate
-      });
+        statusUpdate,
+        verifiedBy: isAutoVerified ? `Verified NGO: ${currentUser.user.name}` : null
+      }, isAutoVerified);
 
-      setSuccessMsg('✅ Relief delivery log submitted! The Admin Control Room will connect with you via WhatsApp for photo verification before publishing to the live timeline.');
+      if (isAutoVerified) {
+        setSuccessMsg('⚡ Verified NGO Dispatch Logged! Your delivery has been auto-verified and published directly to the live request timeline.');
+      } else {
+        setSuccessMsg('✅ Relief delivery log submitted! The Admin Control Room will connect with you via WhatsApp for photo verification before publishing to the live timeline.');
+      }
+
       setTimeout(() => {
         if (onSubmitted) onSubmitted();
         onClose();
@@ -81,15 +99,27 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
         </div>
 
         {/* Info Box */}
-        <div className="bg-slate-950/70 border border-blue-500/30 rounded-xl p-3.5 text-xs text-slate-300 flex items-start gap-3">
-          <ShieldCheck className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
-          <div>
-            <p className="font-bold text-blue-200">Manual Admin Verification Workflow</p>
-            <p className="text-slate-400 mt-0.5">
-              Once submitted, our Admin Control Room will connect with your phone via WhatsApp to receive geotagged delivery images before approving the timeline log.
-            </p>
+        {isNgoAuthenticated ? (
+          <div className="bg-emerald-950/80 border border-emerald-500/40 rounded-xl p-3.5 text-xs text-emerald-200 flex items-start gap-3">
+            <Sparkles className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-black text-emerald-300">Verified NGO Trusted Source Active</p>
+              <p className="text-emerald-100 mt-0.5">
+                Logged in as <strong className="underline">{currentUser.user.name}</strong>. Your relief delivery will be <strong className="text-amber-300 font-black">auto-approved & published directly</strong> to the live timeline!
+              </p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-950/70 border border-blue-500/30 rounded-xl p-3.5 text-xs text-slate-300 flex items-start gap-3">
+            <ShieldCheck className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold text-blue-200">Manual Admin Verification Workflow</p>
+              <p className="text-slate-400 mt-0.5">
+                Guest submissions are reviewed by the Admin Control Room via WhatsApp photo check before publishing. <strong className="text-amber-300">Log in as a verified NGO for instant auto-publishing!</strong>
+              </p>
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="p-3 bg-red-950/80 border border-red-500/40 rounded-xl text-red-200 text-xs font-semibold flex items-center gap-2">
@@ -126,8 +156,8 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
             {/* Volunteer Phone */}
             <div>
               <label className="block text-xs font-bold text-slate-300 mb-1 flex items-center justify-between">
-                <span>Volunteer WhatsApp / Phone Number *</span>
-                <span className="text-[10px] text-amber-400 font-semibold">(For WhatsApp Geo-tag photo confirmation)</span>
+                <span>Volunteer Contact / WhatsApp Number *</span>
+                <span className="text-[10px] text-amber-400 font-semibold">(For dispatch log audit)</span>
               </label>
               <div className="relative">
                 <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
@@ -201,7 +231,7 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
                 className="px-5 py-2.5 text-xs font-black text-slate-950 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 rounded-xl shadow-lg flex items-center gap-2 active:scale-95 transition-all"
               >
                 <Send className="w-4 h-4" />
-                <span>SUBMIT FOR ADMIN VERIFICATION</span>
+                <span>{isNgoAuthenticated ? '⚡ PUBLISH INSTANT RELIEF LOG' : 'SUBMIT FOR ADMIN VERIFICATION'}</span>
               </button>
             </div>
 

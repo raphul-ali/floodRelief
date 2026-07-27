@@ -456,7 +456,7 @@ export const storageService = {
     return logs.filter(log => log.verified !== true);
   },
 
-  submitDeliveryLog: (logData) => {
+  submitDeliveryLog: (logData, isAutoVerified = false) => {
     const rateCheck = securityService.checkRateLimit();
     if (!rateCheck.allowed) {
       throw new Error(rateCheck.message);
@@ -473,16 +473,28 @@ export const storageService = {
       statusUpdate: securityService.sanitizeText(logData.statusUpdate || "In Progress")
     };
 
+    const isVerified = isAutoVerified || logData.verified === true;
     const logs = storageService.getDeliveryLogs(true);
     const newLog = {
       logId: "LOG-" + Math.floor(1000 + Math.random() * 9000),
       createdAt: new Date().toISOString(),
-      verified: false, // Held for Admin review
+      verified: isVerified,
+      verifiedBy: isVerified ? (logData.verifiedBy || `Verified NGO: ${sanitized.deliveredBy}`) : null,
       ...sanitized
     };
 
     const updated = [newLog, ...logs];
     localStorage.setItem(STORAGE_KEYS.DELIVERY_LOGS, JSON.stringify(updated));
+
+    // If auto-verified NGO source, immediately update the request status & assigned NGO
+    if (isVerified && sanitized.requestId) {
+      storageService.updateRequestStatus(
+        sanitized.requestId, 
+        sanitized.statusUpdate, 
+        sanitized.deliveredBy
+      );
+    }
+
     securityService.recordSubmission();
     notifyDataChanged();
     return newLog;

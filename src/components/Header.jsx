@@ -1,10 +1,23 @@
 import React from 'react';
 import { 
   ShieldAlert, MapPin, HeartHandshake, FileText, PhoneCall, Server, 
-  PlusCircle, Sparkles, Stethoscope, Siren, UserCheck, Zap, Building2, ShieldCheck, Package, Info 
+  PlusCircle, Sparkles, Stethoscope, Siren, UserCheck, Zap, Building2, ShieldCheck, Package, Info, Lock, LogOut, User
 } from 'lucide-react';
 
-export default function Header({ activeTab, setActiveTab, openRescueModal, openSupplyModal, urgentCount = 0, pendingCount = 0 }) {
+export default function Header({ 
+  activeTab, 
+  setActiveTab, 
+  openRescueModal, 
+  openSupplyModal, 
+  urgentCount = 0, 
+  pendingCount = 0,
+  currentAuth = { role: 'GUEST', user: null },
+  openLoginModal,
+  onLogout
+}) {
+  const isAdmin = currentAuth.role === 'ADMIN';
+  const isNgo = currentAuth.role === 'NGO' && currentAuth.user;
+
   return (
     <header className="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-xl border-b border-red-900/40 shadow-2xl">
       
@@ -62,8 +75,50 @@ export default function Header({ activeTab, setActiveTab, openRescueModal, openS
             </div>
           </div>
 
-          {/* Primary Top Action Buttons: Request Rescue vs Relief Form */}
+          {/* Primary Action Buttons + Login Session Pill */}
           <div className="flex items-center gap-2">
+            
+            {/* Auth Session Button */}
+            {currentAuth.role === 'GUEST' ? (
+              <button
+                onClick={openLoginModal}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/40 shadow-md active:scale-95 transition-all"
+              >
+                <Lock className="w-3.5 h-3.5 text-amber-400" />
+                <span>🔐 Login / NGO Portal</span>
+              </button>
+            ) : isNgo ? (
+              <div className="flex items-center gap-2 bg-emerald-950/80 border border-emerald-500/40 px-3 py-1.5 rounded-xl text-xs">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                  <span className="font-black text-emerald-300 truncate max-w-[140px]" title={currentAuth.user.name}>
+                    {currentAuth.user.name}
+                  </span>
+                </div>
+                <button
+                  onClick={onLogout}
+                  className="text-[11px] font-bold text-slate-400 hover:text-red-400 ml-1 p-1"
+                  title="Log out"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : isAdmin ? (
+              <div className="flex items-center gap-2 bg-red-950/80 border border-red-500/40 px-3 py-1.5 rounded-xl text-xs">
+                <div className="flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-red-400" />
+                  <span className="font-black text-red-200">Admin Control Active</span>
+                </div>
+                <button
+                  onClick={onLogout}
+                  className="text-[11px] font-bold text-slate-400 hover:text-red-400 ml-1 p-1"
+                  title="Lock Session"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : null}
+
             <button
               onClick={openRescueModal}
               className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 text-white shadow-xl shadow-red-900/60 active:scale-95 transition-all border border-red-400/40 animate-urgent-pulse"
@@ -74,11 +129,12 @@ export default function Header({ activeTab, setActiveTab, openRescueModal, openS
 
             <button
               onClick={openSupplyModal}
-              className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 shadow-md active:scale-95 transition-all border border-amber-300/40"
+              className="hidden sm:flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 shadow-md active:scale-95 transition-all border border-amber-300/40"
             >
               <Package className="w-4 h-4 fill-slate-950 text-amber-500" />
               <span>📦 RELIEF FORM</span>
             </button>
+
           </div>
 
         </div>
@@ -86,23 +142,25 @@ export default function Header({ activeTab, setActiveTab, openRescueModal, openS
         {/* Navigation Bar */}
         <nav className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto py-2 border-t border-slate-800/80 no-scrollbar text-xs font-black">
           
-          {/* Admin Control Center Tab */}
-          <button
-            onClick={() => setActiveTab('admin')}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all whitespace-nowrap relative ${
-              activeTab === 'admin'
-                ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-950/60 border border-amber-300'
-                : 'bg-slate-900 text-amber-300 hover:bg-slate-800 border border-amber-500/30'
-            }`}
-          >
-            <ShieldCheck className="w-4 h-4 text-amber-400" />
-            <span>🛡️ ADMIN CONTROL</span>
-            {pendingCount > 0 && (
-              <span className="px-1.5 py-0.2 text-[10px] font-black bg-red-600 text-white rounded-full animate-pulse ml-1">
-                {pendingCount}
-              </span>
-            )}
-          </button>
+          {/* Admin Control Center Tab (Visible ONLY when logged in as Admin) */}
+          {isAdmin && (
+            <button
+              onClick={() => setActiveTab('admin')}
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all whitespace-nowrap relative ${
+                activeTab === 'admin'
+                  ? 'bg-red-600 text-white font-black shadow-lg shadow-red-950/60 border border-red-400'
+                  : 'bg-red-950/60 text-red-300 hover:bg-red-900/60 border border-red-800/50'
+              }`}
+            >
+              <ShieldCheck className="w-4 h-4 text-red-400" />
+              <span>🛡️ ADMIN CONTROL ROOM</span>
+              {pendingCount > 0 && (
+                <span className="px-1.5 py-0.2 text-[10px] font-black bg-white text-red-600 rounded-full animate-pulse ml-1">
+                  {pendingCount}
+                </span>
+              )}
+            </button>
+          )}
 
           {/* NGO Directory */}
           <button
