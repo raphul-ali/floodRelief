@@ -20,6 +20,8 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [loginModalMode, setLoginModalMode] = useState('NGO_LOGIN'); // 'NGO_LOGIN' | 'VOLUNTEER_LOGIN' | 'REGISTER'
+  const [loginModalRegRole, setLoginModalRegRole] = useState('NGO'); // 'NGO' | 'VOLUNTEER'
   const [modalUrgentMode, setModalUrgentMode] = useState(true);
   
   const [victimRequests, setVictimRequests] = useState([]);
@@ -276,6 +278,11 @@ export default function App() {
           <NGODirectory 
             ngos={ngos} 
             volunteers={volunteers}
+            openLoginModal={(mode = 'REGISTER', regRole = 'NGO') => {
+              setLoginModalMode(mode);
+              setLoginModalRegRole(regRole);
+              setIsLoginModalOpen(true);
+            }}
           />
         )}
 
@@ -287,6 +294,8 @@ export default function App() {
       {/* NGO & Volunteer Login Modal */}
       {isLoginModalOpen && (
         <LoginModal
+          initialMode={loginModalMode}
+          initialRegRole={loginModalRegRole}
           onClose={() => setIsLoginModalOpen(false)}
           onLoggedIn={() => {
             loadData();

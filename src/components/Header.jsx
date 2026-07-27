@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   ShieldAlert, MapPin, HeartHandshake, FileText, PhoneCall, 
-  PlusCircle, Sparkles, Stethoscope, Siren, UserCheck, Zap, Building2, ShieldCheck, Package, Info, Lock, LogOut, User
+  PlusCircle, Sparkles, Stethoscope, Siren, UserCheck, Zap, Building2, ShieldCheck, Package, Info, Lock, LogOut, User, Home
 } from 'lucide-react';
 
 export default function Header({ 
@@ -130,6 +130,21 @@ export default function Header({
 
         {/* Navigation Bar */}
         <nav className="flex flex-col sm:flex-row items-center gap-1.5 py-1.5 border-t border-slate-800/80 text-[11px] sm:text-xs font-black w-full max-w-full">
+          
+          {/* Home Button */}
+          <button
+            onClick={() => setActiveTab('dashboard')}
+            title="Home"
+            className={`shrink-0 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl transition-all min-h-[38px] border ${
+              activeTab === 'dashboard'
+                ? 'bg-white text-slate-950 border-white shadow-md font-black'
+                : 'text-slate-300 bg-slate-900 hover:bg-slate-800 border-slate-700'
+            }`}
+          >
+            <Home className="w-4 h-4 shrink-0" />
+            <span className="hidden sm:inline">HOME</span>
+          </button>
+
           <div className="flex items-center gap-1.5 w-full sm:w-auto sm:flex-1">
             <button
               onClick={() => setActiveTab('dashboard')}
@@ -140,7 +155,7 @@ export default function Header({
               }`}
             >
               <Package className="w-3.5 h-3.5 shrink-0" />
-              <span className="truncate">📦 RELIEF QUEUE</span>
+              <span className="truncate">RELIEF QUEUE</span>
             </button>
 
             <button
@@ -152,7 +167,7 @@ export default function Header({
               }`}
             >
               <HeartHandshake className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span className="truncate">🤝 NGO & VOLUNTEERS</span>
+              <span className="truncate">NGO & VOLUNTEERS</span>
             </button>
           </div>
 
@@ -164,8 +179,8 @@ export default function Header({
                 : 'text-red-200 bg-red-950/40 hover:bg-red-900/60 border border-red-900/40 font-bold'
             }`}
           >
-            <Siren className="w-4 h-4 shrink-0 text-white animate-pulse" />
-            <span className="uppercase tracking-tight">🚨 EMERGENCY SERVICES</span>
+            <Siren className="w-4 h-4 shrink-0 animate-pulse" />
+            <span className="uppercase tracking-tight">EMERGENCY SERVICES</span>
           </button>
         </nav>
 

@@ -3,8 +3,8 @@ import { X, Lock, Key, ShieldCheck, HeartHandshake, Mail, UserCheck, AlertTriang
 import { authService } from '../services/authService';
 import { securityService } from '../services/securityService';
 
-export default function LoginModal({ onClose, onLoggedIn }) {
-  const [activeMode, setActiveMode] = useState('NGO_LOGIN'); // 'NGO_LOGIN' | 'VOLUNTEER_LOGIN' | 'REGISTER'
+export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOGIN', initialRegRole = 'NGO' }) {
+  const [activeMode, setActiveMode] = useState(initialMode); // 'NGO_LOGIN' | 'VOLUNTEER_LOGIN' | 'REGISTER'
   
   // Login state
   const [email, setEmail] = useState('');
@@ -12,7 +12,7 @@ export default function LoginModal({ onClose, onLoggedIn }) {
   const [loginError, setLoginError] = useState('');
 
   // Registration state
-  const [regRole, setRegRole] = useState('NGO'); // 'NGO' | 'VOLUNTEER'
+  const [regRole, setRegRole] = useState(initialRegRole); // 'NGO' | 'VOLUNTEER'
   const [regName, setRegName] = useState('');
   const [regPhone, setRegPhone] = useState('');
   const [regEmail, setRegEmail] = useState('');
@@ -31,12 +31,7 @@ export default function LoginModal({ onClose, onLoggedIn }) {
   const [emailTouched, setEmailTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
 
-  // OTP Verification state
-  const [otpStep, setOtpStep] = useState(false);
-  const [generatedOtp, setGeneratedOtp] = useState('');
-  const [otpInput, setOtpInput] = useState('');
-  
-  const [regSuccess, setRegSuccess] = useState('');
+  const [regSuccess, setRegSuccess] = useState(false);
   const [regError, setRegError] = useState('');
 
   // Debounced Phone Validation (400ms pause)
@@ -103,10 +98,11 @@ export default function LoginModal({ onClose, onLoggedIn }) {
     }
   };
 
-  // Step 1 of Registration: Validate fields & Send 6-Digit Email OTP
-  const handleRequestOtp = (e) => {
+  // Registration Handler — Direct registration with pending admin approval state
+  const handleDirectRegister = (e) => {
     e.preventDefault();
     setRegError('');
+    setRegSuccess(false);
 
     setPhoneTouched(true);
     setEmailTouched(true);
@@ -137,46 +133,7 @@ export default function LoginModal({ onClose, onLoggedIn }) {
 
     try {
       const fullPhone = `+91 ${regPhone}`;
-      const res = authService.generateEmailOtp(regEmail);
-      setGeneratedOtp(res.code);
-      setOtpStep(true);
-    } catch (err) {
-      setRegError(err.message || 'Failed to generate OTP.');
-    }
-  };
 
-  const handleLogoChange = (e) => {
-    const file = e.target.files?.[0];
-    setLogoError('');
-    if (!file) return;
-
-    const result = securityService.validateLogoFile(file);
-    if (!result.valid) {
-      setLogoError(result.error);
-      setRegLogoUrl('');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setRegLogoUrl(reader.result);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // Step 2 of Registration: Verify OTP and Register Account
-  const handleVerifyOtpAndRegister = (e) => {
-    e.preventDefault();
-    setRegError('');
-    setRegSuccess('');
-
-    try {
-      // Verify OTP code
-      authService.verifyEmailOtp(regEmail, otpInput);
-
-      const fullPhone = `+91 ${regPhone}`;
-
-      // Register based on role
       if (regRole === 'NGO') {
         authService.registerNgo({
           name: regName,
@@ -198,15 +155,9 @@ export default function LoginModal({ onClose, onLoggedIn }) {
         }, regPassword);
       }
 
-      setRegSuccess(`✅ Email Verified! Account registered successfully. You can now log in.`);
-      setTimeout(() => {
-        setActiveMode(regRole === 'NGO' ? 'NGO_LOGIN' : 'VOLUNTEER_LOGIN');
-        setRegSuccess('');
-        setOtpStep(false);
-      }, 3000);
-
+      setRegSuccess(true);
     } catch (err) {
-      setRegError(err.message || 'OTP Verification failed.');
+      setRegError(err.message || 'Registration failed.');
     }
   };
 
@@ -214,13 +165,22 @@ export default function LoginModal({ onClose, onLoggedIn }) {
     <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
       <div className="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-md w-full p-4 sm:p-6 shadow-2xl space-y-4 text-slate-100 relative max-h-[92vh] flex flex-col justify-between my-auto">
         
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-3.5 right-3.5 p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-        >
-          <X className="w-5 h-5" />
-        </button>
+        {/* Modal Header Row — Title + Close Button */}
+        <div className="flex items-center justify-between gap-2 shrink-0">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-xl bg-gradient-to-br from-red-600 to-amber-500 border border-red-400/40">
+              <ShieldCheck className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-sm font-black text-white tracking-tight uppercase">Partner Portal Login</span>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-xl transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center border border-slate-700 bg-slate-800 shrink-0"
+            aria-label="Close"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
 
         {/* Mode Switcher Tabs */}
         <div className="flex items-center gap-1 p-1 bg-slate-950 rounded-2xl border border-slate-800 text-xs font-black shrink-0">
@@ -430,15 +390,61 @@ export default function LoginModal({ onClose, onLoggedIn }) {
               </div>
             )}
 
-            {regSuccess && (
-              <div className="p-4 bg-emerald-950/90 border border-emerald-500/40 rounded-xl text-emerald-200 text-xs font-bold flex items-center gap-2 animate-pulse">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                <span>{regSuccess}</span>
-              </div>
-            )}
+            {/* AWAITING ADMIN APPROVAL SUCCESS STATE */}
+            {regSuccess ? (
+              <div className="bg-slate-950 border border-amber-500/50 rounded-2xl p-5 space-y-4 text-slate-100 shadow-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black uppercase tracking-wider mb-1">
+                      ⏳ Status: Pending Verification
+                    </div>
+                    <h4 className="text-base font-black text-white leading-tight">
+                      Awaiting Admin Approval
+                    </h4>
+                  </div>
+                </div>
 
-            {!regSuccess && !otpStep && (
-              <form onSubmit={handleRequestOtp} className="space-y-3">
+                <div className="space-y-3 text-xs leading-relaxed border-t border-b border-slate-800 py-3">
+                  <p className="font-semibold text-slate-200">
+                    Your <span className="text-amber-400 font-bold">{regRole === 'NGO' ? 'NGO' : 'Volunteer'}</span> registration for <strong className="text-white">{regName}</strong> has been submitted successfully!
+                  </p>
+                  
+                  <div className="p-3 bg-amber-950/40 border border-amber-500/30 rounded-xl space-y-1.5 text-amber-200">
+                    <div className="flex items-center gap-2 font-bold text-amber-300">
+                      <Phone className="w-4 h-4 text-amber-400 animate-pulse shrink-0" />
+                      <span>Verification Phone Call Notice</span>
+                    </div>
+                    <p className="text-[11px] text-slate-300 leading-normal">
+                      You will receive a call from our verification team shortly on <strong className="text-amber-300 font-mono">+91 {regPhone}</strong> to verify your organization / volunteer details before your profile is activated.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRegSuccess(false);
+                      setActiveMode(regRole === 'NGO' ? 'NGO_LOGIN' : 'VOLUNTEER_LOGIN');
+                    }}
+                    className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs transition-colors"
+                  >
+                    Go to Login Screen
+                  </button>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="flex-1 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition-colors shadow-md"
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleDirectRegister} className="space-y-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-300 mb-1">
                     {regRole === 'NGO' ? 'NGO / Organization Name *' : 'Full Name *'}
@@ -475,7 +481,20 @@ export default function LoginModal({ onClose, onLoggedIn }) {
                       <input
                         type="file"
                         accept="image/jpeg,image/jpg,image/png"
-                        onChange={handleLogoChange}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          setLogoError('');
+                          if (!file) return;
+                          const result = securityService.validateLogoFile(file);
+                          if (!result.valid) {
+                            setLogoError(result.error);
+                            setRegLogoUrl('');
+                            return;
+                          }
+                          const reader = new FileReader();
+                          reader.onloadend = () => setRegLogoUrl(reader.result);
+                          reader.readAsDataURL(file);
+                        }}
                         className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-slate-300 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400 cursor-pointer min-h-[44px]"
                       />
                     </div>
@@ -605,62 +624,11 @@ export default function LoginModal({ onClose, onLoggedIn }) {
 
                 <button
                   type="submit"
-                  className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black rounded-xl text-xs sm:text-sm shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 min-h-[46px]"
+                  className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs sm:text-sm shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 min-h-[46px]"
                 >
                   <Send className="w-4 h-4" />
-                  <span>GENERATE & SEND 6-DIGIT EMAIL OTP</span>
+                  <span>SUBMIT REGISTRATION FOR APPROVAL</span>
                 </button>
-              </form>
-            )}
-
-            {/* STEP 2: ENTER 6-DIGIT EMAIL OTP CODE */}
-            {otpStep && !regSuccess && (
-              <form onSubmit={handleVerifyOtpAndRegister} className="space-y-4 pt-1">
-                <div className="p-3 bg-emerald-950/80 border border-emerald-500/50 rounded-2xl space-y-1 text-xs text-emerald-200">
-                  <div className="flex items-center gap-2 font-bold text-emerald-300">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span>6-Digit Email OTP Dispatched!</span>
-                  </div>
-                  <p className="text-slate-300">
-                    Enter the 6-digit verification code sent to <strong className="text-white">{regEmail}</strong>:
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
-                    Enter 6-Digit Verification OTP Code *
-                  </label>
-                  <div className="relative">
-                    <Hash className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
-                    <input
-                      type="text"
-                      maxLength={6}
-                      value={otpInput}
-                      onChange={(e) => setOtpInput(e.target.value)}
-                      placeholder="e.g. 582910"
-                      className="w-full bg-slate-950 border-2 border-emerald-500/60 rounded-xl pl-9 pr-3.5 py-3 text-base font-mono font-black text-white tracking-widest text-center focus:outline-none focus:border-emerald-400 min-h-[44px]"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setOtpStep(false)}
-                    className="flex-1 py-2.5 bg-slate-800 text-slate-300 font-bold rounded-xl text-xs min-h-[44px]"
-                  >
-                    Edit Info
-                  </button>
-
-                  <button
-                    type="submit"
-                    className="flex-2 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black rounded-xl text-xs shadow-lg flex items-center justify-center gap-1.5 min-h-[44px]"
-                  >
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>VERIFY & CREATE ACCOUNT</span>
-                  </button>
-                </div>
               </form>
             )}
 

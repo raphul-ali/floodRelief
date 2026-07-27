@@ -5,71 +5,9 @@ import {
 } from 'lucide-react';
 import { storageService, ASSAM_DISTRICTS, VOLUNTEER_ROLES } from '../services/storageService';
 
-export default function NGODirectory({ ngos = [], volunteers = [] }) {
+export default function NGODirectory({ ngos = [], volunteers = [], openLoginModal }) {
   const [activeCategory, setActiveCategory] = useState('ALL'); // 'ALL' | 'NGOS' | 'VOLUNTEERS' | 'BOATS_CARS'
-  const [showAddNgoModal, setShowAddNgoModal] = useState(false);
-  const [showAddVolModal, setShowAddVolModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-
-  // Form State for NGO
-  const [newNgo, setNewNgo] = useState({
-    name: '',
-    contactPerson: '',
-    phone: '',
-    whatsapp: '',
-    email: '',
-    operatingZones: 'All Zones',
-    services: 'Motorized Rescue Boats, Food Packets, Medical Aid',
-    address: ''
-  });
-
-  // Form State for Volunteer
-  const [newVol, setNewVol] = useState({
-    name: '',
-    roleType: '🚤 Free Motorboat / Rescue Boat Service',
-    phone: '',
-    whatsapp: '',
-    district: 'Jorhat',
-    vehicleType: 'Boat',
-    offerings: ''
-  });
-
-  const handleAddNgo = (e) => {
-    e.preventDefault();
-    if (!newNgo.name || !newNgo.phone) {
-      alert("Please provide NGO Name and Contact Phone Number.");
-      return;
-    }
-
-    const zonesArray = newNgo.operatingZones.split(',').map(z => z.trim());
-    const servicesArray = newNgo.services.split(',').map(s => s.trim());
-
-    storageService.addNGO({
-      ...newNgo,
-      operatingZones: zonesArray,
-      services: servicesArray,
-      whatsapp: newNgo.whatsapp || newNgo.phone.replace(/[^0-9]/g, '')
-    });
-
-    setShowAddNgoModal(false);
-    alert("NGO account submitted! It will appear in the directory upon verification.");
-  };
-
-  const handleAddVolunteer = (e) => {
-    e.preventDefault();
-    if (!newVol.name || !newVol.phone) {
-      alert("Please enter your Name and Phone Number.");
-      return;
-    }
-
-    storageService.addVolunteer({
-      ...newVol,
-      whatsapp: newVol.whatsapp || newVol.phone.replace(/[^0-9]/g, '')
-    });
-
-    setShowAddVolModal(false);
-    alert("Volunteer profile & free transport service submitted! Thank you for supporting flood relief.");
-  };
 
   // Filtering
   const cleanQuery = searchQuery.toLowerCase().trim();
@@ -149,7 +87,7 @@ export default function NGODirectory({ ngos = [], volunteers = [] }) {
 
           <div className="flex flex-wrap items-center gap-2 shrink-0">
             <button
-              onClick={() => setShowAddNgoModal(true)}
+              onClick={() => openLoginModal?.('REGISTER', 'NGO')}
               className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-black bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-lg active:scale-95 transition-all"
             >
               <Building2 className="w-4 h-4" />
@@ -157,7 +95,7 @@ export default function NGODirectory({ ngos = [], volunteers = [] }) {
             </button>
 
             <button
-              onClick={() => setShowAddVolModal(true)}
+              onClick={() => openLoginModal?.('REGISTER', 'VOLUNTEER')}
               className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg active:scale-95 transition-all"
             >
               <Anchor className="w-4 h-4 text-cyan-300" />
@@ -351,175 +289,6 @@ export default function NGODirectory({ ngos = [], volunteers = [] }) {
         ))}
 
       </div>
-
-      {/* MODAL: REGISTER NEW NGO */}
-      {showAddNgoModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 relative text-slate-100">
-            <button onClick={() => setShowAddNgoModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white">
-              <X className="w-5 h-5" />
-            </button>
-            <h3 className="text-lg font-black text-white flex items-center gap-2">
-              <Building2 className="w-5 h-5 text-amber-400" />
-              <span>Register New NGO / Relief Team</span>
-            </h3>
-
-            <form onSubmit={handleAddNgo} className="space-y-3">
-              <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">NGO / Organization Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={newNgo.name}
-                  onChange={(e) => setNewNgo({...newNgo, name: e.target.value})}
-                  placeholder="e.g. Brahmaputra Relief Alliance"
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Contact Person Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={newNgo.contactPerson}
-                  onChange={(e) => setNewNgo({...newNgo, contactPerson: e.target.value})}
-                  placeholder="e.g. Dr. Hitesh Kalita"
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Phone Number *</label>
-                  <input
-                    type="tel"
-                    required
-                    value={newNgo.phone}
-                    onChange={(e) => setNewNgo({...newNgo, phone: e.target.value})}
-                    placeholder="+91 98640 00000"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Email Address</label>
-                  <input
-                    type="email"
-                    value={newNgo.email}
-                    onChange={(e) => setNewNgo({...newNgo, email: e.target.value})}
-                    placeholder="ngo@domain.org"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Operating Districts (comma separated)</label>
-                <input
-                  type="text"
-                  value={newNgo.operatingZones}
-                  onChange={(e) => setNewNgo({...newNgo, operatingZones: e.target.value})}
-                  placeholder="Jorhat, Majuli, Lakhimpur"
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-sm shadow-lg"
-              >
-                SUBMIT NGO REGISTRATION
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: OFFER FREE BOAT / CAR / VOLUNTEER SERVICE */}
-      {showAddVolModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 relative text-slate-100">
-            <button onClick={() => setShowAddVolModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white">
-              <X className="w-5 h-5" />
-            </button>
-            <h3 className="text-lg font-black text-white flex items-center gap-2">
-              <Anchor className="w-5 h-5 text-blue-400" />
-              <span>Offer Free Rescue Boat, Car or Relief Service</span>
-            </h3>
-
-            <form onSubmit={handleAddVolunteer} className="space-y-3">
-              <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Your Full Name / Owner Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={newVol.name}
-                  onChange={(e) => setNewVol({...newVol, name: e.target.value})}
-                  placeholder="e.g. Pranjal Saikia"
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Service Type *</label>
-                <select
-                  value={newVol.roleType}
-                  onChange={(e) => setNewVol({...newVol, roleType: e.target.value})}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none font-bold text-amber-300"
-                >
-                  {VOLUNTEER_ROLES.map(role => (
-                    <option key={role} value={role}>{role}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Phone Number *</label>
-                  <input
-                    type="tel"
-                    required
-                    value={newVol.phone}
-                    onChange={(e) => setNewVol({...newVol, phone: e.target.value})}
-                    placeholder="+91 98640 00000"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Operating District</label>
-                  <select
-                    value={newVol.district}
-                    onChange={(e) => setNewVol({...newVol, district: e.target.value})}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
-                  >
-                    {ASSAM_DISTRICTS.map(dist => (
-                      <option key={dist} value={dist}>{dist}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Vehicle / Boat / Service Details *</label>
-                <textarea
-                  required
-                  value={newVol.offerings}
-                  onChange={(e) => setNewVol({...newVol, offerings: e.target.value})}
-                  placeholder="e.g. 2 wooden motorboats available 24/7 for evacuation in Kamalabari Ghat area... OR 1 Mahindra Thar 4x4 for flooded roads..."
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none h-20"
-                ></textarea>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-black rounded-xl text-sm shadow-lg"
-              >
-                SUBMIT FREE TRANSPORT / SERVICE OFFERING
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
 
     </div>
   );
