@@ -295,7 +295,7 @@ export default function App() {
       </main>
 
       {/* Mobile Floating SOS Button */}
-      <FloatingSOSButton openModal={openRescueModal} />
+      <FloatingSOSButton openModal={openRescueModal} openSupplyModal={openSupplyModal} />
 
       {/* NGO & Volunteer Login Modal */}
       {isLoginModalOpen && (

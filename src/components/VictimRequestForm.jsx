@@ -132,39 +132,39 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-lg overflow-y-auto">
-      <div className={`relative w-full max-w-2xl bg-slate-900 border-2 rounded-2xl shadow-2xl overflow-hidden my-auto ${
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-slate-950/85 backdrop-blur-lg overflow-y-auto">
+      <div className={`relative w-full max-w-2xl bg-slate-900 border-2 rounded-2xl shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col ${
         formData.isUrgentRescue ? 'border-red-500 shadow-red-950/80' : 'border-amber-500/40 shadow-amber-950/50'
       }`}>
         
         {/* Modal Header */}
-        <div className={`flex items-center justify-between px-6 py-4 border-b ${
+        <div className={`flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b shrink-0 ${
           formData.isUrgentRescue 
             ? 'bg-gradient-to-r from-red-950 via-slate-950 to-slate-950 border-red-800' 
             : 'bg-gradient-to-r from-amber-950 via-slate-950 to-slate-950 border-amber-800'
         }`}>
-          <div className="flex items-center gap-3">
-            <div className={`p-2.5 rounded-xl border text-white ${
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className={`p-2 sm:p-2.5 rounded-xl border text-white shrink-0 ${
               formData.isUrgentRescue 
                 ? 'bg-red-600 border-red-400 shadow-lg shadow-red-600/50 animate-pulse' 
                 : 'bg-amber-500/20 text-amber-400 border-amber-500/40'
             }`}>
-              {formData.isUrgentRescue ? <Siren className="w-6 h-6" /> : <Package className="w-6 h-6" />}
+              {formData.isUrgentRescue ? <Siren className="w-5 h-5 sm:w-6 sm:h-6" /> : <Package className="w-5 h-5 sm:w-6 sm:h-6" />}
             </div>
             <div>
-              <h3 className="text-lg font-black text-white uppercase tracking-tight">
-                {formData.isUrgentRescue ? '🚨 EMERGENCY RESCUE SOS (VICTIM INFO ONLY)' : '📦 FLOOD RELIEF & SUPPLY REQUEST FORM'}
+              <h3 className="text-sm sm:text-lg font-black text-white uppercase tracking-tight leading-tight">
+                {formData.isUrgentRescue ? '🚨 EMERGENCY RESCUE SOS' : '📦 FLOOD RELIEF & SUPPLY REQUEST'}
               </h3>
-              <p className="text-xs font-semibold text-amber-300">
+              <p className="text-[10px] sm:text-xs font-semibold text-amber-300">
                 {formData.isUrgentRescue 
-                  ? 'Transmitting victim location & demographics directly to motorboat rescue teams' 
+                  ? 'Transmitting victim location directly to rescue boats' 
                   : 'Published to NGOs & Volunteers to supply food & materials'}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <X className="w-5 h-5" />
           </button>
