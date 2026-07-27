@@ -41,12 +41,13 @@ export const ASSAM_DISTRICTS = [
 ];
 
 export const VOLUNTEER_ROLES = [
-  "Social Media Influencer / Fundraiser",
-  "Individual Volunteer Helper",
-  "Local Boat / Transport Owner",
-  "Medical Doctor / Paramedic",
-  "Food & Water Supply Donor",
-  "Student Rescue Alliance"
+  "🚤 Free Motorboat / Rescue Boat Service",
+  "🚗 Free Car / SUV / 4x4 Transport Service",
+  "🚚 Free Goods Truck / Pickup Van",
+  "🩺 Free Medical Doctor / Paramedic",
+  "📦 Free Food & Water Supply Donor",
+  "📢 Social Media Influencer / Fundraiser",
+  "🤝 Individual Volunteer Helper"
 ];
 
 // Clean Production Storage Keys
@@ -433,6 +434,7 @@ export const storageService = {
         phone: newNgo.phone,
         email: newNgo.email,
         password: newNgo.password,
+        logo_url: newNgo.logoUrl || null,
         operating_zones: newNgo.operatingZones,
         services: newNgo.services,
         address: newNgo.address,

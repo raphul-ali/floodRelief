@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, ShieldAlert, MessageSquare, Phone, CheckCircle2, XCircle, 
-  Search, RefreshCw, Lock, Key, Clock, Package, HeartHandshake, UserCheck, AlertTriangle, ExternalLink 
+  Search, RefreshCw, Lock, Key, Clock, Package, HeartHandshake, UserCheck, AlertTriangle, ExternalLink, Bell
 } from 'lucide-react';
 import { storageService, ASSAM_DISTRICTS } from '../services/storageService';
 
 export default function AdminDashboard({ onDataUpdated }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [pinInput, setPinInput] = useState('');
-  const [pinError, setPinError] = useState(false);
-  
   const [activeQueueTab, setActiveQueueTab] = useState('sos'); // 'sos' | 'deliveries' | 'ngos' | 'volunteers'
   const [pendingRequests, setPendingRequests] = useState([]);
   const [pendingDeliveries, setPendingDeliveries] = useState([]);
@@ -33,19 +29,8 @@ export default function AdminDashboard({ onDataUpdated }) {
     return () => window.removeEventListener('flood_data_changed', handleDataChanged);
   }, []);
 
-  const handlePinSubmit = (e) => {
-    e.preventDefault();
-    // Accept default PIN 1070 or 1234 or any demo key
-    if (pinInput.trim() === '1070' || pinInput.trim() === '1234' || pinInput.trim().toLowerCase() === 'admin') {
-      setIsAuthenticated(true);
-      setPinError(false);
-    } else {
-      setPinError(true);
-    }
-  };
-
   const handleApproveSos = (id) => {
-    storageService.verifyVictimRequest(id, "Control Room Officer");
+    storageService.verifyVictimRequest(id, "Super Admin");
     loadAdminData();
     if (onDataUpdated) onDataUpdated();
   };
@@ -59,7 +44,7 @@ export default function AdminDashboard({ onDataUpdated }) {
   };
 
   const handleApproveDelivery = (logId) => {
-    storageService.verifyDeliveryLog(logId, "Control Room Officer");
+    storageService.verifyDeliveryLog(logId, "Super Admin");
     loadAdminData();
     if (onDataUpdated) onDataUpdated();
   };
@@ -109,15 +94,15 @@ export default function AdminDashboard({ onDataUpdated }) {
     let text = "";
     if (type === "SOS") {
       text = encodeURIComponent(
-        `Hello ${name}, this is Assam Flood Relief Control Room verifying your emergency SOS request (${reqId}). Please send your exact location & geotagged photos/videos via WhatsApp to verify and publish to our live rescue boat map.`
+        `Hello ${name}, this is Super Admin verifying your emergency SOS request (${reqId}). Please send your exact location & geotagged photos/videos via WhatsApp to verify and publish to our live map.`
       );
     } else if (type === "DELIVERY") {
       text = encodeURIComponent(
-        `Hello, this is Assam Flood Relief Control Room regarding your relief delivery log for request ${reqId}. Please share geotagged photo proof of the delivered items so we can approve your timeline log.`
+        `Hello, this is Super Admin regarding your relief delivery log for request ${reqId}. Please share geotagged photo proof of the delivered items so we can approve your timeline log.`
       );
     } else {
       text = encodeURIComponent(
-        `Hello ${name}, this is Assam Flood Relief Control Room verifying your registration (${reqId}). Please confirm your contact details.`
+        `Hello ${name}, this is Super Admin verifying your registration (${reqId}). Please confirm your contact details.`
       );
     }
 
@@ -125,67 +110,6 @@ export default function AdminDashboard({ onDataUpdated }) {
   };
 
   const totalPendingCount = pendingRequests.length + pendingDeliveries.length + pendingNgos.length + pendingVolunteers.length;
-
-  // PIN Unlock Screen
-  if (!isAuthenticated) {
-    return (
-      <div className="max-w-md mx-auto my-12 bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6 text-center">
-        <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-red-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-amber-900/40 border border-amber-400/30">
-          <ShieldCheck className="w-8 h-8 text-slate-950" />
-        </div>
-        
-        <div>
-          <h2 className="text-xl font-black text-white">ADMIN CONTROL ROOM</h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Manual Data Verification & Moderation Dashboard
-          </p>
-        </div>
-
-        <form onSubmit={handlePinSubmit} className="space-y-4">
-          <div className="text-left">
-            <label className="block text-xs font-bold text-slate-300 mb-1">
-              Enter Admin Passcode / PIN
-            </label>
-            <div className="relative">
-              <Key className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-              <input
-                type="password"
-                value={pinInput}
-                onChange={(e) => setPinInput(e.target.value)}
-                placeholder="Enter PIN (Default: 1070)"
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
-              />
-            </div>
-            {pinError && (
-              <p className="text-xs text-red-400 font-semibold mt-1.5 flex items-center gap-1">
-                <AlertTriangle className="w-3.5 h-3.5" /> Incorrect PIN. Use <span className="font-bold underline">1070</span> for demo access.
-              </p>
-            )}
-          </div>
-
-          <button
-            type="submit"
-            className="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black rounded-xl text-sm shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2"
-          >
-            <Lock className="w-4 h-4" />
-            <span>UNLOCK CONTROL ROOM</span>
-          </button>
-        </form>
-
-        <div className="pt-2 border-t border-slate-800">
-          <button
-            onClick={() => {
-              setPinInput('1070');
-              setIsAuthenticated(true);
-            }}
-            className="text-xs text-amber-400 hover:underline font-bold flex items-center justify-center gap-1 mx-auto"
-          >
-            <span>⚡ One-Tap Demo Access (PIN: 1070)</span>
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   // Filter pending SOS
   const filteredSos = pendingRequests.filter(req => {
@@ -195,84 +119,108 @@ export default function AdminDashboard({ onDataUpdated }) {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       
       {/* Top Banner Header */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 border border-amber-500/40 rounded-2xl p-5 shadow-2xl flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-amber-500/20 text-amber-400 rounded-xl border border-amber-500/30">
-            <ShieldCheck className="w-7 h-7" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg sm:text-xl font-black text-white">MANUAL VERIFICATION CONTROL ROOM</h2>
-              <span className="px-2.5 py-0.5 text-xs font-black bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/40">
-                {totalPendingCount} PENDING
-              </span>
+      <div className="bg-slate-900 border border-red-500/40 rounded-2xl p-3.5 sm:p-5 shadow-2xl space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2.5 bg-red-600/20 text-red-400 rounded-xl border border-red-500/40 shrink-0">
+              <ShieldCheck className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
-            <p className="text-xs text-slate-400">
-              Verify incoming citizen requests & NGO delivery logs via WhatsApp geotag image check before publishing live.
-            </p>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base sm:text-xl font-black text-white uppercase tracking-tight">SUPER ADMIN CONTROL ROOM</h2>
+              </div>
+              <p className="text-[11px] sm:text-xs text-slate-300 font-semibold mt-0.5">
+                Verify incoming distress signals, relief logs, and registrations before live publishing.
+              </p>
+            </div>
+          </div>
+
+          {/* Pending Notification Pill */}
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="px-3 py-1.5 bg-red-950/90 border border-red-500/50 rounded-xl text-red-200 text-xs font-black flex items-center gap-1.5 animate-pulse">
+              <Bell className="w-3.5 h-3.5 text-red-400" />
+              <span>{totalPendingCount} PENDING VERIFICATIONS</span>
+            </div>
           </div>
         </div>
-
-        <button
-          onClick={() => setIsAuthenticated(false)}
-          className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold border border-slate-700 flex items-center gap-1.5"
-        >
-          <Lock className="w-3.5 h-3.5" /> Lock Session
-        </button>
       </div>
 
-      {/* Queue Tabs */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-3 font-bold text-xs">
+      {/* Swipeable Notification Queue Tabs */}
+      <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-2 border-b border-slate-800 text-xs font-black no-scrollbar touch-pan-x">
         
+        {/* Tab 1: Pending SOS */}
         <button
           onClick={() => setActiveQueueTab('sos')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all ${
+          className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
             activeQueueTab === 'sos'
-              ? 'bg-amber-500 text-slate-950 font-black shadow-lg'
+              ? 'bg-red-600 text-white font-black shadow-lg border border-red-400'
               : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
           }`}
         >
-          <ShieldAlert className="w-4 h-4" />
-          <span>Pending SOS Requests ({pendingRequests.length})</span>
+          <ShieldAlert className="w-4 h-4 text-red-300 shrink-0" />
+          <span>Pending SOS Requests</span>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+            pendingRequests.length > 0 ? 'bg-white text-red-600 animate-pulse' : 'bg-slate-800 text-slate-400'
+          }`}>
+            {pendingRequests.length}
+          </span>
         </button>
 
+        {/* Tab 2: Delivery Logs */}
         <button
           onClick={() => setActiveQueueTab('deliveries')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all ${
+          className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
             activeQueueTab === 'deliveries'
-              ? 'bg-amber-500 text-slate-950 font-black shadow-lg'
+              ? 'bg-amber-500 text-slate-950 font-black shadow-lg border border-amber-400'
               : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
           }`}
         >
-          <Package className="w-4 h-4" />
-          <span>Relief Delivery Logs ({pendingDeliveries.length})</span>
+          <Package className="w-4 h-4 text-amber-400 shrink-0" />
+          <span>Delivery Logs</span>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+            pendingDeliveries.length > 0 ? 'bg-amber-400 text-slate-950 animate-pulse' : 'bg-slate-800 text-slate-400'
+          }`}>
+            {pendingDeliveries.length}
+          </span>
         </button>
 
+        {/* Tab 3: NGOs */}
         <button
           onClick={() => setActiveQueueTab('ngos')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all ${
+          className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
             activeQueueTab === 'ngos'
-              ? 'bg-amber-500 text-slate-950 font-black shadow-lg'
+              ? 'bg-blue-600 text-white font-black shadow-lg border border-blue-400'
               : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
           }`}
         >
-          <HeartHandshake className="w-4 h-4" />
-          <span>Pending NGOs ({pendingNgos.length})</span>
+          <HeartHandshake className="w-4 h-4 text-blue-400 shrink-0" />
+          <span>Pending NGOs</span>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+            pendingNgos.length > 0 ? 'bg-blue-400 text-slate-950 animate-pulse' : 'bg-slate-800 text-slate-400'
+          }`}>
+            {pendingNgos.length}
+          </span>
         </button>
 
+        {/* Tab 4: Volunteers */}
         <button
           onClick={() => setActiveQueueTab('volunteers')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all ${
+          className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
             activeQueueTab === 'volunteers'
-              ? 'bg-amber-500 text-slate-950 font-black shadow-lg'
+              ? 'bg-purple-600 text-white font-black shadow-lg border border-purple-400'
               : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
           }`}
         >
-          <UserCheck className="w-4 h-4" />
-          <span>Pending Volunteers ({pendingVolunteers.length})</span>
+          <UserCheck className="w-4 h-4 text-purple-400 shrink-0" />
+          <span>Volunteers</span>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+            pendingVolunteers.length > 0 ? 'bg-purple-400 text-slate-950 animate-pulse' : 'bg-slate-800 text-slate-400'
+          }`}>
+            {pendingVolunteers.length}
+          </span>
         </button>
 
       </div>
@@ -282,22 +230,22 @@ export default function AdminDashboard({ onDataUpdated }) {
         <div className="space-y-4">
           
           {/* Filters */}
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-900 p-3 rounded-xl border border-slate-800">
-            <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-              <Search className="w-4 h-4 text-slate-400" />
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-900 p-3 rounded-xl border border-slate-800">
+            <div className="flex items-center gap-2 w-full sm:w-auto flex-1">
+              <Search className="w-4 h-4 text-slate-400 shrink-0" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by name, ID, or phone..."
-                className="bg-transparent border-none text-xs text-white placeholder-slate-500 focus:outline-none w-full"
+                placeholder="Search name, ID, phone..."
+                className="bg-transparent border-none text-xs text-white placeholder-slate-500 focus:outline-none w-full min-h-[36px]"
               />
             </div>
             
             <select
               value={selectedDistrict}
               onChange={(e) => setSelectedDistrict(e.target.value)}
-              className="bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-lg px-3 py-1.5 focus:outline-none"
+              className="bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-lg px-3 py-2 focus:outline-none w-full sm:w-auto min-h-[36px]"
             >
               <option value="ALL">All Districts ({pendingRequests.length})</option>
               {ASSAM_DISTRICTS.map(d => (
@@ -307,202 +255,124 @@ export default function AdminDashboard({ onDataUpdated }) {
           </div>
 
           {filteredSos.length === 0 ? (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-slate-400 space-y-2">
+            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center space-y-2">
               <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="font-bold text-white text-sm">No Pending SOS Requests Requiring Verification</h3>
-              <p className="text-xs text-slate-500">All submitted requests have been reviewed or published.</p>
+              <h3 className="text-base font-bold text-white">No Pending SOS Requests</h3>
+              <p className="text-xs text-slate-400">All incoming distress signals have been verified & published live.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredSos.map(req => (
-                <div 
-                  key={req.id}
-                  className={`bg-slate-900 border rounded-2xl p-5 space-y-4 shadow-lg relative ${
-                    req.isUrgentRescue ? 'border-red-600/60 bg-gradient-to-r from-slate-900 via-slate-900 to-red-950/20' : 'border-slate-800'
-                  }`}
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-black text-amber-400 text-sm">{req.id}</span>
-                        {req.isUrgentRescue ? (
-                          <span className="px-2 py-0.5 text-[10px] font-black bg-red-600 text-white rounded-full animate-pulse">
-                            🚨 URGENT RESCUE
-                          </span>
-                        ) : (
-                          <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30">
-                            📦 FOOD / RELIEF
-                          </span>
-                        )}
-                        <span className="text-xs text-slate-400">
-                          • {req.district}
+                <div key={req.id} className="bg-slate-900 border border-red-500/40 rounded-2xl p-4 shadow-xl space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="px-2 py-0.5 text-[10px] font-black bg-red-600/30 text-red-300 border border-red-500/40 rounded-md">
+                          {req.isUrgentRescue ? '🚨 BOAT RESCUE' : '📦 RELIEF SUPPLY'}
                         </span>
+                        <span className="text-xs font-mono text-slate-400">{req.id}</span>
                       </div>
-                      
-                      <h4 className="text-base font-black text-white">{req.name}</h4>
-                      <p className="text-xs text-slate-300 font-semibold">{req.locationName}</p>
-                    </div>
-
-                    <div className="text-right text-xs text-slate-400">
-                      <p className="flex items-center gap-1 justify-end text-slate-300">
-                        <Clock className="w-3.5 h-3.5 text-amber-400" />
-                        {new Date(req.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                      <p className="text-[11px] font-bold text-amber-400 mt-0.5">
-                        {req.peopleCount} People ({req.childrenCount} Children)
-                      </p>
+                      <h3 className="text-base font-black text-white mt-1">{req.name}</h3>
+                      <p className="text-xs text-amber-300 font-bold">📍 {req.district}: {req.locationName || req.villageName}</p>
                     </div>
                   </div>
 
-                  {/* Needs */}
-                  <div className="flex flex-wrap gap-1.5">
-                    {req.needs?.map((need, idx) => (
-                      <span key={idx} className="px-2.5 py-1 text-[11px] font-semibold bg-slate-950 text-slate-200 rounded-lg border border-slate-800">
-                        • {need}
-                      </span>
-                    ))}
+                  <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1">
+                    <p className="text-slate-300"><strong className="text-white">People Trapped:</strong> {req.peopleCount || 1} Total</p>
+                    <p className="text-slate-300"><strong className="text-white">Phone:</strong> {req.phone}</p>
+                    {req.details && <p className="text-slate-400 italic">"{req.details}"</p>}
                   </div>
 
-                  {/* Details */}
-                  {req.details && (
-                    <p className="text-xs text-slate-300 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
-                      "{req.details}"
-                    </p>
-                  )}
+                  {/* Actions */}
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <a
+                      href={getWhatsAppVerifyUrl(req.phone, req.name, req.id, "SOS")}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span>WhatsApp Geotag</span>
+                    </a>
 
-                  {/* Verification Actions Bar */}
-                  <div className="pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
-                    
-                    {/* Contact Buttons */}
-                    <div className="flex items-center gap-2">
-                      <a
-                        href={getWhatsAppVerifyUrl(req.phone, req.name, req.id, "SOS")}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md"
-                      >
-                        <MessageSquare className="w-3.5 h-3.5" />
-                        <span>Verify via WhatsApp</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
+                    <a
+                      href={`tel:${req.phone.replace(/[^0-9]/g, '')}`}
+                      className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-xl text-xs font-black flex items-center justify-center gap-1 border border-slate-700 min-h-[44px]"
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                      <span>Call Victim</span>
+                    </a>
 
-                      <a
-                        href={`tel:${req.phone}`}
-                        className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-xl text-xs font-bold flex items-center gap-1 border border-slate-700"
-                      >
-                        <Phone className="w-3.5 h-3.5" />
-                        <span>Call ({req.phone})</span>
-                      </a>
-                    </div>
+                    <button
+                      onClick={() => handleApproveSos(req.id)}
+                      className="col-span-2 py-2.5 px-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 shadow-md min-h-[44px]"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>✓ APPROVE & PUBLISH LIVE</span>
+                    </button>
 
-                    {/* Approve vs Reject */}
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleRejectSos(req.id)}
-                        className="px-3 py-1.5 bg-red-950 hover:bg-red-900 text-red-300 rounded-xl text-xs font-bold border border-red-800 flex items-center gap-1"
-                      >
-                        <XCircle className="w-3.5 h-3.5" /> Reject
-                      </button>
-
-                      <button
-                        onClick={() => handleApproveSos(req.id)}
-                        className="px-4 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 rounded-xl text-xs font-black shadow-md flex items-center gap-1.5 active:scale-95 transition-all"
-                      >
-                        <CheckCircle2 className="w-4 h-4 text-slate-950" /> Approve & Publish Live
-                      </button>
-                    </div>
-
+                    <button
+                      onClick={() => handleRejectSos(req.id)}
+                      className="col-span-2 py-2 px-3 bg-red-950 hover:bg-red-900 text-red-300 border border-red-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 min-h-[38px]"
+                    >
+                      <XCircle className="w-3.5 h-3.5" />
+                      <span>Reject & Delete</span>
+                    </button>
                   </div>
-
                 </div>
               ))}
             </div>
           )}
-
         </div>
       )}
 
-      {/* QUEUE 2: PENDING RELIEF DELIVERY LOGS */}
+      {/* QUEUE 2: PENDING DELIVERY LOGS */}
       {activeQueueTab === 'deliveries' && (
         <div className="space-y-4">
           {pendingDeliveries.length === 0 ? (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-slate-400 space-y-2">
+            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center space-y-2">
               <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="font-bold text-white text-sm">No Pending Relief Delivery Logs</h3>
-              <p className="text-xs text-slate-500">NGOs and volunteers have not submitted unverified delivery updates.</p>
+              <h3 className="text-base font-bold text-white">No Pending Delivery Logs</h3>
+              <p className="text-xs text-slate-400">All relief dispatches have been audited and verified.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {pendingDeliveries.map(log => (
-                <div key={log.logId} className="bg-slate-900 border border-amber-500/40 rounded-2xl p-5 space-y-4 shadow-lg">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
+                <div key={log.logId} className="bg-slate-900 border border-amber-500/40 rounded-2xl p-4 shadow-xl space-y-3">
+                  <div className="flex items-start justify-between">
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-black text-amber-400 text-sm">{log.logId}</span>
-                        <span className="px-2 py-0.5 text-[10px] font-black bg-blue-500/20 text-blue-300 rounded-full border border-blue-500/30">
-                          For SOS: {log.requestId}
-                        </span>
-                      </div>
-                      <h4 className="text-base font-black text-white mt-1">
-                        Delivery by: <span className="text-amber-300">{log.deliveredBy}</span>
-                      </h4>
-                      <p className="text-xs text-slate-400">
-                        Recipient: <strong className="text-slate-200">{log.recipientName}</strong> ({log.district})
-                      </p>
-                    </div>
-
-                    <div className="text-right text-xs text-slate-400">
-                      <p className="flex items-center gap-1 justify-end text-slate-300">
-                        <Clock className="w-3.5 h-3.5 text-amber-400" />
-                        {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                      <p className="text-[11px] font-bold text-emerald-400 mt-0.5">
-                        Status Update: {log.statusUpdate}
-                      </p>
+                      <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md">
+                        DISPATCH LOG #{log.logId}
+                      </span>
+                      <h3 className="text-base font-black text-white mt-1">Delivered by: {log.deliveredBy}</h3>
+                      <p className="text-xs text-slate-300">Items: <strong className="text-amber-300">{log.itemsDelivered}</strong></p>
                     </div>
                   </div>
 
-                  {/* Delivered Items */}
-                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
-                    <p className="text-xs font-bold text-slate-300">Supplies Delivered:</p>
-                    <p className="text-xs font-semibold text-amber-200">{log.itemsDelivered}</p>
-                    {log.deliveryNotes && (
-                      <p className="text-[11px] text-slate-400 italic pt-1 border-t border-slate-900">
-                        "{log.deliveryNotes}"
-                      </p>
-                    )}
+                  <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1">
+                    <p className="text-slate-300"><strong className="text-white">Volunteer Phone:</strong> {log.volunteerPhone}</p>
+                    {log.deliveryNotes && <p className="text-slate-400 italic">"{log.deliveryNotes}"</p>}
                   </div>
 
-                  {/* Actions */}
-                  <div className="pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                  <div className="grid grid-cols-2 gap-2">
                     <a
-                      href={getWhatsAppVerifyUrl(log.volunteerPhone, log.deliveredBy, log.requestId, "DELIVERY")}
+                      href={getWhatsAppVerifyUrl(log.volunteerPhone, log.deliveredBy, log.requestId || log.logId, "DELIVERY")}
                       target="_blank"
-                      rel="noreferrer"
-                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md"
+                      rel="noopener noreferrer"
+                      className="py-2.5 px-3 bg-emerald-600 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
                     >
                       <MessageSquare className="w-3.5 h-3.5" />
-                      <span>Request Photo Proof via WhatsApp</span>
-                      <ExternalLink className="w-3 h-3" />
+                      <span>Request Photo Proof</span>
                     </a>
 
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleRejectDelivery(log.logId)}
-                        className="px-3 py-1.5 bg-red-950 hover:bg-red-900 text-red-300 rounded-xl text-xs font-bold border border-red-800"
-                      >
-                        Reject Log
-                      </button>
-
-                      <button
-                        onClick={() => handleApproveDelivery(log.logId)}
-                        className="px-4 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 rounded-xl text-xs font-black shadow-md flex items-center gap-1.5"
-                      >
-                        <CheckCircle2 className="w-4 h-4" /> Approve & Add to Timeline
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => handleApproveDelivery(log.logId)}
+                      className="py-2.5 px-3 bg-emerald-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 shadow-md min-h-[44px]"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Approve Log</span>
+                    </button>
                   </div>
-
                 </div>
               ))}
             </div>
@@ -514,32 +384,35 @@ export default function AdminDashboard({ onDataUpdated }) {
       {activeQueueTab === 'ngos' && (
         <div className="space-y-4">
           {pendingNgos.length === 0 ? (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-slate-400 space-y-2">
+            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center space-y-2">
               <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="font-bold text-white text-sm">No Pending NGO Registrations</h3>
+              <h3 className="text-base font-bold text-white">No Pending NGO Registrations</h3>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {pendingNgos.map(ngo => (
-                <div key={ngo.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="text-base font-black text-white">{ngo.name}</h4>
-                      <p className="text-xs text-slate-400">{ngo.contactPerson} • {ngo.phone}</p>
-                    </div>
-                    <a
-                      href={getWhatsAppVerifyUrl(ngo.phone, ngo.contactPerson, ngo.name, "NGO")}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-bold flex items-center gap-1"
-                    >
-                      <MessageSquare className="w-3.5 h-3.5" /> WhatsApp
-                    </a>
+                <div key={ngo.id} className="bg-slate-900 border border-blue-500/40 rounded-2xl p-4 shadow-xl space-y-3">
+                  <div>
+                    <h3 className="text-base font-black text-white">{ngo.name}</h3>
+                    <p className="text-xs text-slate-300">Contact: <strong>{ngo.contactPerson}</strong> ({ngo.phone})</p>
                   </div>
 
-                  <div className="flex gap-2 justify-end pt-2 border-t border-slate-800">
-                    <button onClick={() => handleRejectNgo(ngo.id)} className="px-3 py-1 bg-red-950 text-red-300 rounded-lg text-xs font-bold">Reject</button>
-                    <button onClick={() => handleApproveNgo(ngo.id)} className="px-4 py-1 bg-emerald-500 text-slate-950 rounded-lg text-xs font-black">Approve NGO</button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => handleApproveNgo(ngo.id)}
+                      className="py-2.5 px-3 bg-emerald-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 min-h-[44px]"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Approve NGO</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleRejectNgo(ngo.id)}
+                      className="py-2.5 px-3 bg-red-950 text-red-300 border border-red-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 min-h-[44px]"
+                    >
+                      <XCircle className="w-4 h-4" />
+                      <span>Reject</span>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -552,25 +425,36 @@ export default function AdminDashboard({ onDataUpdated }) {
       {activeQueueTab === 'volunteers' && (
         <div className="space-y-4">
           {pendingVolunteers.length === 0 ? (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-slate-400 space-y-2">
+            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center space-y-2">
               <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="font-bold text-white text-sm">No Pending Volunteer Registrations</h3>
+              <h3 className="text-base font-bold text-white">No Pending Volunteer Profiles</h3>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {pendingVolunteers.map(vol => (
-                <div key={vol.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="text-base font-black text-white">{vol.name}</h4>
-                      <p className="text-xs text-amber-300 font-bold">{vol.roleType} • {vol.district}</p>
-                      <p className="text-xs text-slate-400">Contact: {vol.phone}</p>
-                    </div>
+                <div key={vol.id} className="bg-slate-900 border border-purple-500/40 rounded-2xl p-4 shadow-xl space-y-3">
+                  <div>
+                    <h3 className="text-base font-black text-white">{vol.name}</h3>
+                    <p className="text-xs text-purple-300 font-bold">{vol.roleType} - {vol.phone}</p>
+                    {vol.offerings && <p className="text-xs text-slate-300 mt-1">"{vol.offerings}"</p>}
                   </div>
 
-                  <div className="flex gap-2 justify-end pt-2 border-t border-slate-800">
-                    <button onClick={() => handleRejectVol(vol.id)} className="px-3 py-1 bg-red-950 text-red-300 rounded-lg text-xs font-bold">Reject</button>
-                    <button onClick={() => handleApproveVol(vol.id)} className="px-4 py-1 bg-emerald-500 text-slate-950 rounded-lg text-xs font-black">Approve Volunteer</button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => handleApproveVol(vol.id)}
+                      className="py-2.5 px-3 bg-emerald-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 min-h-[44px]"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Approve Volunteer</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleRejectVol(vol.id)}
+                      className="py-2.5 px-3 bg-red-950 text-red-300 border border-red-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 min-h-[44px]"
+                    >
+                      <XCircle className="w-4 h-4" />
+                      <span>Reject</span>
+                    </button>
                   </div>
                 </div>
               ))}

@@ -4,6 +4,7 @@
  * Includes: Email & Password Login for NGOs and Volunteers + 6-Digit Email OTP Verification
  */
 import { storageService } from './storageService';
+import { securityService } from './securityService';
 
 const AUTH_SESSION_KEY = "flood_portal_auth_session_v1";
 const OTP_STORAGE_KEY = "flood_portal_active_otps_v1";
@@ -113,9 +114,16 @@ export const authService = {
    * Register a new NGO account
    */
   registerNgo: (ngoData, password) => {
-    const cleanPass = (password || '').trim();
-    if (cleanPass.length < 4) {
-      throw new Error("Password must be at least 4 characters long.");
+    if (!securityService.validateEmail(ngoData.email)) {
+      throw new Error("Invalid Email Address. Please enter a valid email format (e.g. ngo@domain.org).");
+    }
+
+    if (!securityService.validatePhoneNumber(ngoData.phone)) {
+      throw new Error("Invalid Phone Number. Must be a valid 10-digit Indian mobile number (+91).");
+    }
+
+    if (!securityService.validatePassword(password)) {
+      throw new Error("Password too weak! Must be at least 8 characters long and contain at least 1 letter, 1 number, and 1 special symbol (@#$%^&*).");
     }
 
     const ngos = storageService.getNGOs(true);
@@ -124,9 +132,12 @@ export const authService = {
       throw new Error("An NGO with this email address is already registered.");
     }
 
+    const formattedPhone = securityService.formatIndianPhone(ngoData.phone);
+
     const newNgo = storageService.addNGO({
       ...ngoData,
-      password: cleanPass,
+      phone: formattedPhone,
+      password: (password || '').trim(),
       verified: false
     });
 
@@ -137,9 +148,16 @@ export const authService = {
    * Register a new Volunteer account
    */
   registerVolunteer: (volData, password) => {
-    const cleanPass = (password || '').trim();
-    if (cleanPass.length < 4) {
-      throw new Error("Password must be at least 4 characters long.");
+    if (!securityService.validateEmail(volData.email)) {
+      throw new Error("Invalid Email Address. Please enter a valid email format (e.g. volunteer@domain.com).");
+    }
+
+    if (!securityService.validatePhoneNumber(volData.phone)) {
+      throw new Error("Invalid Phone Number. Must be a valid 10-digit Indian mobile number (+91).");
+    }
+
+    if (!securityService.validatePassword(password)) {
+      throw new Error("Password too weak! Must be at least 8 characters long and contain at least 1 letter, 1 number, and 1 special symbol (@#$%^&*).");
     }
 
     const vols = storageService.getVolunteers(true);
@@ -150,9 +168,12 @@ export const authService = {
       }
     }
 
+    const formattedPhone = securityService.formatIndianPhone(volData.phone);
+
     const newVol = storageService.addVolunteer({
       ...volData,
-      password: cleanPass,
+      phone: formattedPhone,
+      password: (password || '').trim(),
       verified: false
     });
 

@@ -439,7 +439,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                   Select Materials & Food Needed (Check all that apply)
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {availableNeeds.map((item) => {
+                  {SUPPLY_NEEDS.map((item) => {
                     const isSelected = formData.needs.includes(item);
                     return (
                       <button

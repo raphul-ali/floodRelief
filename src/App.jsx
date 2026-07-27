@@ -113,14 +113,14 @@ export default function App() {
       <div className="min-h-screen bg-slate-950 text-slate-100 font-sans p-4 sm:p-8 space-y-6">
         
         {/* Private Top Bar */}
-        <div className="max-w-7xl mx-auto flex items-center justify-between border-b border-red-900/40 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-red-600 rounded-xl text-white">
-              <ShieldCheck className="w-6 h-6" />
+        <div className="max-w-7xl mx-auto flex items-center justify-between border-b border-red-900/40 pb-3 gap-2">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-2 bg-red-600 rounded-xl text-white shrink-0">
+              <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
-              <h1 className="text-lg font-black text-white">PRIVATE CONTROL ROOM (/raphul-admin)</h1>
-              <p className="text-xs text-red-300">Authorized Super Admin Access Only</p>
+              <h1 className="text-xs sm:text-lg font-black text-white leading-tight">CONTROL ROOM (/raphul-admin)</h1>
+              <p className="text-[10px] sm:text-xs text-red-300">Authorized Super Admin Access</p>
             </div>
           </div>
 
@@ -131,25 +131,25 @@ export default function App() {
               window.location.pathname = '/';
               window.location.hash = '';
             }}
-            className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl text-xs font-bold border border-slate-800"
+            className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl text-[11px] sm:text-xs font-black border border-slate-800 shrink-0 min-h-[38px] flex items-center justify-center"
           >
-            &larr; Exit to Public Portal
+            &larr; Public Site
           </a>
         </div>
 
         {/* If logged in as Super Admin */}
         {currentAuth.role === 'ADMIN' ? (
-          <div className="max-w-7xl mx-auto space-y-6">
-            <div className="bg-red-950/60 border border-red-500/40 rounded-2xl p-4 flex items-center justify-between">
+          <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+            <div className="bg-red-950/70 border border-red-500/40 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
                 <span className="text-xs font-bold text-red-200">
-                  Logged in as Super Admin: <strong className="text-amber-300 font-black">raphulali@gmail.com</strong>
+                  Super Admin: <strong className="text-amber-300 font-black">raphulali@gmail.com</strong>
                 </span>
               </div>
               <button
                 onClick={handleLogout}
-                className="px-3 py-1 bg-red-900 hover:bg-red-800 text-white rounded-lg text-xs font-bold"
+                className="px-3 py-1.5 bg-red-900 hover:bg-red-800 text-white rounded-xl text-xs font-black border border-red-500/40 shrink-0 min-h-[38px] flex items-center justify-center"
               >
                 Logout Super Admin
               </button>
@@ -158,14 +158,14 @@ export default function App() {
             <AdminDashboard onDataUpdated={() => loadData()} />
           </div>
         ) : (
-          /* Secret Login Screen */
-          <div className="max-w-md mx-auto my-12 bg-slate-900 border border-red-900/60 rounded-3xl p-8 shadow-2xl space-y-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-red-600 to-rose-700 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-red-950">
-              <Lock className="w-8 h-8 text-white" />
+          /* Secret Mobile-Optimized Admin Login Screen */
+          <div className="w-[94vw] max-w-md mx-auto my-4 sm:my-12 bg-slate-900 border border-red-900/60 rounded-3xl p-5 sm:p-8 shadow-2xl space-y-5">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-red-600 to-rose-700 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-red-950">
+              <Lock className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
             </div>
 
             <div className="text-center space-y-1">
-              <h2 className="text-xl font-black text-white uppercase tracking-tight">Super Admin Portal</h2>
+              <h2 className="text-lg sm:text-xl font-black text-white uppercase tracking-tight">Super Admin Portal</h2>
               <p className="text-xs text-slate-400">
                 Authorized Login for <span className="text-amber-300 font-bold">Raphul Ali</span>
               </p>
@@ -184,13 +184,13 @@ export default function App() {
                   Super Admin Email
                 </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
                   <input
                     type="email"
                     value={adminEmail}
                     onChange={(e) => setAdminEmail(e.target.value)}
                     placeholder="raphulali@gmail.com"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-3 text-sm text-white focus:outline-none focus:border-red-500 min-h-[44px]"
                     required
                   />
                 </div>
@@ -201,13 +201,13 @@ export default function App() {
                   Super Admin Password
                 </label>
                 <div className="relative">
-                  <Key className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <Key className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
                   <input
                     type="password"
                     value={adminPassword}
                     onChange={(e) => setAdminPassword(e.target.value)}
                     placeholder="Enter password"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-3 text-sm text-white focus:outline-none focus:border-red-500 min-h-[44px]"
                     required
                   />
                 </div>
@@ -215,7 +215,7 @@ export default function App() {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black rounded-xl text-sm shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
+                className="w-full py-3 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black rounded-xl text-sm shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 min-h-[46px]"
               >
                 <Lock className="w-4 h-4" />
                 <span>UNLOCK SUPER ADMIN CONTROL ROOM</span>
@@ -279,17 +279,8 @@ export default function App() {
         {activeTab === 'ngos' && (
           <NGODirectory 
             ngos={ngos} 
+            volunteers={volunteers}
           />
-        )}
-
-        {activeTab === 'volunteers' && (
-          <VolunteerDirectory 
-            volunteers={volunteers} 
-          />
-        )}
-
-        {activeTab === 'hosting-guide' && (
-          <FreeHostingGuide />
         )}
 
       </main>
