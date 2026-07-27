@@ -1,21 +1,61 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Flame, Shield, Phone, MapPin, Search,
-  ExternalLink, Siren, RefreshCw, Compass, Stethoscope, ArrowRight, Loader2
+  ExternalLink, Siren, RefreshCw, Compass, Stethoscope, ArrowRight, Loader2, Navigation
 } from 'lucide-react';
 import { fetchNearestServices } from '../services/emergencyService';
+import { ASSAM_DISTRICTS } from '../services/storageService';
 
 const RADIUS_OPTIONS = [50, 100, 200, 500];
 
+const DISTRICT_COORDS = {
+  "Kamrup Metropolitan (Guwahati)": { lat: 26.1434, lng: 91.7898 },
+  "Jorhat": { lat: 26.7570, lng: 94.2030 },
+  "Dibrugarh": { lat: 27.4728, lng: 94.9120 },
+  "Cachar (Silchar)": { lat: 24.8240, lng: 92.7970 },
+  "Sivasagar": { lat: 26.9826, lng: 94.6425 },
+  "Sonitpur (Tezpur)": { lat: 26.6330, lng: 92.7980 },
+  "Nagaon": { lat: 26.3480, lng: 92.6840 },
+  "Lakhimpur": { lat: 27.2333, lng: 94.1000 },
+  "Tinsukia": { lat: 27.4879, lng: 95.3569 },
+  "Majuli Island": { lat: 26.9600, lng: 94.1700 },
+  "Dhubri": { lat: 26.0200, lng: 89.9800 },
+  "Barpeta": { lat: 26.3200, lng: 91.0000 },
+  "Bongaigaon": { lat: 26.4700, lng: 90.5600 },
+  "Goalpara": { lat: 26.1800, lng: 90.6200 },
+  "Golaghat": { lat: 26.5200, lng: 93.9600 },
+  "Darrang": { lat: 26.4500, lng: 92.0300 },
+  "Dhemaji": { lat: 27.4800, lng: 94.5800 },
+  "Nalbari": { lat: 26.4430, lng: 91.4420 },
+  "Morigaon": { lat: 26.2503, lng: 92.3410 },
+  "Hailakandi": { lat: 24.6800, lng: 92.5600 },
+  "Karimganj": { lat: 24.8700, lng: 92.3500 },
+  "Dima Hasao (Haflong)": { lat: 25.1680, lng: 93.0190 },
+  "Karbi Anglong (Diphu)": { lat: 25.8400, lng: 93.4300 },
+  "Kokrajhar": { lat: 26.4000, lng: 90.2700 },
+  "Baksa": { lat: 26.6000, lng: 91.4000 },
+  "Chirang": { lat: 26.5000, lng: 90.7000 },
+  "Udalguri": { lat: 26.7400, lng: 92.1300 },
+  "Biswanath": { lat: 26.7300, lng: 93.1500 },
+  "Charaideo": { lat: 27.0200, lng: 95.0000 },
+  "Hojai": { lat: 26.0000, lng: 92.8600 },
+  "Bajali": { lat: 26.5000, lng: 91.1700 },
+  "Kamrup Rural": { lat: 26.3126, lng: 91.5975 },
+  "South Salmara-Mankachar": { lat: 25.6000, lng: 89.8500 },
+  "Tamulpur": { lat: 26.6300, lng: 91.5600 },
+  "West Karbi Anglong": { lat: 25.7500, lng: 92.5000 }
+};
+
 export default function EmergencyServices() {
   const [userLocation, setUserLocation] = useState(null);   // { lat, lng, label }
+  const [selectedDistrict, setSelectedDistrict] = useState('ALL');
   const [isLocating, setIsLocating] = useState(false);
   const [locError, setLocError] = useState(null);
 
   const [radiusKm, setRadiusKm] = useState(50);
   const [isFetching, setIsFetching] = useState(false);
   const [fetchError, setFetchError] = useState(null);
-  const [results, setResults] = useState(null); // null = not fetched; [] = fetched, empty
+  const [results, setResults] = useState(null);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
@@ -109,6 +149,25 @@ export default function EmergencyServices() {
   // Auto-detect location on first load
   useEffect(() => { detectLocation(); }, []);
 
+  const handleDistrictChange = (distName) => {
+    setSelectedDistrict(distName);
+    if (distName === 'ALL') {
+      detectLocation();
+      return;
+    }
+
+    const coords = DISTRICT_COORDS[distName];
+    if (coords) {
+      const loc = {
+        lat: coords.lat,
+        lng: coords.lng,
+        label: `${distName} District Center`
+      };
+      setUserLocation(loc);
+      doFetch(loc, radiusKm);
+    }
+  };
+
   // Re-fetch when radius changes (only if location already known)
   const handleRadiusChange = (km) => {
     setRadiusKm(km);
@@ -124,7 +183,8 @@ export default function EmergencyServices() {
       (item.district ?? '').toLowerCase().includes(q) ||
       (item.address ?? '').toLowerCase().includes(q);
     const matchCat = selectedCategory === 'ALL' || item.category === selectedCategory;
-    return matchSearch && matchCat;
+    const matchDist = selectedDistrict === 'ALL' || (item.district ?? '').toLowerCase().includes(selectedDistrict.toLowerCase());
+    return matchSearch && matchCat && matchDist;
   });
 
   // ─── Category badge ───────────────────────────────────────────────────────────
@@ -179,35 +239,40 @@ export default function EmergencyServices() {
           </p>
         </div>
 
-        {/* Location status bar */}
-        {isLocating && (
-          <div className="bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 flex items-center gap-2 text-xs font-bold text-amber-300">
-            <Loader2 className="w-4 h-4 animate-spin shrink-0 text-amber-400" />
-            Detecting your location (GPS → IP fallback)…
+        {/* Location selector status bar */}
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-950/80 border border-slate-800 rounded-2xl p-3">
+          <div className="flex items-center gap-2 text-xs font-bold text-amber-300 truncate flex-1 min-w-[200px]">
+            <MapPin className="w-4 h-4 text-red-400 shrink-0" />
+            <span className="truncate">📍 {userLocation?.label || 'Detecting Location…'}</span>
           </div>
-        )}
-        {!isLocating && locError && (
-          <div className="bg-red-950/60 border border-red-500/40 rounded-xl px-4 py-2.5 flex items-center justify-between gap-3 text-xs font-bold text-red-300">
-            <span>{locError}</span>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {/* District dropdown */}
+            <select
+              value={selectedDistrict}
+              onChange={(e) => handleDistrictChange(e.target.value)}
+              className="bg-slate-900 border border-slate-700 text-amber-300 font-bold text-xs rounded-xl px-3 py-1.5 focus:outline-none focus:border-amber-400 cursor-pointer"
+            >
+              <option value="ALL">📍 Change District / Region</option>
+              {ASSAM_DISTRICTS.map((dist) => (
+                <option key={dist} value={dist}>
+                  {dist}
+                </option>
+              ))}
+            </select>
+
+            {/* Detect Live GPS Button */}
             <button
               onClick={detectLocation}
-              className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-lg font-black text-[11px] shrink-0 transition-colors"
+              disabled={isLocating}
+              className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-xl font-black text-xs flex items-center gap-1.5 transition-colors disabled:opacity-40"
+              title="Detect Live Browser GPS"
             >
-              Retry
+              <Navigation className="w-3.5 h-3.5" />
+              <span>{isLocating ? 'Locating…' : 'Live GPS'}</span>
             </button>
           </div>
-        )}
-        {!isLocating && userLocation && (
-          <div className="bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 flex items-center justify-between gap-2 text-xs font-bold text-amber-300">
-            <div className="flex items-center gap-2 truncate">
-              <MapPin className="w-4 h-4 text-red-400 shrink-0" />
-              <span className="truncate">📍 {userLocation.label}</span>
-            </div>
-            <span className="text-[11px] font-mono text-slate-400 shrink-0 hidden sm:inline">
-              {userLocation.lat.toFixed(5)}, {userLocation.lng.toFixed(5)}
-            </span>
-          </div>
-        )}
+        </div>
       </div>
 
       {/* ── Filters ── */}
