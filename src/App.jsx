@@ -231,13 +231,26 @@ export default function App() {
   }
 
   // PUBLIC WEBSITE VIEW
+  const mainContentRef = useRef(null);
+
+  const handleTabChange = (tabName) => {
+    setActiveTab(tabName);
+    setTimeout(() => {
+      if (mainContentRef.current) {
+        const yOffset = -80; // Offset for sticky header
+        const y = mainContentRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }, 60);
+  };
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans relative">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-red-500 selection:text-white">
       
       {/* Fixed Header Bar (Zero Admin Buttons) */}
       <Header
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
         openRescueModal={openRescueModal}
         openSupplyModal={openSupplyModal}
         urgentCount={urgentCount}
@@ -252,6 +265,9 @@ export default function App() {
         
         {/* Official ASDMA Emergency Helplines Notice */}
         <ASDMAHelplines />
+
+        {/* Scroll Target Element */}
+        <div ref={mainContentRef} className="scroll-mt-24" />
 
         {/* NGO Rescue Queue */}
         {activeTab === 'dashboard' && (
