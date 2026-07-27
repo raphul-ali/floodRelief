@@ -9,6 +9,7 @@ import NearestMedicals from './components/NearestMedicals';
 import NearestResponders from './components/NearestResponders';
 import FreeHostingGuide from './components/FreeHostingGuide';
 import VictimRequestForm from './components/VictimRequestForm';
+import AdminDashboard from './components/AdminDashboard';
 import FloatingSOSButton from './components/FloatingSOSButton';
 import { storageService } from './services/storageService';
 import { RefreshCw } from 'lucide-react';
@@ -21,11 +22,18 @@ export default function App() {
   const [victimRequests, setVictimRequests] = useState([]);
   const [ngos, setNgos] = useState([]);
   const [volunteers, setVolunteers] = useState([]);
+  const [pendingCount, setPendingCount] = useState(0);
 
   const loadData = () => {
     setVictimRequests(storageService.getVictimRequests());
     setNgos(storageService.getNGOs());
     setVolunteers(storageService.getVolunteers());
+
+    const pendingReqs = storageService.getPendingVictimRequests().length;
+    const pendingLogs = storageService.getPendingDeliveryLogs().length;
+    const pendingNgos = storageService.getPendingNGOs().length;
+    const pendingVols = storageService.getPendingVolunteers().length;
+    setPendingCount(pendingReqs + pendingLogs + pendingNgos + pendingVols);
   };
 
   useEffect(() => {
@@ -63,6 +71,7 @@ export default function App() {
         openRescueModal={openRescueModal}
         openSupplyModal={openSupplyModal}
         urgentCount={urgentCount}
+        pendingCount={pendingCount}
       />
 
       {/* Main Container */}
@@ -70,6 +79,11 @@ export default function App() {
         
         {/* Official ASDMA Emergency Helplines Notice */}
         <ASDMAHelplines />
+
+        {/* Admin Manual Verification Control Room */}
+        {activeTab === 'admin' && (
+          <AdminDashboard onDataUpdated={() => loadData()} />
+        )}
 
         {/* NGO Rescue Queue */}
         {activeTab === 'dashboard' && (

@@ -223,12 +223,10 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
             </div>
             <div className="space-y-2">
               <h3 className="text-2xl font-black text-white">
-                {formData.isUrgentRescue ? '🚨 RESCUE SOS SIGNAL TRANSMITTED!' : '📦 RELIEF REQUEST PUBLISHED!'}
+                {formData.isUrgentRescue ? '🚨 SOS TRANSMITTED TO VERIFICATION QUEUE!' : '📦 RELIEF REQUEST SENT TO VERIFICATION QUEUE!'}
               </h3>
-              <p className="text-sm text-slate-300 max-w-md mx-auto">
-                {formData.isUrgentRescue 
-                  ? 'Rescue motorboats and emergency cells have received your distress signal. Keep your phone line free!' 
-                  : 'Your supply request is visible to registered NGOs, local volunteers, and influencers.'}
+              <p className="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
+                Your submission is currently held in the <span className="text-amber-300 font-bold">Admin Verification Queue</span>. Our Control Room officer will connect with your phone via <span className="text-emerald-400 font-bold">WhatsApp / Call</span> to verify your location before publishing to the live map.
               </p>
             </div>
 

@@ -4,7 +4,7 @@ import {
   PlusCircle, Sparkles, Stethoscope, Siren, UserCheck, Zap, Building2, ShieldCheck, Package, Info 
 } from 'lucide-react';
 
-export default function Header({ activeTab, setActiveTab, openRescueModal, openSupplyModal, urgentCount = 0 }) {
+export default function Header({ activeTab, setActiveTab, openRescueModal, openSupplyModal, urgentCount = 0, pendingCount = 0 }) {
   return (
     <header className="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-xl border-b border-red-900/40 shadow-2xl">
       
@@ -83,10 +83,28 @@ export default function Header({ activeTab, setActiveTab, openRescueModal, openS
 
         </div>
 
-        {/* Navigation Bar (NGO Directory on the left of NGO Relief Queue) */}
+        {/* Navigation Bar */}
         <nav className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto py-2 border-t border-slate-800/80 no-scrollbar text-xs font-black">
           
-          {/* NGO Directory (Placed Left of NGO Relief Queue) */}
+          {/* Admin Control Center Tab */}
+          <button
+            onClick={() => setActiveTab('admin')}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all whitespace-nowrap relative ${
+              activeTab === 'admin'
+                ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-950/60 border border-amber-300'
+                : 'bg-slate-900 text-amber-300 hover:bg-slate-800 border border-amber-500/30'
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4 text-amber-400" />
+            <span>🛡️ ADMIN CONTROL</span>
+            {pendingCount > 0 && (
+              <span className="px-1.5 py-0.2 text-[10px] font-black bg-red-600 text-white rounded-full animate-pulse ml-1">
+                {pendingCount}
+              </span>
+            )}
+          </button>
+
+          {/* NGO Directory */}
           <button
             onClick={() => setActiveTab('ngos')}
             className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all whitespace-nowrap ${

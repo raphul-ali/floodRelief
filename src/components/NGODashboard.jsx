@@ -1,16 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShieldAlert, Phone, Download, Search, Filter, CheckCircle2, 
-  Clock, MapPin, Users, AlertTriangle, MessageSquare, ExternalLink, Trash2, Heart, Sparkles, Activity, Package, Siren, Navigation
+  Clock, MapPin, Users, AlertTriangle, MessageSquare, ExternalLink, Trash2, Heart, Sparkles, Activity, Package, Siren, Navigation, ShieldCheck, History, Plus
 } from 'lucide-react';
 import { pdfService } from '../services/pdfService';
 import { storageService, ASSAM_DISTRICTS } from '../services/storageService';
+import DeliveryLogModal from './DeliveryLogModal';
 
 export default function NGODashboard({ victimRequests = [], ngos = [] }) {
   const [queueTab, setQueueTab] = useState('CRITICAL_RESCUE'); // 'CRITICAL_RESCUE', 'SUPPLY_REQUESTS', 'ALL'
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('ALL');   // ALL, Pending, In Progress, Rescued
   const [filterDistrict, setFilterDistrict] = useState('ALL');
+
+  // Modal for logging relief delivery
+  const [activeLogRequest, setActiveLogRequest] = useState(null);
+
+  // Delivery logs state
+  const [deliveryLogs, setDeliveryLogs] = useState([]);
+  const [expandedTimelines, setExpandedTimelines] = useState({}); // { [requestId]: boolean }
+
+  const loadLogs = () => {
+    setDeliveryLogs(storageService.getDeliveryLogs());
+  };
+
+  useEffect(() => {
+    loadLogs();
+    const handleDataChanged = () => loadLogs();
+    window.addEventListener('flood_data_changed', handleDataChanged);
+    return () => window.removeEventListener('flood_data_changed', handleDataChanged);
+  }, []);
+
+  const toggleTimeline = (requestId) => {
+    setExpandedTimelines(prev => ({
+      ...prev,
+      [requestId]: !prev[requestId]
+    }));
+  };
 
   // Separate critical rescue vs supply requests
   const criticalRequests = victimRequests.filter(r => r.isUrgentRescue);
@@ -74,7 +100,6 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
     pdfService.downloadBulkReportPDF(filteredRequests, reportTitle);
   };
 
-  // Helper to open Google Maps routes
   const getGoogleMapsUrl = (req) => {
     if (req.latitude && req.longitude) {
       return `https://www.google.com/maps/dir/?api=1&destination=${req.latitude},${req.longitude}`;
@@ -86,24 +111,23 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
   return (
     <div className="space-y-6">
       
-      {/* Hero & Slogan Banner */}
+      {/* Hero Banner */}
       <div className="relative rounded-3xl overflow-hidden border border-red-500/30 bg-gradient-to-r from-slate-950 via-red-950/60 to-slate-950 p-6 sm:p-8 shadow-2xl space-y-6">
-        
         <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
         <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="relative z-10 space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-600/20 text-red-300 border border-red-500/40 text-xs font-black uppercase tracking-wider">
             <Activity className="w-4 h-4 text-red-400 animate-pulse" />
-            <span>Assam Flood Situation • 2026</span>
+            <span>Assam Flood Situation • Verified Relief Dispatch</span>
           </div>
 
           <div className="space-y-2">
             <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
-              RESCUE & RELIEF CONTROL: <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-amber-300 to-amber-400">EMERGENCY RESCUES & SUPPLY REQUESTS</span>
+              RESCUE & RELIEF CONTROL: <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-amber-300 to-amber-400">EMERGENCY RESCUES & SUPPLY QUEUE</span>
             </h2>
             <p className="text-sm sm:text-base text-slate-300 max-w-3xl leading-relaxed">
-              Connecting stranded citizens directly with rescue motorboats, while providing a clear demand queue for NGOs and volunteers distributing food, water, and medicines.
+              Connecting stranded citizens with rescue motorboats and allowing NGOs to log transparent relief supply deliveries with admin verification.
             </p>
           </div>
 
@@ -118,8 +142,8 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
               <div className="text-lg font-black text-amber-300">{supplyCount} Active Demands</div>
             </div>
             <div className="bg-slate-900/80 border border-slate-800 p-3 rounded-xl">
-              <div className="text-[10px] font-bold text-slate-400 uppercase">Active NGO Motorboats</div>
-              <div className="text-lg font-black text-emerald-400">45+ Response Teams</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase">Verified Delivery Logs</div>
+              <div className="text-lg font-black text-emerald-400">{deliveryLogs.length} Logged Dispatches</div>
             </div>
           </div>
 
@@ -133,8 +157,6 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
           
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
-            
-            {/* Emergency Boat Rescues Section */}
             <button
               onClick={() => setQueueTab('CRITICAL_RESCUE')}
               className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all whitespace-nowrap border ${
@@ -147,7 +169,6 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
               <span>🚨 EMERGENCY BOAT RESCUES ({criticalRequests.length})</span>
             </button>
 
-            {/* Supply Requests Section */}
             <button
               onClick={() => setQueueTab('SUPPLY_REQUESTS')}
               className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all whitespace-nowrap border ${
@@ -160,7 +181,6 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
               <span>📦 FOOD & SUPPLY REQUESTS ({supplyRequests.length})</span>
             </button>
 
-            {/* All Requests Option */}
             <button
               onClick={() => setQueueTab('ALL')}
               className={`flex items-center gap-1.5 px-3.5 py-3 rounded-2xl font-extrabold text-xs transition-all whitespace-nowrap border ${
@@ -171,7 +191,6 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
             >
               <span>View All ({victimRequests.length})</span>
             </button>
-
           </div>
 
           <button
@@ -186,7 +205,6 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
 
         {/* Filter Toolbar */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-          
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
             <input
@@ -219,7 +237,6 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
               <option key={dist} value={dist}>{dist}</option>
             ))}
           </select>
-
         </div>
       </div>
 
@@ -236,9 +253,12 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredRequests.map((req) => {
             const isUrgent = req.isUrgentRescue;
-
             const males = req.malesCount !== undefined ? req.malesCount : Math.max(1, Math.floor((req.peopleCount || 1) / 2));
             const females = req.femalesCount !== undefined ? req.femalesCount : Math.max(0, (req.peopleCount || 1) - males - (req.childrenCount || 0));
+
+            // Find logs for this specific request
+            const reqLogs = deliveryLogs.filter(log => log.requestId === req.id);
+            const isTimelineOpen = expandedTimelines[req.id];
 
             return (
               <div 
@@ -269,7 +289,12 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                         </>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
+                      {req.verified && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1" title="Verified by Admin Control Room">
+                          <ShieldCheck className="w-3 h-3 text-emerald-400" /> Verified
+                        </span>
+                      )}
                       <span className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-black ${
                         req.status === 'Rescued'
                           ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
@@ -303,7 +328,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                       </span>
                     </div>
 
-                    {/* Location Badge with PIN */}
+                    {/* Location Badge */}
                     <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-xl space-y-1.5">
                       <div className="flex items-start gap-2 text-xs text-slate-200">
                         <MapPin className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
@@ -320,11 +345,10 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
 
                       {req.latitude && req.longitude && (
                         <div className="text-[10px] font-mono text-emerald-400 pl-6 flex items-center gap-1">
-                          <span>GPS Pinned: {req.latitude.toFixed(4)}, {req.longitude.toFixed(4)}</span>
+                          <span>GPS: {req.latitude.toFixed(4)}, {req.longitude.toFixed(4)}</span>
                         </div>
                       )}
 
-                      {/* 1-Click Google Maps Navigation Button */}
                       <a
                         href={getGoogleMapsUrl(req)}
                         target="_blank"
@@ -356,39 +380,94 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                       </div>
                     )}
 
-                    {/* Phone & Actions */}
-                    <div className="pt-2 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <a
-                          href={`tel:${req.phone}`}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-md transition-colors"
-                        >
-                          <Phone className="w-3.5 h-3.5" />
-                          <span>Call {req.phone}</span>
-                        </a>
-
-                        {req.phone && (
+                    {/* Contact & Log Relief Delivery Bar */}
+                    <div className="pt-2 border-t border-slate-800 space-y-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
                           <a
-                            href={`https://wa.me/${req.phone.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(req.name)},%20this%20is%20Flood%20NGO%20Relief%20Team.%20We%20saw%20your%20request.`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-1.5 bg-emerald-950 border border-emerald-700 text-emerald-400 hover:bg-emerald-900 rounded-lg text-xs font-bold transition-colors"
-                            title="Chat on WhatsApp"
+                            href={`tel:${req.phone}`}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-md transition-colors"
                           >
-                            <MessageSquare className="w-4 h-4" />
+                            <Phone className="w-3.5 h-3.5" />
+                            <span>Call {req.phone}</span>
                           </a>
-                        )}
+
+                          {req.phone && (
+                            <a
+                              href={`https://wa.me/${req.phone.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(req.name)},%20this%20is%20Flood%20NGO%20Relief%20Team.`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1.5 bg-emerald-950 border border-emerald-700 text-emerald-400 hover:bg-emerald-900 rounded-lg text-xs font-bold transition-colors"
+                              title="Chat on WhatsApp"
+                            >
+                              <MessageSquare className="w-4 h-4" />
+                            </a>
+                          )}
+                        </div>
+
+                        <button
+                          onClick={() => handleDownloadSinglePDF(req)}
+                          className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg text-xs font-bold transition-colors"
+                          title="Download Rescue PDF Slip"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>PDF</span>
+                        </button>
                       </div>
 
+                      {/* Log Delivery Action Button */}
                       <button
-                        onClick={() => handleDownloadSinglePDF(req)}
-                        className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg text-xs font-bold transition-colors"
-                        title="Download Rescue PDF Slip"
+                        onClick={() => setActiveLogRequest(req)}
+                        className="w-full py-2 px-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 rounded-xl text-xs font-black shadow-md flex items-center justify-center gap-1.5 active:scale-95 transition-all"
                       >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>PDF</span>
+                        <Plus className="w-4 h-4" />
+                        <span>📦 LOG RELIEF DELIVERY FOR THIS AREA</span>
                       </button>
                     </div>
+
+                    {/* Relief Delivery History Timeline Section */}
+                    {reqLogs.length > 0 && (
+                      <div className="pt-2 border-t border-slate-800 space-y-2">
+                        <button
+                          onClick={() => toggleTimeline(req.id)}
+                          className="w-full flex items-center justify-between text-xs font-bold text-slate-300 bg-slate-950 p-2 rounded-lg border border-slate-800 hover:text-amber-300"
+                        >
+                          <span className="flex items-center gap-1.5">
+                            <History className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Relief Timeline ({reqLogs.length} Delivered)</span>
+                          </span>
+                          <span className="text-[10px] text-amber-400 font-extrabold">
+                            {isTimelineOpen ? "Hide Log ▲" : "View Log ▼"}
+                          </span>
+                        </button>
+
+                        {isTimelineOpen && (
+                          <div className="bg-slate-950/90 border border-slate-800 rounded-xl p-3 space-y-3.5 text-xs">
+                            {reqLogs.map((log) => (
+                              <div key={log.logId} className="border-l-2 border-amber-500 pl-3 space-y-1">
+                                <div className="flex items-center justify-between text-[11px]">
+                                  <span className="font-black text-amber-300">{log.deliveredBy}</span>
+                                  <span className="text-[10px] text-slate-400">
+                                    {new Date(log.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                  </span>
+                                </div>
+                                <p className="font-semibold text-slate-200">
+                                  📦 <span className="text-amber-200">{log.itemsDelivered}</span>
+                                </p>
+                                {log.deliveryNotes && (
+                                  <p className="text-[10px] text-slate-400 italic">
+                                    "{log.deliveryNotes}"
+                                  </p>
+                                )}
+                                <div className="text-[9px] font-bold text-emerald-400 flex items-center gap-1">
+                                  <ShieldCheck className="w-3 h-3" /> Verified by {log.verifiedBy || "Admin Control Room"}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                   </div>
                 </div>
@@ -432,6 +511,16 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
             );
           })}
         </div>
+      )}
+
+      {/* Modal for Logging Delivery */}
+      {activeLogRequest && (
+        <DeliveryLogModal
+          request={activeLogRequest}
+          ngos={ngos}
+          onClose={() => setActiveLogRequest(null)}
+          onSubmitted={() => loadLogs()}
+        />
       )}
 
     </div>
