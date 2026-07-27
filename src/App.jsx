@@ -14,7 +14,7 @@ import LoginModal from './components/LoginModal';
 import FloatingSOSButton from './components/FloatingSOSButton';
 import { storageService } from './services/storageService';
 import { authService } from './services/authService';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Lock, Key, Mail, ShieldCheck, AlertTriangle } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -29,6 +29,19 @@ export default function App() {
 
   const [currentAuth, setCurrentAuth] = useState(authService.getCurrentUser());
 
+  // Secret /raphul-admin route detection
+  const [isAdminPath, setIsAdminPath] = useState(false);
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [adminLoginError, setAdminLoginError] = useState('');
+
+  const checkPath = () => {
+    const isSecretPath = window.location.pathname === '/raphul-admin' || 
+                         window.location.hash === '#/raphul-admin' || 
+                         window.location.hash === '#raphul-admin';
+    setIsAdminPath(isSecretPath);
+  };
+
   const loadData = () => {
     setVictimRequests(storageService.getVictimRequests());
     setNgos(storageService.getNGOs());
@@ -42,21 +55,25 @@ export default function App() {
   };
 
   useEffect(() => {
+    checkPath();
     loadData();
 
     const handleDataChanged = () => loadData();
     const handleAuthChanged = () => {
       const auth = authService.getCurrentUser();
       setCurrentAuth(auth);
-      if (auth.role === 'ADMIN') {
-        setActiveTab('admin');
-      }
     };
 
+    const handlePopState = () => checkPath();
+
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('hashchange', handlePopState);
     window.addEventListener('flood_data_changed', handleDataChanged);
     window.addEventListener('flood_auth_changed', handleAuthChanged);
     
     return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('hashchange', handlePopState);
       window.removeEventListener('flood_data_changed', handleDataChanged);
       window.removeEventListener('flood_auth_changed', handleAuthChanged);
     };
@@ -74,17 +91,148 @@ export default function App() {
 
   const handleLogout = () => {
     authService.logout();
-    if (activeTab === 'admin') {
-      setActiveTab('dashboard');
+  };
+
+  const handleSecretAdminLogin = (e) => {
+    e.preventDefault();
+    setAdminLoginError('');
+    try {
+      authService.loginAdmin(adminEmail, adminPassword);
+      setAdminPassword('');
+      loadData();
+    } catch (err) {
+      setAdminLoginError(err.message || 'Invalid Email or Password');
     }
   };
 
   const urgentCount = victimRequests.filter(req => req.isUrgentRescue && req.status !== 'Rescued').length;
 
+  // SECRET /raphul-admin ROUTE VIEW
+  if (isAdminPath) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 font-sans p-4 sm:p-8 space-y-6">
+        
+        {/* Private Top Bar */}
+        <div className="max-w-7xl mx-auto flex items-center justify-between border-b border-red-900/40 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-red-600 rounded-xl text-white">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="text-lg font-black text-white">PRIVATE CONTROL ROOM (/raphul-admin)</h1>
+              <p className="text-xs text-red-300">Authorized Super Admin Access Only</p>
+            </div>
+          </div>
+
+          <a
+            href="/"
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.pathname = '/';
+              window.location.hash = '';
+            }}
+            className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl text-xs font-bold border border-slate-800"
+          >
+            &larr; Exit to Public Portal
+          </a>
+        </div>
+
+        {/* If logged in as Super Admin */}
+        {currentAuth.role === 'ADMIN' ? (
+          <div className="max-w-7xl mx-auto space-y-6">
+            <div className="bg-red-950/60 border border-red-500/40 rounded-2xl p-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span className="text-xs font-bold text-red-200">
+                  Logged in as Super Admin: <strong className="text-amber-300 font-black">raphulali@gmail.com</strong>
+                </span>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="px-3 py-1 bg-red-900 hover:bg-red-800 text-white rounded-lg text-xs font-bold"
+              >
+                Logout Super Admin
+              </button>
+            </div>
+
+            <AdminDashboard onDataUpdated={() => loadData()} />
+          </div>
+        ) : (
+          /* Secret Login Screen */
+          <div className="max-w-md mx-auto my-12 bg-slate-900 border border-red-900/60 rounded-3xl p-8 shadow-2xl space-y-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-red-600 to-rose-700 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-red-950">
+              <Lock className="w-8 h-8 text-white" />
+            </div>
+
+            <div className="text-center space-y-1">
+              <h2 className="text-xl font-black text-white uppercase tracking-tight">Super Admin Portal</h2>
+              <p className="text-xs text-slate-400">
+                Authorized Login for <span className="text-amber-300 font-bold">Raphul Ali</span>
+              </p>
+            </div>
+
+            {adminLoginError && (
+              <div className="p-3 bg-red-950/80 border border-red-500/50 rounded-xl text-red-200 text-xs font-semibold flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+                <span>{adminLoginError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSecretAdminLogin} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1">
+                  Super Admin Email
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <input
+                    type="email"
+                    value={adminEmail}
+                    onChange={(e) => setAdminEmail(e.target.value)}
+                    placeholder="raphulali@gmail.com"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1">
+                  Super Admin Password
+                </label>
+                <div className="relative">
+                  <Key className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <input
+                    type="password"
+                    value={adminPassword}
+                    onChange={(e) => setAdminPassword(e.target.value)}
+                    placeholder="Enter password"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500"
+                    required
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black rounded-xl text-sm shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
+              >
+                <Lock className="w-4 h-4" />
+                <span>UNLOCK SUPER ADMIN CONTROL ROOM</span>
+              </button>
+            </form>
+          </div>
+        )}
+
+      </div>
+    );
+  }
+
+  // PUBLIC WEBSITE VIEW
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans relative">
       
-      {/* Fixed Header Bar */}
+      {/* Fixed Header Bar (Zero Admin Buttons) */}
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -102,11 +250,6 @@ export default function App() {
         
         {/* Official ASDMA Emergency Helplines Notice */}
         <ASDMAHelplines />
-
-        {/* Admin Manual Verification Control Room (Visible ONLY when logged in as Admin) */}
-        {activeTab === 'admin' && currentAuth.role === 'ADMIN' && (
-          <AdminDashboard onDataUpdated={() => loadData()} />
-        )}
 
         {/* NGO Rescue Queue */}
         {activeTab === 'dashboard' && (
@@ -154,7 +297,7 @@ export default function App() {
       {/* Mobile Floating SOS Button */}
       <FloatingSOSButton openModal={openRescueModal} />
 
-      {/* Login Modal */}
+      {/* NGO & Volunteer Login Modal */}
       {isLoginModalOpen && (
         <LoginModal
           onClose={() => setIsLoginModalOpen(false)}
@@ -175,7 +318,7 @@ export default function App() {
         />
       )}
 
-      {/* Footer */}
+      {/* Public Footer (Zero Admin Links) */}
       <footer className="bg-slate-950 border-t border-slate-800/80 py-6 text-center text-xs text-slate-500 space-y-2 pb-20 sm:pb-6">
         <div className="flex flex-wrap items-center justify-center gap-4 text-slate-400">
           <button onClick={() => storageService.resetToDefaultSeed()} className="hover:text-amber-400 font-semibold flex items-center gap-1">
@@ -183,7 +326,7 @@ export default function App() {
           </button>
           <span>|</span>
           <button onClick={() => setIsLoginModalOpen(true)} className="hover:text-amber-400 font-semibold flex items-center gap-1">
-            🔐 Officer & NGO Login Portal
+            🤝 Partner Portal Login
           </button>
           <span>|</span>
           <span>Open-Source Assam Flood Relief Network</span>

@@ -170,7 +170,7 @@ export default function LoginModal({ onClose, onLoggedIn }) {
             }`}
           >
             <HeartHandshake className="w-3.5 h-3.5" />
-            <span>NGO</span>
+            <span>NGO Login</span>
           </button>
 
           <button
@@ -183,7 +183,7 @@ export default function LoginModal({ onClose, onLoggedIn }) {
             }`}
           >
             <UserCheck className="w-3.5 h-3.5" />
-            <span>Volunteer</span>
+            <span>Volunteer Login</span>
           </button>
 
           <button
@@ -196,20 +196,7 @@ export default function LoginModal({ onClose, onLoggedIn }) {
             }`}
           >
             <Building2 className="w-3.5 h-3.5" />
-            <span>Register + OTP</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => { setActiveMode('ADMIN_LOGIN'); setAdminError(''); }}
-            className={`flex-1 py-2 px-2 rounded-xl transition-all flex items-center justify-center gap-1 ${
-              activeMode === 'ADMIN_LOGIN'
-                ? 'bg-red-600 text-white font-black shadow-md'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Admin</span>
+            <span>Register Account</span>
           </button>
         </div>
 
@@ -579,70 +566,6 @@ export default function LoginModal({ onClose, onLoggedIn }) {
               </form>
             )}
 
-          </div>
-        )}
-
-        {/* MODE 4: ADMIN LOGIN */}
-        {activeMode === 'ADMIN_LOGIN' && (
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-black text-white flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-red-500" />
-                <span>Admin Control Room Login</span>
-              </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Restricted access for State Disaster Officers to verify citizen SOS requests & NGO/Volunteer registrations.
-              </p>
-            </div>
-
-            {adminError && (
-              <div className="p-3 bg-red-950/80 border border-red-500/40 rounded-xl text-red-200 text-xs font-semibold flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
-                <span>{adminError}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleAdminLoginSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
-                  Enter Admin Passcode / PIN
-                </label>
-                <div className="relative">
-                  <Key className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                  <input
-                    type="password"
-                    value={adminPin}
-                    onChange={(e) => setAdminPin(e.target.value)}
-                    placeholder="Enter PIN (Default: 1070)"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500"
-                    required
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black rounded-xl text-sm shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2"
-              >
-                <Lock className="w-4 h-4" />
-                <span>UNLOCK ADMIN CONTROL ROOM</span>
-              </button>
-            </form>
-
-            <div className="pt-2 border-t border-slate-800 text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setAdminPin('1070');
-                  authService.loginAdmin('1070');
-                  if (onLoggedIn) onLoggedIn();
-                  onClose();
-                }}
-                className="text-xs text-amber-400 hover:underline font-bold"
-              >
-                ⚡ 1-Tap Demo Admin Access (PIN: 1070)
-              </button>
-            </div>
           </div>
         )}
 

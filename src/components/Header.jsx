@@ -141,26 +141,6 @@ export default function Header({
 
         {/* Navigation Bar */}
         <nav className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto py-2 border-t border-slate-800/80 no-scrollbar text-xs font-black">
-          
-          {/* Admin Control Center Tab (Visible ONLY when logged in as Admin) */}
-          {isAdmin && (
-            <button
-              onClick={() => setActiveTab('admin')}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all whitespace-nowrap relative ${
-                activeTab === 'admin'
-                  ? 'bg-red-600 text-white font-black shadow-lg shadow-red-950/60 border border-red-400'
-                  : 'bg-red-950/60 text-red-300 hover:bg-red-900/60 border border-red-800/50'
-              }`}
-            >
-              <ShieldCheck className="w-4 h-4 text-red-400" />
-              <span>🛡️ ADMIN CONTROL ROOM</span>
-              {pendingCount > 0 && (
-                <span className="px-1.5 py-0.2 text-[10px] font-black bg-white text-red-600 rounded-full animate-pulse ml-1">
-                  {pendingCount}
-                </span>
-              )}
-            </button>
-          )}
 
           {/* NGO Directory */}
           <button

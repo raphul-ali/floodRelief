@@ -207,18 +207,20 @@ export const authService = {
   },
 
   /**
-   * Login as Admin Control Officer
+   * Login as Admin Control Officer (Requires raphulali@gmail.com & Raphul@9957422)
    */
-  loginAdmin: (pinOrPass) => {
-    const clean = (pinOrPass || '').trim().toLowerCase();
-    if (clean === '1070' || clean === '1234' || clean === 'admin' || clean === 'admin123') {
+  loginAdmin: (email, password) => {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanPass = (password || '').trim();
+
+    if (cleanEmail === 'raphulali@gmail.com' && cleanPass === 'Raphul@9957422') {
       const session = {
         role: 'ADMIN',
         user: {
-          id: 'admin-control-1',
-          name: 'Control Room Officer',
-          email: 'admin@asdma.gov.in',
-          title: 'ASDMA Emergency Verification Control'
+          id: 'admin-raphul',
+          name: 'Raphul Ali (Super Admin)',
+          email: 'raphulali@gmail.com',
+          title: 'Head Control Room Officer'
         }
       };
 
@@ -226,7 +228,7 @@ export const authService = {
       notifyAuthChanged();
       return session;
     } else {
-      throw new Error("Incorrect Admin Passcode. Default PIN for demo is 1070.");
+      throw new Error("Invalid Admin Email or Password. Access denied.");
     }
   },
 
