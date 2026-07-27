@@ -128,10 +128,8 @@ export default function Header({
 
         </div>
 
-        {/* 100% Screen-Fitted Multi-Line Navigation Bar for Mobile */}
+        {/* Navigation Bar */}
         <nav className="flex flex-col sm:flex-row items-center gap-1.5 py-1.5 border-t border-slate-800/80 text-[11px] sm:text-xs font-black w-full max-w-full">
-          
-          {/* Line 1 on Mobile: Relief Queue & NGO Directory */}
           <div className="flex items-center gap-1.5 w-full sm:w-auto sm:flex-1">
             <button
               onClick={() => setActiveTab('dashboard')}
@@ -158,19 +156,17 @@ export default function Header({
             </button>
           </div>
 
-          {/* Line 2 on Mobile (100% Full Width), Row Item on Desktop */}
           <button
-            onClick={() => setActiveTab('responders')}
-            className={`w-full sm:w-auto sm:flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl transition-all text-center min-h-[40px] ${
-              activeTab === 'responders' || activeTab === 'medicals'
+            onClick={() => setActiveTab('emergency')}
+            className={`w-full sm:w-auto sm:flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl transition-all text-center min-h-[38px] ${
+              activeTab === 'emergency'
                 ? 'bg-gradient-to-r from-red-600 via-rose-600 to-red-600 text-white shadow-md border border-red-400 font-black'
                 : 'text-red-200 bg-red-950/40 hover:bg-red-900/60 border border-red-900/40 font-bold'
             }`}
           >
             <Siren className="w-4 h-4 shrink-0 text-white animate-pulse" />
-            <span className="uppercase tracking-tight">🚨 NEARBY EMERGENCY SERVICES</span>
+            <span className="uppercase tracking-tight">🚨 EMERGENCY SERVICES</span>
           </button>
-
         </nav>
 
       </div>

@@ -1,8 +1,8 @@
 // 100% Free Emergency Medical & Hospital Search Service
-// Memory cache for OpenStreetMap results to prevent loss on Overpass API 429 rate-limiting
+// Memory cache for OpenStreetMap results to prevent loss on network timeouts
 let cachedOsmMedicals = [];
 
-// Pre-seeded verified emergency medical centers across Assam
+// Pre-seeded verified emergency medical centers across Assam (Ordered by State Priority)
 const VERIFIED_ASSAM_MEDICALS = [
   {
     id: "med-1",
@@ -126,19 +126,17 @@ export const medicalService = {
   getNearestMedicals: async (userLat, userLng, category = 'ALL') => {
     let currentOsmResults = [...cachedOsmMedicals];
 
-    // Query live OpenStreetMap Overpass API for medical nodes & ways around user's exact current GPS coordinates
+    // Broad live OpenStreetMap search for medical nodes & ways within 35 km
     if (userLat && userLng) {
       try {
-        const radiusMeters = 35000; // 35 km radius around user GPS
+        const radiusMeters = 35000;
         const query = `
-          [out:json][timeout:8];
+          [out:json][timeout:6];
           (
-            node["amenity"="hospital"](around:${radiusMeters},${userLat},${userLng});
-            node["amenity"="pharmacy"](around:${radiusMeters},${userLat},${userLng});
-            way["amenity"="hospital"](around:${radiusMeters},${userLat},${userLng});
-            way["amenity"="pharmacy"](around:${radiusMeters},${userLat},${userLng});
+            node["amenity"~"hospital|pharmacy|clinic"](around:${radiusMeters},${userLat},${userLng});
+            way["amenity"~"hospital|pharmacy|clinic"](around:${radiusMeters},${userLat},${userLng});
           );
-          out center 25;
+          out center 30;
         `;
         
         const endpoints = [
@@ -148,7 +146,7 @@ export const medicalService = {
 
         for (const url of endpoints) {
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 4000);
+          const timeoutId = setTimeout(() => controller.abort(), 4500);
 
           try {
             const response = await fetch(url, { signal: controller.signal });
@@ -174,8 +172,8 @@ export const medicalService = {
                     category: categoryType,
                     phone: phone,
                     controlPhone: '+91 108',
-                    district: tags['addr:district'] || tags['addr:city'] || 'Current GPS Zone',
-                    address: tags['addr:full'] || tags['addr:street'] || tags['addr:suburb'] || 'Near Your GPS Coordinates',
+                    district: tags['addr:district'] || tags['addr:city'] || 'Current Location',
+                    address: tags['addr:full'] || tags['addr:street'] || tags['addr:suburb'] || 'Near Your Current GPS Coordinates',
                     latitude: lat,
                     longitude: lon,
                     is24x7: tags['opening_hours'] === '24/7' || tags.amenity === 'hospital',
@@ -194,7 +192,7 @@ export const medicalService = {
           }
         }
       } catch (err) {
-        // Silent catch fallback
+        // Silent catch
       }
     }
 
@@ -209,13 +207,19 @@ export const medicalService = {
 
     if (userLat && userLng) {
       listWithDistance.sort((a, b) => {
-        const aIsLocalOsm = a.id.startsWith('osm-') && a.distanceKm !== null && a.distanceKm < 100;
-        const bIsLocalOsm = b.id.startsWith('osm-') && b.distanceKm !== null && b.distanceKm < 100;
+        // 1. Real local stations (< 200 km away) ALWAYS come at the very top sorted by distance!
+        const aIsNear = a.distanceKm !== null && a.distanceKm < 200;
+        const bIsNear = b.distanceKm !== null && b.distanceKm < 200;
 
-        if (aIsLocalOsm && !bIsLocalOsm) return -1;
-        if (!aIsLocalOsm && bIsLocalOsm) return 1;
+        if (aIsNear && !bIsNear) return -1;
+        if (!aIsNear && bIsNear) return 1;
 
-        return (a.distanceKm || 9999) - (b.distanceKm || 9999);
+        if (aIsNear && bIsNear) {
+          return (a.distanceKm || 9999) - (b.distanceKm || 9999);
+        }
+
+        // 2. Distant items maintain Assam state priority order (Guwahati GMCH 1st, JMCH Jorhat 2nd, Dispur 3rd)
+        return 0;
       });
     }
 

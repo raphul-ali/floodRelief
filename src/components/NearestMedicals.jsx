@@ -16,7 +16,6 @@ export default function NearestMedicals() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [selectedDistrict, setSelectedDistrict] = useState('ALL');
-  const [maxDistanceRadius, setMaxDistanceRadius] = useState(80); // Default 80 km radius limit
 
   // Auto-detect GPS location on mount
   const handleDetectGPS = (isAuto = false) => {
@@ -89,7 +88,6 @@ export default function NearestMedicals() {
     handleDetectGPS(true);
   }, []);
 
-  // Filtered Medicals
   const filteredList = medicalsList.filter(med => {
     const q = searchQuery.toLowerCase();
     const matchesSearch = 
@@ -107,14 +105,7 @@ export default function NearestMedicals() {
       (selectedCategory === 'Pharmacy' && (med.category === 'Pharmacy' || med.type?.toLowerCase().includes('pharmacy') || med.name?.toLowerCase().includes('chemist'))) ||
       (selectedCategory === 'Relief Center' && (med.category === 'Relief Center' || med.type?.toLowerCase().includes('relief') || med.name?.toLowerCase().includes('camp')));
 
-    // Distance Radius Filter: default max 80 km
-    const matchesRadius = 
-      !userLocation || 
-      maxDistanceRadius === 'ALL' || 
-      med.distanceKm === null || 
-      med.distanceKm <= maxDistanceRadius;
-
-    return matchesSearch && matchesDistrict && matchesCategory && matchesRadius;
+    return matchesSearch && matchesDistrict && matchesCategory;
   });
 
   return (
@@ -126,11 +117,11 @@ export default function NearestMedicals() {
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs font-black rounded-full border border-emerald-500/40">
-                24x7 Medical & Anti-Venom Wards
+                24x7 Emergency Medical Units
               </span>
               {userLocation && (
                 <span className="px-2 py-0.5 bg-teal-500/20 text-teal-300 text-xs font-extrabold rounded-full border border-teal-500/40">
-                  Within {maxDistanceRadius === 'ALL' ? 'Unlimited' : `${maxDistanceRadius} km`}
+                  Sorted by Live GPS Proximity
                 </span>
               )}
             </div>
@@ -138,7 +129,7 @@ export default function NearestMedicals() {
               NEAREST HOSPITALS, PHARMACIES & MEDICAL RELIEF
             </h2>
             <p className="text-xs sm:text-sm text-slate-300">
-              Locates free anti-venom, emergency ICUs, and flood relief medical wards closest to your location.
+              Locates free anti-venom, emergency ICUs, and medical relief units closest to your current location.
             </p>
           </div>
 
@@ -185,7 +176,7 @@ export default function NearestMedicals() {
             />
           </div>
 
-          {/* Category Tabs & Radius Selector */}
+          {/* Category Tabs & District Filter */}
           <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
             <div className="flex items-center gap-1 overflow-x-auto text-xs w-full sm:w-auto pb-1 sm:pb-0">
               <button
@@ -220,19 +211,6 @@ export default function NearestMedicals() {
               </button>
             </div>
 
-            {/* Distance Radius Filter Dropdown */}
-            <select
-              value={maxDistanceRadius}
-              onChange={(e) => setMaxDistanceRadius(e.target.value === 'ALL' ? 'ALL' : Number(e.target.value))}
-              className="px-3 py-2 bg-slate-950 border border-emerald-500/40 rounded-xl text-xs font-black text-emerald-300 focus:outline-none focus:border-emerald-400 shadow-sm shrink-0"
-              title="Filter by distance from your current location"
-            >
-              <option value={80}>Within 80 km (Default)</option>
-              <option value={150}>Within 150 km</option>
-              <option value={300}>Within 300 km</option>
-              <option value="ALL">Show All Units</option>
-            </select>
-
             {/* District Dropdown */}
             <select
               value={selectedDistrict}
@@ -257,36 +235,25 @@ export default function NearestMedicals() {
           <span>Locating nearest emergency hospitals based on your GPS...</span>
         </div>
       ) : filteredList.length === 0 ? (
-        /* Empty State Callout when no results within 80km */
-        <div className="bg-slate-900/80 border border-emerald-500/40 rounded-3xl p-8 text-center space-y-4 shadow-xl">
+        <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-8 text-center space-y-4 shadow-xl">
           <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/30">
             <Compass className="w-7 h-7" />
           </div>
           <div className="space-y-1">
             <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-tight">
-              No Medical Units Found Within {maxDistanceRadius === 'ALL' ? 'Search Criteria' : `${maxDistanceRadius} km`}
+              No Medical Units Match Filter
             </h3>
             <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
-              Your location is outside the immediate {maxDistanceRadius} km radius of local clinics. Click below to expand search distance to view regional government hospitals.
+              No medical units found for the selected search term or category. Reset your filters to view all emergency units.
             </p>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-            {maxDistanceRadius !== 300 && (
-              <button
-                onClick={() => setMaxDistanceRadius(300)}
-                className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all active:scale-95"
-              >
-                Expand Radius to 300 km
-              </button>
-            )}
-            {maxDistanceRadius !== 'ALL' && (
-              <button
-                onClick={() => setMaxDistanceRadius('ALL')}
-                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 font-black text-xs rounded-xl border border-slate-700 transition-all active:scale-95"
-              >
-                Show All Assam State Medicals
-              </button>
-            )}
+          <div className="pt-2">
+            <button
+              onClick={() => { setSearchQuery(''); setSelectedCategory('ALL'); setSelectedDistrict('ALL'); }}
+              className="px-4 py-2 bg-emerald-500 text-slate-950 font-black text-xs rounded-xl shadow-md"
+            >
+              Reset Filters
+            </button>
           </div>
         </div>
       ) : (

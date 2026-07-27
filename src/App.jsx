@@ -6,12 +6,12 @@ import InteractiveMap from './components/InteractiveMap';
 import NGODirectory from './components/NGODirectory';
 import VolunteerDirectory from './components/VolunteerDirectory';
 import NearestMedicals from './components/NearestMedicals';
-import NearestResponders from './components/NearestResponders';
 import FreeHostingGuide from './components/FreeHostingGuide';
 import VictimRequestForm from './components/VictimRequestForm';
 import AdminDashboard from './components/AdminDashboard';
 import LoginModal from './components/LoginModal';
 import FloatingSOSButton from './components/FloatingSOSButton';
+import EmergencyServices from './components/EmergencyServices';
 import { storageService } from './services/storageService';
 import { authService } from './services/authService';
 import { RefreshCw, Lock, Key, Mail, ShieldCheck, AlertTriangle } from 'lucide-react';
@@ -268,12 +268,8 @@ export default function App() {
           />
         )}
 
-        {activeTab === 'responders' && (
-          <NearestResponders />
-        )}
-
-        {activeTab === 'medicals' && (
-          <NearestMedicals />
+        {activeTab === 'emergency' && (
+          <EmergencyServices />
         )}
 
         {activeTab === 'ngos' && (
