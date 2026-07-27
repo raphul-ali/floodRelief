@@ -1,4 +1,7 @@
 // 100% Free Emergency Medical & Hospital Search Service
+// Memory cache for OpenStreetMap results to prevent loss on Overpass API 429 rate-limiting
+let cachedOsmMedicals = [];
+
 // Pre-seeded verified emergency medical centers across Assam
 const VERIFIED_ASSAM_MEDICALS = [
   {
@@ -101,12 +104,6 @@ const VERIFIED_ASSAM_MEDICALS = [
   }
 ];
 
-// Helper to check if coordinates are within Assam / Northeast region
-const isWithinAssamRegion = (lat, lng) => {
-  if (!lat || !lng) return false;
-  return lat >= 24.0 && lat <= 28.2 && lng >= 89.5 && lng <= 96.5;
-};
-
 // Haversine Distance Formula (Returns distance in kilometers)
 export const calculateDistance = (lat1, lon1, lat2, lon2) => {
   if (!lat1 || !lon1 || !lat2 || !lon2) return 9999;
@@ -125,75 +122,101 @@ export const calculateDistance = (lat1, lon1, lat2, lon2) => {
 };
 
 export const medicalService = {
-  // Get nearest medical centers sorted by distance from user GPS
+  // Get nearest medical centers sorted strictly by distance from user GPS
   getNearestMedicals: async (userLat, userLng, category = 'ALL') => {
-    let medicals = [...VERIFIED_ASSAM_MEDICALS];
+    let currentOsmResults = [...cachedOsmMedicals];
 
-    // Attempt OpenStreetMap Overpass API call if user coordinates are inside Assam
-    if (userLat && userLng && isWithinAssamRegion(userLat, userLng)) {
+    // Query live OpenStreetMap Overpass API for medical nodes & ways around user's exact current GPS coordinates
+    if (userLat && userLng) {
       try {
-        const radiusMeters = 30000;
+        const radiusMeters = 35000; // 35 km radius around user GPS
         const query = `
-          [out:json][timeout:10];
+          [out:json][timeout:8];
           (
             node["amenity"="hospital"](around:${radiusMeters},${userLat},${userLng});
             node["amenity"="pharmacy"](around:${radiusMeters},${userLat},${userLng});
-            node["amenity"="clinic"](around:${radiusMeters},${userLat},${userLng});
+            way["amenity"="hospital"](around:${radiusMeters},${userLat},${userLng});
+            way["amenity"="pharmacy"](around:${radiusMeters},${userLat},${userLng});
           );
-          out body 15;
+          out center 25;
         `;
-        const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
-        const response = await fetch(url);
         
-        if (response.ok) {
-          const data = await response.json();
-          if (data.elements && data.elements.length > 0) {
-            const osmResults = data.elements.map(el => {
-              const tags = el.tags || {};
-              const name = tags.name || tags['name:en'] || (tags.amenity === 'hospital' ? 'Local Medical Hospital' : 'Local Pharmacy');
-              const phone = tags.phone || tags['contact:phone'] || tags['emergency:phone'] || '108';
-              const categoryType = tags.amenity === 'hospital' ? 'Hospital' : (tags.amenity === 'pharmacy' ? 'Pharmacy' : 'Relief Center');
-              
-              return {
-                id: `osm-med-${el.id}`,
-                name: name,
-                type: `OpenStreetMap ${tags.amenity ? tags.amenity.toUpperCase() : 'Medical Unit'}`,
-                category: categoryType,
-                phone: phone,
-                controlPhone: '+91 108',
-                district: tags['addr:district'] || tags['addr:city'] || 'Nearby Zone',
-                address: tags['addr:full'] || tags['addr:street'] || 'Nearby Location',
-                latitude: el.lat,
-                longitude: el.lon,
-                is24x7: tags['opening_hours'] === '24/7' || tags.amenity === 'hospital',
-                services: ["Emergency Care", "First Aid Supplies", "Ambulance"]
-              };
-            });
+        const endpoints = [
+          `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`,
+          `https://overpass.kumi.systems/api/interpreter?data=${encodeURIComponent(query)}`
+        ];
 
-            const combined = [...osmResults, ...VERIFIED_ASSAM_MEDICALS];
-            medicals = Array.from(new Map(combined.map(item => [item.id, item])).values());
+        for (const url of endpoints) {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+          try {
+            const response = await fetch(url, { signal: controller.signal });
+            clearTimeout(timeoutId);
+
+            if (response.ok) {
+              const data = await response.json();
+              if (data.elements && data.elements.length > 0) {
+                currentOsmResults = data.elements.map(el => {
+                  const tags = el.tags || {};
+                  const lat = el.lat || (el.center ? el.center.lat : null);
+                  const lon = el.lon || (el.center ? el.center.lon : null);
+                  if (!lat || !lon) return null;
+
+                  const name = tags.name || tags['name:en'] || (tags.amenity === 'hospital' ? 'Local Hospital' : 'Local Pharmacy');
+                  const phone = tags.phone || tags['contact:phone'] || tags['emergency:phone'] || '108';
+                  const categoryType = tags.amenity === 'hospital' ? 'Hospital' : (tags.amenity === 'pharmacy' ? 'Pharmacy' : 'Relief Center');
+                  
+                  return {
+                    id: `osm-med-${el.id}`,
+                    name: name,
+                    type: `Live GPS ${tags.amenity ? tags.amenity.toUpperCase() : 'Medical Unit'}`,
+                    category: categoryType,
+                    phone: phone,
+                    controlPhone: '+91 108',
+                    district: tags['addr:district'] || tags['addr:city'] || 'Current GPS Zone',
+                    address: tags['addr:full'] || tags['addr:street'] || tags['addr:suburb'] || 'Near Your GPS Coordinates',
+                    latitude: lat,
+                    longitude: lon,
+                    is24x7: tags['opening_hours'] === '24/7' || tags.amenity === 'hospital',
+                    services: ["Emergency Care", "First Aid Supplies", "Ambulance"]
+                  };
+                }).filter(Boolean);
+
+                if (currentOsmResults.length > 0) {
+                  cachedOsmMedicals = currentOsmResults;
+                }
+                break;
+              }
+            }
+          } catch (e) {
+            clearTimeout(timeoutId);
           }
         }
       } catch (err) {
-        console.warn("Overpass OSM API fetch timed out. Falling back to local verified hospital database.", err);
+        // Silent catch fallback
       }
     }
 
-    // Calculate distance and sort by nearest
-    const listWithDistance = medicals.map(med => {
+    const combinedMedicals = [...currentOsmResults, ...VERIFIED_ASSAM_MEDICALS];
+
+    const listWithDistance = combinedMedicals.map(med => {
       const dist = (userLat && userLng) 
         ? calculateDistance(userLat, userLng, med.latitude, med.longitude)
         : null;
       return { ...med, distanceKm: dist };
     });
 
-    const isUserInsideAssam = isWithinAssamRegion(userLat, userLng);
+    if (userLat && userLng) {
+      listWithDistance.sort((a, b) => {
+        const aIsLocalOsm = a.id.startsWith('osm-') && a.distanceKm !== null && a.distanceKm < 100;
+        const bIsLocalOsm = b.id.startsWith('osm-') && b.distanceKm !== null && b.distanceKm < 100;
 
-    if (isUserInsideAssam) {
-      // User is physically inside Assam: sort strictly by closest distance in km
-      listWithDistance.sort((a, b) => (a.distanceKm || 9999) - (b.distanceKm || 9999));
-    } else {
-      // User is testing from outside Assam: keep GMCH Guwahati, JMCH Jorhat, Dispur Relief HQs at top
+        if (aIsLocalOsm && !bIsLocalOsm) return -1;
+        if (!aIsLocalOsm && bIsLocalOsm) return 1;
+
+        return (a.distanceKm || 9999) - (b.distanceKm || 9999);
+      });
     }
 
     if (category !== 'ALL') {

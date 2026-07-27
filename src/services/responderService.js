@@ -1,10 +1,12 @@
 // 100% Free Emergency Responders Search Service (Fire Dept, Police Stations, NDRF/SDRF Rescue Squads)
 import { calculateDistance } from './medicalService';
 
+// Memory cache for OpenStreetMap results to prevent loss on Overpass API 429 rate-limiting
+let cachedOsmResponders = [];
+
 // Helper to check if coordinates are within Assam / Northeast region
 const isWithinAssamRegion = (lat, lng) => {
   if (!lat || !lng) return false;
-  // Assam bounding box approx: Lat 24.0 to 28.2, Lng 89.5 to 96.5
   return lat >= 24.0 && lat <= 28.2 && lng >= 89.5 && lng <= 96.5;
 };
 
@@ -170,74 +172,101 @@ const VERIFIED_ASSAM_RESPONDERS = [
 
 export const responderService = {
   getNearestResponders: async (userLat, userLng, category = 'ALL') => {
-    let responders = [...VERIFIED_ASSAM_RESPONDERS];
+    let currentOsmResults = [...cachedOsmResponders];
 
-    // Attempt OpenStreetMap Overpass API call if user is inside Assam
-    if (userLat && userLng && isWithinAssamRegion(userLat, userLng)) {
+    // 80 km search query with fast 4-second timeout
+    if (userLat && userLng) {
       try {
-        const radiusMeters = 40000; // 40 km radius
+        const radiusMeters = 80000; // 80 km search radius
         const query = `
-          [out:json][timeout:10];
+          [out:json][timeout:8];
           (
             node["amenity"="fire_station"](around:${radiusMeters},${userLat},${userLng});
             node["amenity"="police"](around:${radiusMeters},${userLat},${userLng});
             node["emergency"="rescue_station"](around:${radiusMeters},${userLat},${userLng});
+            way["amenity"="fire_station"](around:${radiusMeters},${userLat},${userLng});
+            way["amenity"="police"](around:${radiusMeters},${userLat},${userLng});
           );
-          out body 15;
+          out center 30;
         `;
-        const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
-        const response = await fetch(url);
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data.elements && data.elements.length > 0) {
-            const osmResults = data.elements.map(el => {
-              const tags = el.tags || {};
-              const name = tags.name || tags['name:en'] || (tags.amenity === 'fire_station' ? 'Local Fire & Rescue Station' : 'Police Station / Thana');
-              const phone = tags.phone || tags['contact:phone'] || tags['emergency:phone'] || (tags.amenity === 'fire_station' ? '101' : '112');
-              const categoryType = tags.amenity === 'fire_station' ? 'Fire Dept' : (tags.amenity === 'police' ? 'Police Station' : 'Rescue Squad');
-              
-              return {
-                id: `osm-resp-${el.id}`,
-                name: name,
-                type: `OpenStreetMap ${tags.amenity ? tags.amenity.toUpperCase() : 'Emergency Unit'}`,
-                category: categoryType,
-                phone: phone,
-                controlPhone: '+91 112',
-                district: tags['addr:district'] || tags['addr:city'] || 'Nearby Zone',
-                address: tags['addr:full'] || tags['addr:street'] || 'Nearby Location',
-                latitude: el.lat,
-                longitude: el.lon,
-                services: ["Emergency Response", "Flood Assistance", "24x7 Patrol"]
-              };
-            });
 
-            const combined = [...osmResults, ...VERIFIED_ASSAM_RESPONDERS];
-            responders = Array.from(new Map(combined.map(item => [item.id, item])).values());
+        const endpoints = [
+          `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`,
+          `https://overpass.kumi.systems/api/interpreter?data=${encodeURIComponent(query)}`
+        ];
+
+        for (const url of endpoints) {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+          try {
+            const response = await fetch(url, { signal: controller.signal });
+            clearTimeout(timeoutId);
+
+            if (response.ok) {
+              const data = await response.json();
+              if (data.elements && data.elements.length > 0) {
+                currentOsmResults = data.elements.map(el => {
+                  const tags = el.tags || {};
+                  const lat = el.lat || (el.center ? el.center.lat : null);
+                  const lon = el.lon || (el.center ? el.center.lon : null);
+                  if (!lat || !lon) return null;
+
+                  const name = tags.name || tags['name:en'] || (tags.amenity === 'fire_station' ? 'Local Fire & Rescue Station' : 'Police Station / Thana');
+                  const phone = tags.phone || tags['contact:phone'] || tags['emergency:phone'] || (tags.amenity === 'fire_station' ? '101' : '112');
+                  const categoryType = tags.amenity === 'fire_station' ? 'Fire Dept' : (tags.amenity === 'police' ? 'Police Station' : 'Rescue Squad');
+                  
+                  return {
+                    id: `osm-resp-${el.id}`,
+                    name: name,
+                    type: `Live GPS ${tags.amenity ? tags.amenity.toUpperCase() : 'Emergency Unit'}`,
+                    category: categoryType,
+                    phone: phone,
+                    controlPhone: '+91 112',
+                    district: tags['addr:district'] || tags['addr:city'] || 'Current GPS Zone',
+                    address: tags['addr:full'] || tags['addr:street'] || tags['addr:suburb'] || 'Near Your GPS Coordinates',
+                    latitude: lat,
+                    longitude: lon,
+                    services: ["Live Emergency Response", "Local Patrol", "24x7 Assistance"]
+                  };
+                }).filter(Boolean);
+
+                if (currentOsmResults.length > 0) {
+                  cachedOsmResponders = currentOsmResults;
+                }
+                break;
+              }
+            }
+          } catch (e) {
+            clearTimeout(timeoutId);
           }
         }
       } catch (err) {
-        console.warn("Overpass OSM API fetch timed out. Falling back to local verified responders.", err);
+        // Silent catch fallback
       }
     }
 
-    // Calculate Haversine distance
-    const listWithDistance = responders.map(resp => {
+    const combinedResponders = [...currentOsmResults, ...VERIFIED_ASSAM_RESPONDERS];
+
+    const listWithDistance = combinedResponders.map(resp => {
       const dist = (userLat && userLng) 
         ? calculateDistance(userLat, userLng, resp.latitude, resp.longitude)
         : null;
       return { ...resp, distanceKm: dist };
     });
 
-    const isUserInsideAssam = isWithinAssamRegion(userLat, userLng);
+    if (userLat && userLng) {
+      listWithDistance.sort((a, b) => {
+        // 1. Live OSM stations near user's GPS (< 100km away) ALWAYS come first!
+        const aIsLocalOsm = a.id.startsWith('osm-') && a.distanceKm !== null && a.distanceKm < 100;
+        const bIsLocalOsm = b.id.startsWith('osm-') && b.distanceKm !== null && b.distanceKm < 100;
 
-    if (isUserInsideAssam) {
-      // User is physically inside Assam: sort strictly by closest distance in km
-      listWithDistance.sort((a, b) => (a.distanceKm || 9999) - (b.distanceKm || 9999));
-    } else {
-      // User is outside Assam (e.g. Delhi / Bangalore / Web preview):
-      // Keep Central HQ & Priority Disaster Hubs at top (Guwahati HQ, NDRF, SDRF, Majuli, Jorhat)
-      // Do NOT let raw distance from Delhi sort Dhubri first!
+        if (aIsLocalOsm && !bIsLocalOsm) return -1;
+        if (!aIsLocalOsm && bIsLocalOsm) return 1;
+
+        // 2. Sort strictly by nearest distanceKm
+        return (a.distanceKm || 9999) - (b.distanceKm || 9999);
+      });
     }
 
     if (category !== 'ALL') {

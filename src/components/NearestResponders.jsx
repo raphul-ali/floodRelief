@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Flame, Shield, Navigation, Phone, MessageSquare, MapPin, Search, Filter, 
-  ExternalLink, CheckCircle2, Siren, RefreshCw 
+  ExternalLink, CheckCircle2, Siren, RefreshCw, Compass
 } from 'lucide-react';
 import { responderService } from '../services/responderService';
 import { ASSAM_DISTRICTS } from '../services/storageService';
@@ -16,11 +16,16 @@ export default function NearestResponders() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [selectedDistrict, setSelectedDistrict] = useState('ALL');
+  const [maxDistanceRadius, setMaxDistanceRadius] = useState(80); // Default 80 km radius limit
 
   // Auto-detect GPS location on mount
   const handleDetectGPS = (isAuto = false) => {
     setIsLocating(true);
     setLocationStatus(isAuto ? 'Auto-detecting your live GPS coordinates...' : 'Acquiring your exact GPS coordinates...');
+
+    // Use current userLocation as fallback if already acquired
+    const fallbackLat = userLocation?.lat || null;
+    const fallbackLng = userLocation?.lng || null;
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -39,7 +44,7 @@ export default function NearestResponders() {
               const ipData = await res.json();
               if (ipData.latitude && ipData.longitude) {
                 setUserLocation({ lat: ipData.latitude, lng: ipData.longitude });
-                setLocationStatus(`📍 Live IP Location (${ipData.city || 'Assam'}): ${ipData.latitude.toFixed(4)}, ${ipData.longitude.toFixed(4)}`);
+                setLocationStatus(`📍 Live Location (${ipData.city || 'Assam'}): ${ipData.latitude.toFixed(4)}, ${ipData.longitude.toFixed(4)}`);
                 loadResponders(ipData.latitude, ipData.longitude, selectedCategory);
                 setIsLocating(false);
                 return;
@@ -50,15 +55,20 @@ export default function NearestResponders() {
           }
 
           setIsLocating(false);
-          setLocationStatus('⚠️ Click "Detect Live GPS" to pin your location or select your District.');
-          loadResponders(null, null, selectedCategory);
+          if (fallbackLat && fallbackLng) {
+            setLocationStatus(`📍 Live GPS Retained: ${fallbackLat.toFixed(4)}, ${fallbackLng.toFixed(4)}`);
+            loadResponders(fallbackLat, fallbackLng, selectedCategory);
+          } else {
+            setLocationStatus('⚠️ Click "Detect Live GPS" to pin your location or select your District.');
+            loadResponders(null, null, selectedCategory);
+          }
         },
-        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
       );
     } else {
       setIsLocating(false);
       setLocationStatus('⚠️ Geolocation not supported by browser. Select your District below.');
-      loadResponders(null, null, selectedCategory);
+      loadResponders(fallbackLat, fallbackLng, selectedCategory);
     }
   };
 
@@ -89,7 +99,21 @@ export default function NearestResponders() {
 
     const matchesDistrict = selectedDistrict === 'ALL' || resp.district === selectedDistrict;
 
-    return matchesSearch && matchesDistrict;
+    const matchesCategory = 
+      selectedCategory === 'ALL' || 
+      resp.category === selectedCategory ||
+      (selectedCategory === 'Fire Dept' && (resp.category === 'Fire Dept' || resp.type?.toLowerCase().includes('fire') || resp.name?.toLowerCase().includes('fire'))) ||
+      (selectedCategory === 'Police Station' && (resp.category === 'Police Station' || resp.type?.toLowerCase().includes('police') || resp.name?.toLowerCase().includes('police') || resp.name?.toLowerCase().includes('thana'))) ||
+      (selectedCategory === 'Rescue Squad' && (resp.category === 'Rescue Squad' || resp.type?.toLowerCase().includes('rescue') || resp.name?.toLowerCase().includes('ndrf') || resp.name?.toLowerCase().includes('sdrf')));
+
+    // Distance Radius Filter: maxDistanceRadius default is 80km
+    const matchesRadius = 
+      !userLocation || 
+      maxDistanceRadius === 'ALL' || 
+      resp.distanceKm === null || 
+      resp.distanceKm <= maxDistanceRadius;
+
+    return matchesSearch && matchesDistrict && matchesCategory && matchesRadius;
   });
 
   const getCategoryBadge = (category) => {
@@ -123,34 +147,45 @@ export default function NearestResponders() {
       {/* Header Banner */}
       <div className="bg-gradient-to-r from-red-950 via-slate-900 to-amber-950 border border-red-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/20 text-red-300 border border-red-500/40 text-xs font-black uppercase tracking-wider">
-              <Siren className="w-4 h-4 text-red-400 animate-pulse" />
-              <span>Live GPS Auto-Detection Active</span>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 bg-red-500/20 text-red-400 text-xs font-black rounded-full border border-red-500/40">
+                24x7 Government & Rescue Squads
+              </span>
+              {userLocation && (
+                <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs font-extrabold rounded-full border border-emerald-500/40">
+                  Within {maxDistanceRadius === 'ALL' ? 'Unlimited' : `${maxDistanceRadius} km`}
+                </span>
+              )}
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-white">
+            <h2 className="text-xl sm:text-3xl font-black text-white tracking-tight uppercase">
               NEAREST FIRE STATIONS, POLICE THANAS & RESCUE SQUADS
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-300">
               Calculates real-time distance from your exact live GPS coordinates.
             </p>
           </div>
 
+          {/* GPS Detector Button */}
           <button
             onClick={() => handleDetectGPS(false)}
             disabled={isLocating}
-            className="flex items-center gap-2 px-5 py-3 rounded-2xl text-xs sm:text-sm font-black bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 hover:from-red-500 hover:to-amber-400 text-white shadow-xl shadow-red-950/60 transition-all shrink-0 active:scale-95 animate-urgent-pulse"
+            className="flex items-center justify-center gap-2 px-5 py-3 rounded-2xl font-black text-xs bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 text-white shadow-lg active:scale-95 transition-all border border-red-400/40 shrink-0 disabled:opacity-50"
           >
-            <Navigation className={`w-5 h-5 ${isLocating ? 'animate-spin' : ''}`} />
-            <span>{isLocating ? 'REFRESHING GPS...' : 'RE-DETECT MY LIVE GPS'}</span>
+            <Navigation className={`w-4 h-4 ${isLocating ? 'animate-spin' : ''}`} />
+            <span>{isLocating ? 'Acquiring GPS...' : 'RE-DETECT MY LIVE GPS'}</span>
           </button>
         </div>
 
+        {/* Location Status Bar */}
         {locationStatus && (
-          <div className="text-xs font-bold text-amber-300 bg-amber-950/50 border border-amber-800/60 px-4 py-2 rounded-xl flex items-center justify-between">
-            <span>{locationStatus}</span>
+          <div className="bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 flex items-center justify-between gap-2 text-xs font-bold text-amber-300">
+            <div className="flex items-center gap-2 truncate">
+              <MapPin className="w-4 h-4 text-red-400 shrink-0" />
+              <span className="truncate">{locationStatus}</span>
+            </div>
             {userLocation && (
-              <span className="text-[10px] bg-slate-900 px-2 py-1 rounded border border-amber-500/40 text-white font-mono">
+              <span className="text-[11px] font-mono text-slate-400 shrink-0 hidden sm:inline">
                 {userLocation.lat.toFixed(4)}, {userLocation.lng.toFixed(4)}
               </span>
             )}
@@ -158,77 +193,93 @@ export default function NearestResponders() {
         )}
       </div>
 
-      {/* Toolbar */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl">
-        
-        {/* Search */}
-        <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search station name, district..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-red-400"
-          />
-        </div>
-
-        {/* Categories & District Filter */}
-        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto text-xs">
+      {/* Filter and Search Bar */}
+      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-4 shadow-xl">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-3">
           
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => setSelectedCategory('ALL')}
-              className={`px-3 py-1.5 rounded-xl font-bold border transition-colors ${
-                selectedCategory === 'ALL'
-                  ? 'bg-red-600 text-white border-red-500'
-                  : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
-              }`}
-            >
-              All Responders
-            </button>
-            <button
-              onClick={() => setSelectedCategory('Fire Dept')}
-              className={`px-3 py-1.5 rounded-xl font-bold border transition-colors ${
-                selectedCategory === 'Fire Dept'
-                  ? 'bg-amber-600 text-white border-amber-500'
-                  : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
-              }`}
-            >
-              🚒 Fire Dept
-            </button>
-            <button
-              onClick={() => setSelectedCategory('Police Station')}
-              className={`px-3 py-1.5 rounded-xl font-bold border transition-colors ${
-                selectedCategory === 'Police Station'
-                  ? 'bg-blue-600 text-white border-blue-500'
-                  : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
-              }`}
-            >
-              👮 Police Thana
-            </button>
-            <button
-              onClick={() => setSelectedCategory('Rescue Squad')}
-              className={`px-3 py-1.5 rounded-xl font-bold border transition-colors ${
-                selectedCategory === 'Rescue Squad'
-                  ? 'bg-rose-600 text-white border-rose-500'
-                  : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
-              }`}
-            >
-              🚁 NDRF/SDRF
-            </button>
+          {/* Search Box */}
+          <div className="relative w-full md:flex-1">
+            <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search station name, district, or town..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-medium"
+            />
           </div>
 
-          <select
-            value={selectedDistrict}
-            onChange={(e) => setSelectedDistrict(e.target.value)}
-            className="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold text-amber-300 focus:outline-none focus:border-amber-400"
-          >
-            <option value="ALL">All Districts / Regions</option>
-            {ASSAM_DISTRICTS.map(dist => (
-              <option key={dist} value={dist}>{dist}</option>
-            ))}
-          </select>
+          {/* Category Tabs & Radius Selector */}
+          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+            <div className="flex items-center gap-1 overflow-x-auto text-xs w-full sm:w-auto pb-1 sm:pb-0">
+              <button
+                onClick={() => setSelectedCategory('ALL')}
+                className={`px-3 py-1.5 rounded-xl font-bold border transition-colors ${
+                  selectedCategory === 'ALL'
+                    ? 'bg-red-600 text-white border-red-500'
+                    : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+                }`}
+              >
+                All Responders
+              </button>
+              <button
+                onClick={() => setSelectedCategory('Fire Dept')}
+                className={`px-3 py-1.5 rounded-xl font-bold border transition-colors ${
+                  selectedCategory === 'Fire Dept'
+                    ? 'bg-amber-600 text-white border-amber-500'
+                    : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+                }`}
+              >
+                Fire Dept
+              </button>
+              <button
+                onClick={() => setSelectedCategory('Police Station')}
+                className={`px-3 py-1.5 rounded-xl font-bold border transition-colors ${
+                  selectedCategory === 'Police Station'
+                    ? 'bg-blue-600 text-white border-blue-500'
+                    : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+                }`}
+              >
+                Police Thana
+              </button>
+              <button
+                onClick={() => setSelectedCategory('Rescue Squad')}
+                className={`px-3 py-1.5 rounded-xl font-bold border transition-colors ${
+                  selectedCategory === 'Rescue Squad'
+                    ? 'bg-rose-600 text-white border-rose-500'
+                    : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+                }`}
+              >
+                NDRF / SDRF
+              </button>
+            </div>
+
+            {/* Distance Radius Filter Dropdown */}
+            <select
+              value={maxDistanceRadius}
+              onChange={(e) => setMaxDistanceRadius(e.target.value === 'ALL' ? 'ALL' : Number(e.target.value))}
+              className="px-3 py-2 bg-slate-950 border border-amber-500/40 rounded-xl text-xs font-black text-amber-300 focus:outline-none focus:border-amber-400 shadow-sm shrink-0"
+              title="Filter by distance from your current location"
+            >
+              <option value={80}>Within 80 km (Default)</option>
+              <option value={150}>Within 150 km</option>
+              <option value={300}>Within 300 km</option>
+              <option value="ALL">Show All Stations</option>
+            </select>
+
+            {/* District Dropdown */}
+            <select
+              value={selectedDistrict}
+              onChange={(e) => setSelectedDistrict(e.target.value)}
+              className="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold text-amber-300 focus:outline-none focus:border-amber-400"
+            >
+              <option value="ALL">All Districts / Regions</option>
+              {ASSAM_DISTRICTS.map(dist => (
+                <option key={dist} value={dist}>{dist}</option>
+              ))}
+            </select>
+
+          </div>
 
         </div>
 
@@ -241,93 +292,120 @@ export default function NearestResponders() {
           <span>Locating nearest emergency stations based on your GPS...</span>
         </div>
       ) : filteredList.length === 0 ? (
-        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-12 text-center space-y-3">
-          <Siren className="w-12 h-12 text-slate-600 mx-auto" />
-          <h3 className="text-lg font-bold text-white">No Responder Stations Found Nearby</h3>
-          <p className="text-xs text-slate-400">Try re-detecting your live GPS coordinates.</p>
+        /* Empty State Callout when no results within 80km */
+        <div className="bg-slate-900/80 border border-amber-500/40 rounded-3xl p-8 text-center space-y-4 shadow-xl">
+          <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto border border-amber-500/30">
+            <Compass className="w-7 h-7" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-tight">
+              No Emergency Stations Found Within {maxDistanceRadius === 'ALL' ? 'Search Criteria' : `${maxDistanceRadius} km`}
+            </h3>
+            <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
+              Your location is outside the immediate {maxDistanceRadius} km radius of local units. Click below to expand search distance to view regional and state disaster response bases.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+            {maxDistanceRadius !== 300 && (
+              <button
+                onClick={() => setMaxDistanceRadius(300)}
+                className="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all active:scale-95"
+              >
+                Expand Radius to 300 km
+              </button>
+            )}
+            {maxDistanceRadius !== 'ALL' && (
+              <button
+                onClick={() => setMaxDistanceRadius('ALL')}
+                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-300 font-black text-xs rounded-xl border border-slate-700 transition-all active:scale-95"
+              >
+                Show All Assam State Stations
+              </button>
+            )}
+          </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredList.map((resp) => (
             <div 
-              key={resp.id} 
-              className="bg-slate-900/90 border border-slate-800 hover:border-red-500/40 rounded-2xl p-5 shadow-lg space-y-4 flex flex-col justify-between transition-all"
+              key={resp.id}
+              className="bg-slate-900/80 border border-slate-800 hover:border-red-500/50 rounded-2xl p-5 space-y-4 shadow-lg transition-all flex flex-col justify-between group"
             >
               <div className="space-y-3">
-                
-                {/* Header Badge */}
+                {/* Category Badge & Distance */}
                 <div className="flex items-start justify-between gap-2">
-                  <div>
-                    {getCategoryBadge(resp.category)}
-                    <h3 className="text-base font-black text-white mt-2 leading-tight">{resp.name}</h3>
-                  </div>
-
-                  {resp.distanceKm !== null && resp.distanceKm !== undefined && resp.distanceKm < 9000 && (
-                    <span className="px-2.5 py-1 rounded-lg text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0">
+                  {getCategoryBadge(resp.category)}
+                  {resp.distanceKm !== null && (
+                    <span className="text-[11px] font-black px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30 shrink-0">
                       📍 {resp.distanceKm} km away
                     </span>
                   )}
                 </div>
 
-                {/* Location */}
-                <div className="text-xs text-slate-300 bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-1">
-                  <div className="flex items-center gap-1.5 font-bold text-amber-400">
-                    <MapPin className="w-3.5 h-3.5 text-red-400 shrink-0" />
-                    <span>{resp.district}</span>
-                  </div>
-                  <div className="text-[11px] text-slate-400 pl-5">
-                    {resp.address}
-                  </div>
+                {/* Station Name */}
+                <h3 className="text-base font-black text-white group-hover:text-amber-400 transition-colors leading-snug">
+                  {resp.name}
+                </h3>
+
+                {/* Location Details */}
+                <div className="space-y-1 text-xs text-slate-300 font-medium">
+                  {resp.district && (
+                    <div className="flex items-center gap-1.5 text-amber-400 font-bold">
+                      <MapPin className="w-3.5 h-3.5 shrink-0" />
+                      <span>{resp.district}</span>
+                    </div>
+                  )}
+                  {resp.address && (
+                    <p className="text-slate-400 text-[11px] pl-5 leading-relaxed">
+                      {resp.address}
+                    </p>
+                  )}
                 </div>
 
-                {/* Services */}
-                {Array.isArray(resp.services) && (
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Capabilities:</span>
+                {/* Services / Capabilities */}
+                {resp.services && resp.services.length > 0 && (
+                  <div className="pt-2 border-t border-slate-800/80">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">Capabilities:</p>
                     <div className="flex flex-wrap gap-1">
-                      {resp.services.map((srv, idx) => (
-                        <span key={idx} className="px-2 py-0.5 text-[11px] font-semibold bg-slate-800 text-slate-300 rounded-md">
-                          ✓ {srv}
+                      {resp.services.map((svc, i) => (
+                        <span key={i} className="text-[10px] font-bold text-slate-300 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
+                          ✓ {svc}
                         </span>
                       ))}
                     </div>
                   </div>
                 )}
-
               </div>
 
-              {/* Actions */}
+              {/* Action Phone Buttons */}
               <div className="pt-3 border-t border-slate-800 flex items-center gap-2">
                 <a
-                  href={`tel:${resp.phone}`}
-                  className="flex-1 py-2.5 px-3 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-md transition-colors"
+                  href={`tel:${resp.phone.replace(/[^0-9+]/g, '')}`}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-xs shadow-md transition-colors"
                 >
-                  <Phone className="w-4 h-4" />
+                  <Phone className="w-3.5 h-3.5" />
                   <span>Call {resp.phone}</span>
                 </a>
-
-                {resp.controlPhone && (
+                
+                {resp.controlPhone && resp.controlPhone !== resp.phone && (
                   <a
-                    href={`tel:${resp.controlPhone}`}
-                    className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-xl text-xs font-bold transition-colors"
-                    title="Call Secondary Line"
+                    href={`tel:${resp.controlPhone.replace(/[^0-9+]/g, '')}`}
+                    className="flex items-center justify-center p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-700 transition-colors"
+                    title={`Control Room: ${resp.controlPhone}`}
                   >
                     Alt Line
                   </a>
                 )}
 
-                {resp.latitude && resp.longitude && (
-                  <a
-                    href={`https://www.openstreetmap.org/?mlat=${resp.latitude}&mlon=${resp.longitude}#map=15/${resp.latitude}/${resp.longitude}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-blue-400 border border-slate-700 rounded-xl text-xs font-bold transition-colors flex items-center gap-1"
-                    title="View Navigation Map"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    <span>Map</span>
-                  </a>
-                )}
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${resp.latitude},${resp.longitude}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs border border-slate-700 transition-colors"
+                  title="Open Google Maps Navigation"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
               </div>
 
             </div>

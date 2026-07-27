@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Stethoscope, Navigation, Phone, MessageSquare, MapPin, Search, Filter, 
-  Clock, ShieldAlert, HeartHandshake, ExternalLink, CheckCircle2, RefreshCw 
+  Stethoscope, Building2, Pill, Navigation, Phone, MapPin, Search, 
+  ExternalLink, Siren, RefreshCw, Compass 
 } from 'lucide-react';
 import { medicalService } from '../services/medicalService';
 import { ASSAM_DISTRICTS } from '../services/storageService';
 
 export default function NearestMedicals() {
-  const [userLocation, setUserLocation] = useState(null); // { lat, lng }
+  const [userLocation, setUserLocation] = useState(null);
   const [isLocating, setIsLocating] = useState(false);
   const [locationStatus, setLocationStatus] = useState('');
   const [medicalsList, setMedicalsList] = useState([]);
@@ -16,11 +16,16 @@ export default function NearestMedicals() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [selectedDistrict, setSelectedDistrict] = useState('ALL');
+  const [maxDistanceRadius, setMaxDistanceRadius] = useState(80); // Default 80 km radius limit
 
   // Auto-detect GPS location on mount
   const handleDetectGPS = (isAuto = false) => {
     setIsLocating(true);
     setLocationStatus(isAuto ? 'Auto-detecting your live GPS coordinates...' : 'Acquiring your exact GPS coordinates...');
+
+    // Use current userLocation as fallback if already acquired
+    const fallbackLat = userLocation?.lat || null;
+    const fallbackLng = userLocation?.lng || null;
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -39,7 +44,7 @@ export default function NearestMedicals() {
               const ipData = await res.json();
               if (ipData.latitude && ipData.longitude) {
                 setUserLocation({ lat: ipData.latitude, lng: ipData.longitude });
-                setLocationStatus(`📍 Live IP Location (${ipData.city || 'Assam'}): ${ipData.latitude.toFixed(4)}, ${ipData.longitude.toFixed(4)}`);
+                setLocationStatus(`📍 Live Location (${ipData.city || 'Assam'}): ${ipData.latitude.toFixed(4)}, ${ipData.longitude.toFixed(4)}`);
                 loadMedicals(ipData.latitude, ipData.longitude, selectedCategory);
                 setIsLocating(false);
                 return;
@@ -50,15 +55,20 @@ export default function NearestMedicals() {
           }
 
           setIsLocating(false);
-          setLocationStatus('⚠️ Click "Detect Live GPS" to pin your location or select your District.');
-          loadMedicals(null, null, selectedCategory);
+          if (fallbackLat && fallbackLng) {
+            setLocationStatus(`📍 Live GPS Retained: ${fallbackLat.toFixed(4)}, ${fallbackLng.toFixed(4)}`);
+            loadMedicals(fallbackLat, fallbackLng, selectedCategory);
+          } else {
+            setLocationStatus('⚠️ Click "Detect Live GPS" to pin your location or select your District.');
+            loadMedicals(null, null, selectedCategory);
+          }
         },
-        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
       );
     } else {
       setIsLocating(false);
       setLocationStatus('⚠️ Geolocation not supported by browser. Select your District below.');
-      loadMedicals(null, null, selectedCategory);
+      loadMedicals(fallbackLat, fallbackLng, selectedCategory);
     }
   };
 
@@ -90,44 +100,68 @@ export default function NearestMedicals() {
 
     const matchesDistrict = selectedDistrict === 'ALL' || med.district === selectedDistrict;
 
-    return matchesSearch && matchesDistrict;
+    const matchesCategory = 
+      selectedCategory === 'ALL' || 
+      med.category === selectedCategory ||
+      (selectedCategory === 'Hospital' && (med.category === 'Hospital' || med.type?.toLowerCase().includes('hospital') || med.name?.toLowerCase().includes('hospital'))) ||
+      (selectedCategory === 'Pharmacy' && (med.category === 'Pharmacy' || med.type?.toLowerCase().includes('pharmacy') || med.name?.toLowerCase().includes('chemist'))) ||
+      (selectedCategory === 'Relief Center' && (med.category === 'Relief Center' || med.type?.toLowerCase().includes('relief') || med.name?.toLowerCase().includes('camp')));
+
+    // Distance Radius Filter: default max 80 km
+    const matchesRadius = 
+      !userLocation || 
+      maxDistanceRadius === 'ALL' || 
+      med.distanceKm === null || 
+      med.distanceKm <= maxDistanceRadius;
+
+    return matchesSearch && matchesDistrict && matchesCategory && matchesRadius;
   });
 
   return (
     <div className="space-y-6">
       
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-rose-950 via-slate-900 to-slate-950 border border-rose-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4">
+      <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 border border-emerald-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 text-xs font-black uppercase tracking-wider">
-              <Stethoscope className="w-4 h-4 text-rose-400" />
-              <span>Live GPS Auto-Detection Active</span>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs font-black rounded-full border border-emerald-500/40">
+                24x7 Medical & Anti-Venom Wards
+              </span>
+              {userLocation && (
+                <span className="px-2 py-0.5 bg-teal-500/20 text-teal-300 text-xs font-extrabold rounded-full border border-teal-500/40">
+                  Within {maxDistanceRadius === 'ALL' ? 'Unlimited' : `${maxDistanceRadius} km`}
+                </span>
+              )}
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-white">
-              NEAREST HOSPITALS & EMERGENCY MEDICALS
+            <h2 className="text-xl sm:text-3xl font-black text-white tracking-tight uppercase">
+              NEAREST HOSPITALS, PHARMACIES & MEDICAL RELIEF
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-              Automatically sorted by real-time distance from your current GPS coordinates.
+            <p className="text-xs sm:text-sm text-slate-300">
+              Locates free anti-venom, emergency ICUs, and flood relief medical wards closest to your location.
             </p>
           </div>
 
-          {/* GPS Detector Trigger */}
+          {/* GPS Detector Button */}
           <button
             onClick={() => handleDetectGPS(false)}
             disabled={isLocating}
-            className="flex items-center gap-2 px-5 py-3 rounded-2xl text-xs sm:text-sm font-black bg-gradient-to-r from-rose-600 via-red-600 to-amber-500 hover:from-rose-500 hover:to-amber-400 text-white shadow-xl shadow-rose-950/60 transition-all shrink-0 active:scale-95 animate-urgent-pulse"
+            className="flex items-center justify-center gap-2 px-5 py-3 rounded-2xl font-black text-xs bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 text-white shadow-lg active:scale-95 transition-all border border-emerald-400/40 shrink-0 disabled:opacity-50"
           >
-            <Navigation className={`w-5 h-5 ${isLocating ? 'animate-spin' : ''}`} />
-            <span>{isLocating ? 'REFRESHING GPS...' : 'RE-DETECT MY LIVE GPS'}</span>
+            <Navigation className={`w-4 h-4 ${isLocating ? 'animate-spin' : ''}`} />
+            <span>{isLocating ? 'Acquiring GPS...' : 'RE-DETECT MY LIVE GPS'}</span>
           </button>
         </div>
 
+        {/* Location Status Bar */}
         {locationStatus && (
-          <div className="text-xs font-bold text-amber-300 bg-amber-950/50 border border-amber-800/60 px-4 py-2 rounded-xl flex items-center justify-between">
-            <span>{locationStatus}</span>
+          <div className="bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-2.5 flex items-center justify-between gap-2 text-xs font-bold text-emerald-300">
+            <div className="flex items-center gap-2 truncate">
+              <MapPin className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span className="truncate">{locationStatus}</span>
+            </div>
             {userLocation && (
-              <span className="text-[10px] bg-slate-900 px-2 py-1 rounded border border-amber-500/40 text-white font-mono">
+              <span className="text-[11px] font-mono text-slate-400 shrink-0 hidden sm:inline">
                 {userLocation.lat.toFixed(4)}, {userLocation.lng.toFixed(4)}
               </span>
             )}
@@ -135,171 +169,200 @@ export default function NearestMedicals() {
         )}
       </div>
 
-      {/* Toolbar */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl">
-        
-        {/* Search */}
-        <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search hospital name, area..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-rose-400"
-          />
-        </div>
-
-        {/* Category & District Filters */}
-        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto text-xs">
+      {/* Filter and Search Bar */}
+      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-4 shadow-xl">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-3">
           
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => setSelectedCategory('ALL')}
-              className={`px-3 py-1.5 rounded-xl font-bold border transition-colors ${
-                selectedCategory === 'ALL'
-                  ? 'bg-rose-600 text-white border-rose-500'
-                  : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
-              }`}
-            >
-              All Medicals
-            </button>
-            <button
-              onClick={() => setSelectedCategory('Hospital')}
-              className={`px-3 py-1.5 rounded-xl font-bold border transition-colors ${
-                selectedCategory === 'Hospital'
-                  ? 'bg-rose-600 text-white border-rose-500'
-                  : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
-              }`}
-            >
-              Hospitals
-            </button>
-            <button
-              onClick={() => setSelectedCategory('Pharmacy')}
-              className={`px-3 py-1.5 rounded-xl font-bold border transition-colors ${
-                selectedCategory === 'Pharmacy'
-                  ? 'bg-rose-600 text-white border-rose-500'
-                  : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
-              }`}
-            >
-              Pharmacies
-            </button>
+          {/* Search Box */}
+          <div className="relative w-full md:flex-1">
+            <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search hospital name, pharmacy, or district..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400 font-medium"
+            />
           </div>
 
-          <select
-            value={selectedDistrict}
-            onChange={(e) => setSelectedDistrict(e.target.value)}
-            className="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold text-amber-300 focus:outline-none focus:border-amber-400"
-          >
-            <option value="ALL">All Districts / Regions</option>
-            {ASSAM_DISTRICTS.map(dist => (
-              <option key={dist} value={dist}>{dist}</option>
-            ))}
-          </select>
+          {/* Category Tabs & Radius Selector */}
+          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+            <div className="flex items-center gap-1 overflow-x-auto text-xs w-full sm:w-auto pb-1 sm:pb-0">
+              <button
+                onClick={() => setSelectedCategory('ALL')}
+                className={`px-3 py-1.5 rounded-xl font-bold border transition-colors ${
+                  selectedCategory === 'ALL'
+                    ? 'bg-emerald-600 text-white border-emerald-500'
+                    : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+                }`}
+              >
+                All Medical Units
+              </button>
+              <button
+                onClick={() => setSelectedCategory('Hospital')}
+                className={`px-3 py-1.5 rounded-xl font-bold border transition-colors ${
+                  selectedCategory === 'Hospital'
+                    ? 'bg-teal-600 text-white border-teal-500'
+                    : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+                }`}
+              >
+                Hospitals & ICUs
+              </button>
+              <button
+                onClick={() => setSelectedCategory('Pharmacy')}
+                className={`px-3 py-1.5 rounded-xl font-bold border transition-colors ${
+                  selectedCategory === 'Pharmacy'
+                    ? 'bg-blue-600 text-white border-blue-500'
+                    : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+                }`}
+              >
+                Pharmacies
+              </button>
+            </div>
+
+            {/* Distance Radius Filter Dropdown */}
+            <select
+              value={maxDistanceRadius}
+              onChange={(e) => setMaxDistanceRadius(e.target.value === 'ALL' ? 'ALL' : Number(e.target.value))}
+              className="px-3 py-2 bg-slate-950 border border-emerald-500/40 rounded-xl text-xs font-black text-emerald-300 focus:outline-none focus:border-emerald-400 shadow-sm shrink-0"
+              title="Filter by distance from your current location"
+            >
+              <option value={80}>Within 80 km (Default)</option>
+              <option value={150}>Within 150 km</option>
+              <option value={300}>Within 300 km</option>
+              <option value="ALL">Show All Units</option>
+            </select>
+
+            {/* District Dropdown */}
+            <select
+              value={selectedDistrict}
+              onChange={(e) => setSelectedDistrict(e.target.value)}
+              className="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold text-emerald-300 focus:outline-none focus:border-emerald-400"
+            >
+              <option value="ALL">All Districts / Regions</option>
+              {ASSAM_DISTRICTS.map(dist => (
+                <option key={dist} value={dist}>{dist}</option>
+              ))}
+            </select>
+
+          </div>
 
         </div>
-
       </div>
 
-      {/* Medical Center Cards Grid */}
+      {/* Medical Cards Grid */}
       {loading ? (
         <div className="p-12 text-center text-slate-400 text-xs font-bold flex items-center justify-center gap-2">
-          <RefreshCw className="w-4 h-4 animate-spin text-rose-400" />
-          <span>Locating nearest medical centers based on your GPS...</span>
+          <RefreshCw className="w-4 h-4 animate-spin text-emerald-400" />
+          <span>Locating nearest emergency hospitals based on your GPS...</span>
         </div>
       ) : filteredList.length === 0 ? (
-        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-12 text-center space-y-3">
-          <Stethoscope className="w-12 h-12 text-slate-600 mx-auto" />
-          <h3 className="text-lg font-bold text-white">No Medical Facilities Found Nearby</h3>
-          <p className="text-xs text-slate-400">Try clearing search terms or re-detecting your live GPS location.</p>
+        /* Empty State Callout when no results within 80km */
+        <div className="bg-slate-900/80 border border-emerald-500/40 rounded-3xl p-8 text-center space-y-4 shadow-xl">
+          <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/30">
+            <Compass className="w-7 h-7" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-base sm:text-lg font-black text-white uppercase tracking-tight">
+              No Medical Units Found Within {maxDistanceRadius === 'ALL' ? 'Search Criteria' : `${maxDistanceRadius} km`}
+            </h3>
+            <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
+              Your location is outside the immediate {maxDistanceRadius} km radius of local clinics. Click below to expand search distance to view regional government hospitals.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+            {maxDistanceRadius !== 300 && (
+              <button
+                onClick={() => setMaxDistanceRadius(300)}
+                className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all active:scale-95"
+              >
+                Expand Radius to 300 km
+              </button>
+            )}
+            {maxDistanceRadius !== 'ALL' && (
+              <button
+                onClick={() => setMaxDistanceRadius('ALL')}
+                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 font-black text-xs rounded-xl border border-slate-700 transition-all active:scale-95"
+              >
+                Show All Assam State Medicals
+              </button>
+            )}
+          </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredList.map((med) => (
             <div 
-              key={med.id} 
-              className="bg-slate-900/90 border border-slate-800 hover:border-rose-500/40 rounded-2xl p-5 shadow-lg space-y-4 flex flex-col justify-between transition-all"
+              key={med.id}
+              className="bg-slate-900/80 border border-slate-800 hover:border-emerald-500/50 rounded-2xl p-5 space-y-4 shadow-lg transition-all flex flex-col justify-between group"
             >
               <div className="space-y-3">
-                
-                {/* Header */}
+                {/* Type Badge & Distance */}
                 <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-rose-400 bg-rose-950/60 px-2.5 py-0.5 rounded border border-rose-500/30 w-fit">
-                      <Stethoscope className="w-3.5 h-3.5" />
-                      <span>{med.type}</span>
-                    </div>
-                    <h3 className="text-base font-black text-white mt-2 leading-tight">{med.name}</h3>
-                  </div>
-
-                  {med.distanceKm !== null && med.distanceKm !== undefined && med.distanceKm < 9000 && (
-                    <span className="px-2.5 py-1 rounded-lg text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0">
+                  <span className="text-[11px] font-black px-2.5 py-0.5 bg-emerald-950/80 text-emerald-400 rounded-full border border-emerald-500/30">
+                    🏥 {med.type || med.category}
+                  </span>
+                  {med.distanceKm !== null && (
+                    <span className="text-[11px] font-black px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30 shrink-0">
                       📍 {med.distanceKm} km away
                     </span>
                   )}
                 </div>
 
-                {/* Location */}
-                <div className="text-xs text-slate-300 bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-1">
-                  <div className="flex items-center gap-1.5 font-bold text-amber-400">
-                    <MapPin className="w-3.5 h-3.5 text-red-400 shrink-0" />
-                    <span>{med.district}</span>
-                  </div>
-                  <div className="text-[11px] text-slate-400 pl-5">
-                    {med.address}
-                  </div>
+                {/* Medical Name */}
+                <h3 className="text-base font-black text-white group-hover:text-emerald-300 transition-colors leading-snug">
+                  {med.name}
+                </h3>
+
+                {/* Location Details */}
+                <div className="space-y-1 text-xs text-slate-300 font-medium">
+                  {med.district && (
+                    <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
+                      <MapPin className="w-3.5 h-3.5 shrink-0" />
+                      <span>{med.district}</span>
+                    </div>
+                  )}
+                  {med.address && (
+                    <p className="text-slate-400 text-[11px] pl-5 leading-relaxed">
+                      {med.address}
+                    </p>
+                  )}
                 </div>
 
-                {/* Services */}
-                {Array.isArray(med.services) && (
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Available Services:</span>
+                {/* Services / Capabilities */}
+                {med.services && med.services.length > 0 && (
+                  <div className="pt-2 border-t border-slate-800/80">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">Available Care:</p>
                     <div className="flex flex-wrap gap-1">
-                      {med.services.map((srv, idx) => (
-                        <span key={idx} className="px-2 py-0.5 text-[11px] font-semibold bg-slate-800 text-slate-300 rounded-md">
-                          ✓ {srv}
+                      {med.services.map((svc, i) => (
+                        <span key={i} className="text-[10px] font-bold text-slate-300 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
+                          ✓ {svc}
                         </span>
                       ))}
                     </div>
                   </div>
                 )}
-
               </div>
 
-              {/* Actions */}
+              {/* Action Phone Buttons */}
               <div className="pt-3 border-t border-slate-800 flex items-center gap-2">
                 <a
-                  href={`tel:${med.phone}`}
-                  className="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-md transition-colors"
+                  href={`tel:${med.phone.replace(/[^0-9+]/g, '')}`}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-md transition-colors"
                 >
-                  <Phone className="w-4 h-4" />
-                  <span>Call Hospital</span>
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>Call {med.phone}</span>
                 </a>
 
-                {med.phone && (
-                  <a
-                    href={`https://wa.me/${med.phone.replace(/[^0-9]/g, '')}?text=Emergency%20Medical%20Assistance%20Inquiry`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="py-2.5 px-3 bg-emerald-950 border border-emerald-700 text-emerald-400 hover:bg-emerald-900 rounded-xl text-xs font-bold transition-colors"
-                    title="WhatsApp Emergency Desk"
-                  >
-                    <MessageSquare className="w-4 h-4" />
-                  </a>
-                )}
-
-                {med.latitude && med.longitude && (
-                  <a
-                    href={`https://www.openstreetmap.org/?mlat=${med.latitude}&mlon=${med.longitude}#map=15/${med.latitude}/${med.longitude}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-xl text-xs font-bold transition-colors flex items-center gap-1"
-                    title="View Navigation Map"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    <span>Map</span>
-                  </a>
-                )}
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${med.latitude},${med.longitude}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold text-xs border border-slate-700 transition-colors"
+                  title="Open Google Maps Navigation"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
               </div>
 
             </div>

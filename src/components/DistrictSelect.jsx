@@ -9,11 +9,11 @@ export default function DistrictSelect({ value, onChange, placeholder = "Select 
   const containerRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Re-order districts so Jorhat & Sivasagar are at the top as priority
-  const prioritizedDistricts = Array.from(new Set(["Jorhat", "Sivasagar", ...ASSAM_DISTRICTS]));
+  // Standard alphabetical district list
+  const districtList = [...ASSAM_DISTRICTS];
 
   // Filter districts based on user keyboard input
-  const filtered = prioritizedDistricts.filter(dist =>
+  const filtered = districtList.filter(dist =>
     dist.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -77,11 +77,6 @@ export default function DistrictSelect({ value, onChange, placeholder = "Select 
           <span className="truncate">
             {value || placeholder}
           </span>
-          {(value === 'Jorhat' || value === 'Sivasagar') && (
-            <span className="text-[10px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-black border border-amber-500/30">
-              PRIORITY
-            </span>
-          )}
         </div>
         <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>
@@ -96,7 +91,7 @@ export default function DistrictSelect({ value, onChange, placeholder = "Select 
             <input
               ref={inputRef}
               type="text"
-              placeholder="Type district name (e.g. Jorhat, Sivasagar...)"
+              placeholder="Type district name (e.g. Guwahati, Kamrup, Majuli...)"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -112,7 +107,6 @@ export default function DistrictSelect({ value, onChange, placeholder = "Select 
               </div>
             ) : (
               filtered.map((dist, idx) => {
-                const isPriority = dist === 'Jorhat' || dist === 'Sivasagar';
                 const isSelected = value === dist;
                 const isHighlighted = idx === highlightedIndex;
 
@@ -129,11 +123,6 @@ export default function DistrictSelect({ value, onChange, placeholder = "Select 
                   >
                     <div className="flex items-center gap-2">
                       <span>{dist}</span>
-                      {isPriority && (
-                        <span className="text-[10px] bg-amber-500/30 text-amber-200 px-1.5 py-0.2 rounded font-black border border-amber-400/40">
-                          ⭐ TOP
-                        </span>
-                      )}
                     </div>
                     {isSelected && <Check className="w-4 h-4 text-amber-400" />}
                   </div>
