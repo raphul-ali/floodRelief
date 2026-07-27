@@ -61,6 +61,18 @@ export default function EmergencyServices() {
   const [selectedCategory, setSelectedCategory] = useState('ALL');
 
   const fetchAbortRef = useRef(null);
+  const filtersRef = useRef(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (filtersRef.current) {
+        const yOffset = -90;
+        const y = filtersRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }, 120);
+    return () => clearTimeout(timer);
+  }, []);
 
   // ─── Detect current GPS location ─────────────────────────────────────────────
   const detectLocation = async () => {
@@ -276,7 +288,7 @@ export default function EmergencyServices() {
       </div>
 
       {/* ── Filters ── */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-xl">
+      <div id="emergency-filters-section" ref={filtersRef} className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-xl scroll-mt-24">
 
         {/* Search */}
         <div className="relative">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Header from './components/Header';
 import ASDMAHelplines from './components/ASDMAHelplines';
 import NGODashboard from './components/NGODashboard';
@@ -236,12 +236,19 @@ export default function App() {
   const handleTabChange = (tabName) => {
     setActiveTab(tabName);
     setTimeout(() => {
-      if (mainContentRef.current) {
+      if (tabName === 'emergency') {
+        const emergencyEl = document.getElementById('emergency-filters-section');
+        if (emergencyEl) {
+          const yOffset = -90; // Offset for sticky header
+          const y = emergencyEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      } else if (mainContentRef.current) {
         const yOffset = -80; // Offset for sticky header
         const y = mainContentRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
         window.scrollTo({ top: y, behavior: 'smooth' });
       }
-    }, 60);
+    }, 80);
   };
 
   return (

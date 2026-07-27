@@ -79,6 +79,20 @@ export default function Header({
           {/* Top Right Action Buttons */}
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             
+            {/* Home Button in Top Header */}
+            <button
+              onClick={() => setActiveTab('dashboard')}
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 min-h-[36px] sm:min-h-[42px] rounded-xl text-[11px] sm:text-xs font-black border transition-all active:scale-95 shadow-md ${
+                activeTab === 'dashboard'
+                  ? 'bg-amber-500 text-slate-950 border-amber-400 font-black'
+                  : 'bg-slate-900 hover:bg-slate-800 text-slate-200 border-slate-700'
+              }`}
+              title="Home Dashboard"
+            >
+              <Home className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>HOME</span>
+            </button>
+
             {/* Auth Session Button */}
             {currentAuth.role === 'GUEST' ? (
               <button
@@ -130,20 +144,6 @@ export default function Header({
 
         {/* Navigation Bar */}
         <nav className="flex flex-col sm:flex-row items-center gap-1.5 py-1.5 border-t border-slate-800/80 text-[11px] sm:text-xs font-black w-full max-w-full">
-          
-          {/* Home Button */}
-          <button
-            onClick={() => setActiveTab('dashboard')}
-            title="Home"
-            className={`shrink-0 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl transition-all min-h-[38px] border ${
-              activeTab === 'dashboard'
-                ? 'bg-white text-slate-950 border-white shadow-md font-black'
-                : 'text-slate-300 bg-slate-900 hover:bg-slate-800 border-slate-700'
-            }`}
-          >
-            <Home className="w-4 h-4 shrink-0" />
-            <span className="hidden sm:inline">HOME</span>
-          </button>
 
           <div className="flex items-center gap-1.5 w-full sm:w-auto sm:flex-1">
             <button
