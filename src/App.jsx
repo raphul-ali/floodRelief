@@ -36,6 +36,7 @@ export default function App() {
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [adminLoginError, setAdminLoginError] = useState('');
+  const mainContentRef = useRef(null);
 
   const checkPath = () => {
     const isSecretPath = window.location.pathname === '/raphul-admin' || 
@@ -231,8 +232,6 @@ export default function App() {
   }
 
   // PUBLIC WEBSITE VIEW
-  const mainContentRef = useRef(null);
-
   const handleTabChange = (tabName) => {
     setActiveTab(tabName);
     setTimeout(() => {
