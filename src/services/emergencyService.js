@@ -95,67 +95,20 @@ export const VERIFIED_EMERGENCY_UNITS = offlineEmergencyUnits;
 
 /**
  * Fetch nearest emergency services within radiusKm of (lat, lng).
- * Tries Overpass servers in sequence. Fallbacks to pre-seeded verified emergency units on failure/empty.
+ * Uses local pre-seeded dataset of 231 verified emergency stations instantly.
  */
 export async function fetchNearestServices(lat, lng, radiusKm = 50, signal = null) {
-  let osmResults = [];
+  const results = VERIFIED_EMERGENCY_UNITS.map((unit) => {
+    const dist = (lat != null && lng != null)
+      ? calculateDistance(lat, lng, unit.latitude, unit.longitude)
+      : null;
+    return { ...unit, distanceKm: dist };
+  });
 
   if (lat != null && lng != null) {
-    const query = buildQuery(lat, lng, radiusKm * 1000);
-    const url = (server) => `${server}?data=${encodeURIComponent(query)}`;
-
-    for (const server of OVERPASS_SERVERS) {
-      const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), 7000);
-
-      const onExternalAbort = () => ctrl.abort();
-      signal?.addEventListener('abort', onExternalAbort);
-
-      try {
-        const res = await fetch(url(server), { signal: ctrl.signal });
-        clearTimeout(timer);
-        signal?.removeEventListener('abort', onExternalAbort);
-
-        if (signal?.aborted) return [];
-        if (!res.ok) continue;
-
-        const data = await res.json();
-        if (!data.elements?.length) continue;
-
-        osmResults = data.elements
-          .map((el) => parseElement(el, lat, lng))
-          .filter(Boolean);
-
-        if (osmResults.length > 0) break;
-      } catch (err) {
-        clearTimeout(timer);
-        signal?.removeEventListener('abort', onExternalAbort);
-        if (err.name === 'AbortError' && signal?.aborted) return [];
-      }
-    }
+    results.sort((a, b) => (a.distanceKm ?? 9999) - (b.distanceKm ?? 9999));
   }
 
-  // Combine live OpenStreetMap results + verified fallback units
-  const combined = [...osmResults];
-  const osmIds = new Set(osmResults.map(r => r.name.toLowerCase()));
-
-  for (const unit of VERIFIED_EMERGENCY_UNITS) {
-    if (!osmIds.has(unit.name.toLowerCase())) {
-      const dist = (lat != null && lng != null)
-        ? calculateDistance(lat, lng, unit.latitude, unit.longitude)
-        : null;
-      combined.push({
-        ...unit,
-        distanceKm: dist
-      });
-    }
-  }
-
-  // Sort by distance if location available
-  if (lat != null && lng != null) {
-    combined.sort((a, b) => (a.distanceKm ?? 9999) - (b.distanceKm ?? 9999));
-  }
-
-  return combined;
+  return results;
 }
 

@@ -162,8 +162,8 @@ export default function EmergencyServices() {
       <div className="bg-gradient-to-r from-red-950 via-slate-900 to-amber-950 border border-red-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="px-2.5 py-0.5 bg-red-500/20 text-red-400 text-xs font-black rounded-full border border-red-500/40">
-              Live OpenStreetMap Data
+            <span className="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs font-black rounded-full border border-emerald-500/40">
+              ⚡ 231 Verified Emergency Stations (Offline Instant)
             </span>
             {userLocation && !isLocating && (
               <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 text-xs font-bold rounded-full border border-amber-500/40">
@@ -286,7 +286,7 @@ export default function EmergencyServices() {
       {!isLocating && isFetching && (
         <div className="flex flex-col items-center justify-center py-16 gap-3 text-slate-400 text-sm">
           <RefreshCw className="w-8 h-8 animate-spin text-amber-400" />
-          <p className="font-bold">Searching OpenStreetMap within {radiusKm} km…</p>
+          <p className="font-bold">Locating nearest emergency stations within {radiusKm} km…</p>
           <p className="text-xs text-slate-500">May take a few seconds</p>
         </div>
       )}
