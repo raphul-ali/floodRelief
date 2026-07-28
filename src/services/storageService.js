@@ -64,13 +64,26 @@ const notifyDataChanged = () => {
   window.dispatchEvent(new Event("flood_data_changed"));
 };
 
+const cloudMemoryCache = {
+  victims: null,
+  ngos: null,
+  volunteers: null,
+  deliveryLogs: null
+};
+
 export const storageService = {
   
   // --- VICTIM SOS REQUESTS ---
   getVictimRequests: (includeUnverified = false) => {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.VICTIMS);
-      let list = data ? JSON.parse(data) : [];
+      let list = [];
+      if (isSupabaseConfigured && cloudMemoryCache.victims !== null) {
+        list = cloudMemoryCache.victims;
+      } else {
+        const data = localStorage.getItem(STORAGE_KEYS.VICTIMS);
+        list = data ? JSON.parse(data) : [];
+      }
+      
       if (!includeUnverified) {
         return list.filter(req => req.verified === true);
       }
@@ -129,11 +142,13 @@ export const storageService = {
       ...sanitized
     };
 
+    const requests = storageService.getVictimRequests(true);
     const updated = [newRequest, ...requests];
-    localStorage.setItem(STORAGE_KEYS.VICTIMS, JSON.stringify(updated));
 
-    // Supabase Cloud Sync
     if (isSupabaseConfigured && supabase) {
+      // Optimitic memory cache update for live mode
+      cloudMemoryCache.victims = updated;
+      
       supabase.from('victim_requests').insert([{
         id: newRequest.id,
         created_at: newRequest.createdAt,

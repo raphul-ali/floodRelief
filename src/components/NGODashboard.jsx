@@ -140,11 +140,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
     storageService.updateRequestStatus(requestId, newStatus, ngoName || ngoUserDetail.name);
   };
 
-  const handleDelete = (requestId) => {
-    if (window.confirm("Are you sure you want to remove this distress record from the active queue?")) {
-      storageService.deleteVictimRequest(requestId);
-    }
-  };
+
 
   const handleDownloadSinglePDF = (victim) => {
     pdfService.downloadVictimPDF(victim);
@@ -699,16 +695,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                           Fulfilled
                         </button>
                       </div>
-
-                      <button
-                        onClick={() => handleDelete(req.id)}
-                        className="p-1 text-slate-500 hover:text-red-400 transition-colors"
-                        title="Remove Record"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
                     </div>
-
                   </div>
                 );
               })}
