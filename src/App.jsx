@@ -66,19 +66,7 @@ export default function App() {
     // Trigger immediate Supabase Cloud Data Sync if configured
     storageService.syncWithSupabase();
 
-    // Smart Sync: Poll every 60 seconds ONLY if the tab is visible to prevent API spam
-    const pollInterval = setInterval(() => {
-      if (!document.hidden) {
-        storageService.syncWithSupabase();
-      }
-    }, 60000);
 
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        storageService.syncWithSupabase();
-      }
-    };
-    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     const stopAutoRefresh = authService.startSessionAutoRefresh();
 
@@ -96,9 +84,7 @@ export default function App() {
     window.addEventListener('flood_auth_changed', handleAuthChanged);
     
     return () => {
-      clearInterval(pollInterval);
       stopAutoRefresh();
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener('popstate', handlePopState);
       window.removeEventListener('hashchange', handlePopState);
       window.removeEventListener('flood_data_changed', handleDataChanged);
