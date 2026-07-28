@@ -78,13 +78,13 @@ export default function Header({
             
             {/* Home Button in Top Header */}
             <button
-              onClick={() => setActiveTab('dashboard')}
+              onClick={() => setActiveTab(currentAuth.role === 'GUEST' ? 'ngos' : 'dashboard')}
               className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 min-h-[36px] sm:min-h-[42px] rounded-xl text-[11px] sm:text-xs font-black border transition-all active:scale-95 shadow-md ${
-                activeTab === 'dashboard'
+                (activeTab === 'dashboard' || activeTab === 'ngos')
                   ? 'bg-amber-500 text-slate-950 border-amber-400 font-black'
                   : 'bg-slate-900 hover:bg-slate-800 text-slate-200 border-slate-700'
               }`}
-              title="Home Dashboard"
+              title="Home"
             >
               <Home className="w-4 h-4 text-amber-400 shrink-0" />
               <span>HOME</span>
@@ -100,14 +100,22 @@ export default function Header({
                 <span>🔐 Login</span>
               </button>
             ) : currentAuth.role !== 'GUEST' ? (
-              <button
-                onClick={onLogout}
-                className="flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] sm:min-h-[42px] rounded-xl text-xs font-black bg-red-950/80 hover:bg-red-900 text-red-200 border border-red-500/40 shadow-md active:scale-95 transition-all cursor-pointer shrink-0"
-                title={`Logout ${currentAuth.user?.name || 'Session'}`}
-              >
-                <LogOut className="w-3.5 h-3.5 text-red-400 shrink-0" />
-                <span>Logout</span>
-              </button>
+              <div className="flex items-center gap-2 bg-slate-900 border border-slate-700 rounded-xl pl-3 pr-1 py-1 shadow-md shrink-0">
+                <div className="flex items-center gap-1.5 hidden sm:flex">
+                  <User className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="text-[11px] font-bold text-slate-300 truncate max-w-[120px]">
+                    {currentAuth.role === 'ADMIN' ? 'Super Admin' : (currentAuth.user?.name || 'User')}
+                  </span>
+                </div>
+                <button
+                  onClick={onLogout}
+                  className="flex items-center gap-1 px-2.5 py-1.5 min-h-[32px] rounded-lg text-xs font-black bg-red-950/80 hover:bg-red-900 text-red-200 border border-red-500/40 active:scale-95 transition-all cursor-pointer"
+                  title="Logout"
+                >
+                  <LogOut className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                  <span className="hidden sm:inline">Logout</span>
+                </button>
+              </div>
             ) : null}
 
             {/* Emergency SOS Button (Desktop/Tablet) */}
@@ -136,31 +144,31 @@ export default function Header({
         <nav className="flex flex-col sm:flex-row items-center gap-1.5 py-1.5 border-t border-slate-800/80 text-[11px] sm:text-xs font-black w-full max-w-full">
 
           <div className="flex items-center gap-1.5 w-full sm:w-auto sm:flex-1">
-            <button
-              onClick={() => setActiveTab('dashboard')}
-              className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all truncate text-center min-h-[38px] ${
-                activeTab === 'dashboard'
-                  ? 'bg-amber-500 text-slate-950 font-black shadow-md border border-amber-400'
-                  : 'text-amber-300 bg-amber-950/40 hover:bg-amber-900/60 border border-amber-900/40'
-              }`}
-            >
-              <Package className="w-3.5 h-3.5 shrink-0" />
-              <span className="truncate">{currentAuth.role !== 'GUEST' ? 'CONTROL ROOM DASHBOARD' : 'RELIEF QUEUE'}</span>
-            </button>
-
-            {currentAuth.role === 'GUEST' && (
+            {currentAuth.role !== 'GUEST' && (
               <button
-                onClick={() => setActiveTab('ngos')}
+                onClick={() => setActiveTab('dashboard')}
                 className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all truncate text-center min-h-[38px] ${
-                  activeTab === 'ngos'
-                    ? 'bg-slate-800 text-amber-400 border border-amber-500/40 shadow-md'
-                    : 'text-slate-300 bg-slate-900/80 hover:bg-slate-800 border border-slate-800'
+                  activeTab === 'dashboard'
+                    ? 'bg-amber-500 text-slate-950 font-black shadow-md border border-amber-400'
+                    : 'text-amber-300 bg-amber-950/40 hover:bg-amber-900/60 border border-amber-900/40'
                 }`}
               >
-                <HeartHandshake className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span className="truncate">NGO & VOLUNTEERS</span>
+                <Package className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">CONTROL ROOM DASHBOARD</span>
               </button>
             )}
+
+            <button
+              onClick={() => setActiveTab('ngos')}
+              className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all truncate text-center min-h-[38px] ${
+                activeTab === 'ngos'
+                  ? 'bg-slate-800 text-amber-400 border border-amber-500/40 shadow-md'
+                  : 'text-slate-300 bg-slate-900/80 hover:bg-slate-800 border border-slate-800'
+              }`}
+            >
+              <HeartHandshake className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="truncate">NGO & VOLUNTEERS</span>
+            </button>
           </div>
 
           <button

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Lock, Key, ShieldCheck, HeartHandshake, Mail, UserCheck, AlertTriangle, ArrowRight, CheckCircle2, Building2, Send, Hash, Phone, Eye, EyeOff } from 'lucide-react';
 import { authService } from '../services/authService';
 import { securityService } from '../services/securityService';
-import { storageService } from '../services/storageService';
+import { storageService, VOLUNTEER_ROLES, NGO_TYPES, ASSAM_DISTRICTS } from '../services/storageService';
 
 export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOGIN', initialRegRole = 'NGO' }) {
   const [activeMode, setActiveMode] = useState(initialMode); // 'NGO_LOGIN' | 'VOLUNTEER_LOGIN' | 'REGISTER' | 'FORGOT_PASSWORD' | 'FORGOT_EMAIL'
@@ -31,6 +31,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
   const [showRegPassword, setShowRegPassword] = useState(false);
   const [regAddress, setRegAddress] = useState('');
   const [regRoleType, setRegRoleType] = useState('');
+  const [regNgoType, setRegNgoType] = useState('');
   const [regLogoUrl, setRegLogoUrl] = useState('');
   const [logoError, setLogoError] = useState('');
 
@@ -232,7 +233,8 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
           email: regEmail,
           logoUrl: regLogoUrl,
           address: regAddress || 'Assam Operational Zone',
-          operatingZones: finalZones
+          operatingZones: finalZones,
+          services: regNgoType
         }, regPassword);
       } else {
         authService.registerVolunteer({
@@ -611,13 +613,27 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
               <form onSubmit={handleDirectRegister} className="space-y-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-300 mb-1">
-                    {regRole === 'NGO' ? 'NGO / Organization Name *' : 'Full Name *'}
+                    {regRole !== 'NGO' 
+                      ? 'Full Name *'
+                      : (regNgoType.includes('Individual') || regNgoType.includes('Influencer')) 
+                        ? 'Full Name *'
+                        : regNgoType.includes('Donor') 
+                          ? 'Organization / Full Name *'
+                          : 'NGO / Organization Name *'}
                   </label>
                   <input
                     type="text"
                     value={regName}
                     onChange={(e) => setRegName(e.target.value)}
-                    placeholder={regRole === 'NGO' ? 'e.g. Assam Relief Alliance' : 'e.g. Bishal Dutta'}
+                    placeholder={
+                      regRole !== 'NGO'
+                        ? 'e.g. Bishal Dutta'
+                        : (regNgoType.includes('Individual') || regNgoType.includes('Influencer'))
+                          ? 'e.g. Bishal Dutta'
+                          : regNgoType.includes('Donor')
+                            ? 'e.g. Assam Relief Alliance or Bishal Dutta'
+                            : 'e.g. Assam Relief Alliance'
+                    }
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 min-h-[44px]"
                     required
                   />
@@ -625,11 +641,30 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
 
                 {regRole === 'NGO' && (
                   <div>
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                      Registration Type
+                    </label>
+                    <select
+                      value={regNgoType}
+                      onChange={(e) => setRegNgoType(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs font-bold text-amber-300 focus:outline-none min-h-[44px]"
+                      required
+                    >
+                      <option value="" disabled>-- Select Coordinator / NGO Type * --</option>
+                      {NGO_TYPES.map(type => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {regRole === 'NGO' && (
+                  <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="block text-xs font-bold text-slate-300">
-                        NGO Logo Image (Optional)
+                      <label className="block text-xs font-bold text-slate-300 mt-2">
+                        Logo Image (Optional)
                       </label>
-                      <span className="text-[10px] text-amber-400 font-bold">
+                      <span className="text-[10px] text-amber-400 font-bold mt-2">
                         JPG/PNG (20 KB - 50 KB)
                       </span>
                     </div>
@@ -683,12 +718,9 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                       required
                     >
                       <option value="" disabled>-- Select Volunteer Service Role * --</option>
-                      <option value="🚤 Free Motorboat / Rescue Boat Service">🚤 Free Motorboat / Rescue Boat Service</option>
-                      <option value="🚗 Free Car / SUV / 4x4 Transport Service">🚗 Free Car / SUV / 4x4 Transport Service</option>
-                      <option value="🚚 Free Goods Truck / Pickup Van">🚚 Free Goods Truck / Pickup Van</option>
-                      <option value="🩺 Free Medical Doctor / Paramedic">🩺 Free Medical Doctor / Paramedic</option>
-                      <option value="📦 Free Food & Water Supply Donor">📦 Free Food & Water Supply Donor</option>
-                      <option value="📢 Social Media Influencer / Fundraiser">📢 Social Media Influencer / Fundraiser</option>
+                      {VOLUNTEER_ROLES.map(role => (
+                        <option key={role} value={role}>{role}</option>
+                      ))}
                     </select>
                   </div>
                 )}

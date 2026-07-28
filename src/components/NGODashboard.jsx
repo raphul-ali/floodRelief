@@ -10,7 +10,8 @@ import DeliveryLogModal from './DeliveryLogModal';
 import DeliveryUpdatesTreeModal from './DeliveryUpdatesTreeModal';
 
 export default function NGODashboard({ victimRequests = [], ngos = [] }) {
-  const [queueTab, setQueueTab] = useState('ALL'); // 'ALL' | 'CRITICAL_RESCUE' | 'SUPPLY_REQUESTS' | 'VOLUNTEERS' | 'COLLABORATIONS'
+  const currentUser = authService.getCurrentUser();
+  const [queueTab, setQueueTab] = useState(currentUser.role === 'VOLUNTEER' ? 'COLLABORATIONS' : 'ALL'); // 'ALL' | 'CRITICAL_RESCUE' | 'SUPPLY_REQUESTS' | 'VOLUNTEERS' | 'COLLABORATIONS'
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('ALL');   // ALL, Pending, In Progress, Rescued
   const [filterDistrict, setFilterDistrict] = useState('ALL');
@@ -40,8 +41,9 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
   const [collabRequests, setCollabRequests] = useState([]);
   const [expandedTimelines, setExpandedTimelines] = useState({});
 
-  const currentUser = authService.getCurrentUser();
   const isNgoUser = currentUser.role === 'NGO';
+  const isVolunteerUser = currentUser.role === 'VOLUNTEER';
+  const [volunteerStatus, setVolunteerStatus] = useState(currentUser.user?.availableStatus || 'Active Now');
   const isAuthorizedUser = currentUser && (currentUser.role === 'NGO' || currentUser.role === 'VOLUNTEER' || currentUser.role === 'ADMIN');
   const ngoUserDetail = currentUser.user || {
     id: 'ngo-demo',
@@ -210,106 +212,169 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
     <div className="space-y-6">
       
       {/* --- TOP NGO PROFILE INFORMATION BANNER --- */}
-      <div className="relative rounded-2xl border border-emerald-500/40 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 p-3 sm:p-4 shadow-xl">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      {isNgoUser && (
+        <div className="relative rounded-2xl border border-emerald-500/40 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 p-3 sm:p-4 shadow-xl">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-        {/* ALWAYS VISIBLE ULTRA-COMPACT TOP HEADER */}
-        <div className="relative z-10 flex items-center justify-between gap-3">
-          
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl text-slate-950 shadow-md shrink-0">
-              <Building2 className="w-5 h-5 sm:w-6 sm:h-6" />
+          {/* ALWAYS VISIBLE ULTRA-COMPACT TOP HEADER */}
+          <div className="relative z-10 flex items-center justify-between gap-3">
+            
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl text-slate-950 shadow-md shrink-0">
+                <Building2 className="w-5 h-5 sm:w-6 sm:h-6" />
+              </div>
+              <h2 className="text-base sm:text-xl font-black text-white tracking-tight truncate">
+                {ngoUserDetail.name}
+              </h2>
             </div>
-            <h2 className="text-base sm:text-xl font-black text-white tracking-tight truncate">
-              {ngoUserDetail.name}
-            </h2>
+
+            {/* More Button */}
+            <button
+              onClick={() => setIsProfileExpanded(!isProfileExpanded)}
+              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-xl text-xs font-bold flex items-center gap-1 shadow-md transition-all shrink-0 min-h-[38px]"
+            >
+              <span>{isProfileExpanded ? 'Less' : 'More'}</span>
+              {isProfileExpanded ? <ChevronUp className="w-4 h-4 text-amber-400" /> : <ChevronDown className="w-4 h-4 text-amber-400" />}
+            </button>
+
           </div>
 
-          {/* More Button */}
-          <button
-            onClick={() => setIsProfileExpanded(!isProfileExpanded)}
-            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-xl text-xs font-bold flex items-center gap-1 shadow-md transition-all shrink-0 min-h-[38px]"
-          >
-            <span>{isProfileExpanded ? 'Less' : 'More'}</span>
-            {isProfileExpanded ? <ChevronUp className="w-4 h-4 text-amber-400" /> : <ChevronDown className="w-4 h-4 text-amber-400" />}
-          </button>
+          {/* COLLAPSIBLE PERSONAL / CONTACT INFO BOX */}
+          {isProfileExpanded && (
+            <div className="relative z-10 pt-4 border-t border-slate-800 space-y-4 animate-fadeIn">
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl space-y-1">
+                  <span className="text-[10px] font-extrabold text-slate-400 uppercase flex items-center gap-1">
+                    <Users className="w-3.5 h-3.5 text-amber-400" />
+                    Contact Person / Relief Officer
+                  </span>
+                  <p className="font-black text-white text-sm">{ngoUserDetail.contactPerson || 'Relief Desk'}</p>
+                </div>
+
+                <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl space-y-1">
+                  <span className="text-[10px] font-extrabold text-slate-400 uppercase flex items-center gap-1">
+                    <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                    Official Mobile Phone
+                  </span>
+                  <p className="font-mono font-bold text-amber-300 text-sm">{ngoUserDetail.phone}</p>
+                </div>
+
+                <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl space-y-1">
+                  <span className="text-[10px] font-extrabold text-slate-400 uppercase flex items-center gap-1">
+                    <Mail className="w-3.5 h-3.5 text-cyan-400" />
+                    Official Email Address
+                  </span>
+                  <p className="font-mono text-white text-xs truncate">{ngoUserDetail.email || 'N/A'}</p>
+                </div>
+              </div>
+
+              {/* Operating Zones & Zone Configurer inside Collapsible Box */}
+              <div className="p-3.5 bg-slate-950 border border-slate-800 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-bold text-slate-400 flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5 text-red-400" />
+                    Operating Zones:
+                  </span>
+                  {Array.isArray(ngoUserDetail.operatingZones) ? (
+                    ngoUserDetail.operatingZones.map(zone => (
+                      <span key={zone} className="px-2.5 py-0.5 bg-slate-900 text-amber-300 border border-slate-800 rounded-md font-bold text-[11px]">
+                        📍 {zone}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="px-2.5 py-0.5 bg-slate-900 text-amber-300 border border-slate-800 rounded-md font-bold text-[11px]">
+                      📍 Assam State Relief Corridor
+                    </span>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => {
+                    const currentZones = Array.isArray(ngoUserDetail.operatingZones) ? ngoUserDetail.operatingZones : [];
+                    const isWhole = currentZones.some(z => z.includes('Whole Assam'));
+                    setZoneModalMode(isWhole ? 'WHOLE_ASSAM' : 'CUSTOM_DISTRICTS');
+                    setZoneModalDistricts(isWhole ? ['Jorhat', 'Sivasagar'] : currentZones);
+                    setIsZoneModalOpen(true);
+                  }}
+                  className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs flex items-center gap-1 shadow-md transition-all active:scale-95 shrink-0"
+                >
+                  <span>✏️ Configure Zones</span>
+                </button>
+              </div>
+
+            </div>
+          )}
+
+          {/* Direct Relief Desk Footer Indicator */}
+          <div className="relative z-10 flex items-center justify-end text-[11px] text-emerald-400 font-bold gap-1 pt-1">
+            <Sparkles className="w-3 h-3 text-emerald-400" />
+            <span>Verified NGO Relief Desk Active</span>
+          </div>
 
         </div>
+      )}
 
-        {/* COLLAPSIBLE PERSONAL / CONTACT INFO BOX */}
-        {isProfileExpanded && (
-          <div className="relative z-10 pt-4 border-t border-slate-800 space-y-4 animate-fadeIn">
-            
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl space-y-1">
-                <span className="text-[10px] font-extrabold text-slate-400 uppercase flex items-center gap-1">
-                  <Users className="w-3.5 h-3.5 text-amber-400" />
-                  Contact Person / Relief Officer
-                </span>
-                <p className="font-black text-white text-sm">{ngoUserDetail.contactPerson || 'Relief Desk'}</p>
+      {/* --- TOP VOLUNTEER SERVICE PROVIDER BANNER --- */}
+      {isVolunteerUser && (
+        <div className="relative rounded-2xl border border-purple-500/40 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 p-3 sm:p-4 shadow-xl">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div className="relative z-10 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="p-2 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl text-white shadow-md shrink-0">
+                <Truck className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-
-              <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl space-y-1">
-                <span className="text-[10px] font-extrabold text-slate-400 uppercase flex items-center gap-1">
-                  <Phone className="w-3.5 h-3.5 text-emerald-400" />
-                  Official Mobile Phone
-                </span>
-                <p className="font-mono font-bold text-amber-300 text-sm">{ngoUserDetail.phone}</p>
-              </div>
-
-              <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl space-y-1">
-                <span className="text-[10px] font-extrabold text-slate-400 uppercase flex items-center gap-1">
-                  <Mail className="w-3.5 h-3.5 text-cyan-400" />
-                  Official Email Address
-                </span>
-                <p className="font-mono text-white text-xs truncate">{ngoUserDetail.email || 'N/A'}</p>
+              <div>
+                <h2 className="text-base sm:text-xl font-black text-white tracking-tight truncate">
+                  {currentUser.user?.name || 'Service Provider'}
+                </h2>
+                <p className="text-[10px] sm:text-xs font-semibold text-purple-300 truncate">
+                  {currentUser.user?.roleType || 'Logistics Service'}
+                </p>
               </div>
             </div>
 
-            {/* Operating Zones & Zone Configurer inside Collapsible Box */}
-            <div className="p-3.5 bg-slate-950 border border-slate-800 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-bold text-slate-400 flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-red-400" />
-                  Operating Zones:
+            <div className="flex flex-col items-end gap-1.5 shrink-0">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                Your Status
+                <span className="text-[9px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded-full lowercase tracking-normal">
+                  (click to toggle)
                 </span>
-                {Array.isArray(ngoUserDetail.operatingZones) ? (
-                  ngoUserDetail.operatingZones.map(zone => (
-                    <span key={zone} className="px-2.5 py-0.5 bg-slate-900 text-amber-300 border border-slate-800 rounded-md font-bold text-[11px]">
-                      📍 {zone}
-                    </span>
-                  ))
-                ) : (
-                  <span className="px-2.5 py-0.5 bg-slate-900 text-amber-300 border border-slate-800 rounded-md font-bold text-[11px]">
-                    📍 Assam State Relief Corridor
-                  </span>
-                )}
-              </div>
-
+              </span>
+              
               <button
                 onClick={() => {
-                  const currentZones = Array.isArray(ngoUserDetail.operatingZones) ? ngoUserDetail.operatingZones : [];
-                  const isWhole = currentZones.some(z => z.includes('Whole Assam'));
-                  setZoneModalMode(isWhole ? 'WHOLE_ASSAM' : 'CUSTOM_DISTRICTS');
-                  setZoneModalDistricts(isWhole ? ['Jorhat', 'Sivasagar'] : currentZones);
-                  setIsZoneModalOpen(true);
+                  const newStatus = volunteerStatus === 'Active Now' ? 'Busy / Offline' : 'Active Now';
+                  setVolunteerStatus(newStatus);
+                  if (currentUser.user?.id) {
+                    storageService.updateVolunteerStatus(currentUser.user.id, newStatus);
+                    authService.updateUserSessionStatus(newStatus);
+                    currentUser.user.availableStatus = newStatus;
+                    window.dispatchEvent(new Event("flood_data_changed"));
+                  }
                 }}
-                className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs flex items-center gap-1 shadow-md transition-all active:scale-95 shrink-0"
+                className={`relative inline-flex h-7 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900 ${
+                  volunteerStatus === 'Active Now' ? 'bg-emerald-500' : 'bg-red-500'
+                }`}
               >
-                <span>✏️ Configure Zones</span>
+                <span className="sr-only">Toggle Status</span>
+                <span
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                    volunteerStatus === 'Active Now' ? 'translate-x-8' : 'translate-x-1'
+                  }`}
+                />
               </button>
+              
+              <span className={`text-[10px] font-black uppercase ${
+                volunteerStatus === 'Active Now' ? 'text-emerald-400' : 'text-red-400'
+              }`}>
+                {volunteerStatus === 'Active Now' ? 'Available for Booking' : 'Booked'}
+              </span>
             </div>
-
           </div>
-        )}
-
-        {/* Direct Relief Desk Footer Indicator */}
-        <div className="relative z-10 flex items-center justify-end text-[11px] text-emerald-400 font-bold gap-1 pt-1">
-          <Sparkles className="w-3 h-3 text-emerald-400" />
-          <span>Verified NGO Relief Desk Active</span>
         </div>
-
-      </div>
+      )}
 
       {/* --- SECTION TABS SELECTOR --- */}
       <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xl space-y-4">
@@ -319,57 +384,61 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
           
           <div className="flex items-center gap-2 flex-wrap">
             
-            {/* Tab 1: View All Requests (Default) */}
-            <button
-              onClick={() => setQueueTab('ALL')}
-              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all border min-h-[44px] ${
-                queueTab === 'ALL'
-                  ? 'bg-slate-800 text-white border-slate-500 shadow-xl'
-                  : 'bg-slate-950 text-slate-300 border-slate-800 hover:text-white'
-              }`}
-            >
-              <Activity className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>ALL REQUESTS ({victimRequests.length})</span>
-            </button>
+            {currentUser.role !== 'VOLUNTEER' && (
+              <>
+                {/* Tab 1: View All Requests (Default) */}
+                <button
+                  onClick={() => setQueueTab('ALL')}
+                  className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all border min-h-[44px] ${
+                    queueTab === 'ALL'
+                      ? 'bg-slate-800 text-white border-slate-500 shadow-xl'
+                      : 'bg-slate-950 text-slate-300 border-slate-800 hover:text-white'
+                  }`}
+                >
+                  <Activity className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>ALL REQUESTS ({victimRequests.length})</span>
+                </button>
 
-            {/* Tab 2: Emergency Boat Rescues */}
-            <button
-              onClick={() => setQueueTab('CRITICAL_RESCUE')}
-              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all border min-h-[44px] ${
-                queueTab === 'CRITICAL_RESCUE'
-                  ? 'bg-red-600 text-white border-red-400 shadow-xl shadow-red-950/80'
-                  : 'bg-slate-950 text-red-300 border-red-900/40 hover:bg-red-950/40'
-              }`}
-            >
-              <Siren className="w-4 h-4 animate-pulse text-amber-300 shrink-0" />
-              <span>🚨 EMERGENCY RESCUES ({criticalRequests.length})</span>
-            </button>
+                {/* Tab 2: Emergency Boat Rescues */}
+                <button
+                  onClick={() => setQueueTab('CRITICAL_RESCUE')}
+                  className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all border min-h-[44px] ${
+                    queueTab === 'CRITICAL_RESCUE'
+                      ? 'bg-red-600 text-white border-red-400 shadow-xl shadow-red-950/80'
+                      : 'bg-slate-950 text-red-300 border-red-900/40 hover:bg-red-950/40'
+                  }`}
+                >
+                  <Siren className="w-4 h-4 animate-pulse text-amber-300 shrink-0" />
+                  <span>🚨 EMERGENCY RESCUES ({criticalRequests.length})</span>
+                </button>
 
-            {/* Tab 3: Food & Relief Requests */}
-            <button
-              onClick={() => setQueueTab('SUPPLY_REQUESTS')}
-              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all border min-h-[44px] ${
-                queueTab === 'SUPPLY_REQUESTS'
-                  ? 'bg-amber-500 text-slate-950 border-amber-300 shadow-xl shadow-amber-950/80'
-                  : 'bg-slate-950 text-amber-300 border-amber-900/40 hover:bg-amber-950/40'
-              }`}
-            >
-              <Package className="w-4 h-4 text-slate-950 fill-amber-300 shrink-0" />
-              <span>📦 FOOD & RELIEF DEMAND ({supplyRequests.length})</span>
-            </button>
+                {/* Tab 3: Food & Relief Requests */}
+                <button
+                  onClick={() => setQueueTab('SUPPLY_REQUESTS')}
+                  className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all border min-h-[44px] ${
+                    queueTab === 'SUPPLY_REQUESTS'
+                      ? 'bg-amber-500 text-slate-950 border-amber-300 shadow-xl shadow-amber-950/80'
+                      : 'bg-slate-950 text-amber-300 border-amber-900/40 hover:bg-amber-950/40'
+                  }`}
+                >
+                  <Package className="w-4 h-4 text-slate-950 fill-amber-300 shrink-0" />
+                  <span>📦 FOOD & RELIEF DEMAND ({supplyRequests.length})</span>
+                </button>
 
-            {/* Tab 4: Transport & Logistics Volunteers */}
-            <button
-              onClick={() => setQueueTab('VOLUNTEERS')}
-              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all border min-h-[44px] ${
-                queueTab === 'VOLUNTEERS'
-                  ? 'bg-purple-600 text-white border-purple-400 shadow-xl shadow-purple-950/80'
-                  : 'bg-slate-950 text-purple-300 border-purple-900/40 hover:bg-purple-950/40'
-              }`}
-            >
-              <Truck className="w-4 h-4 text-purple-300 shrink-0" />
-              <span>🚤 LOGISTICS VOLUNTEERS ({volunteers.length})</span>
-            </button>
+                {/* Tab 4: Transport & Logistics Volunteers */}
+                <button
+                  onClick={() => setQueueTab('VOLUNTEERS')}
+                  className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all border min-h-[44px] ${
+                    queueTab === 'VOLUNTEERS'
+                      ? 'bg-purple-600 text-white border-purple-400 shadow-xl shadow-purple-950/80'
+                      : 'bg-slate-950 text-purple-300 border-purple-900/40 hover:bg-purple-950/40'
+                  }`}
+                >
+                  <Truck className="w-4 h-4 text-purple-300 shrink-0" />
+                  <span>🚤 LOGISTICS VOLUNTEERS ({volunteers.length})</span>
+                </button>
+              </>
+            )}
 
             {/* Tab 5: Mutual Contact Collaborations */}
             <button

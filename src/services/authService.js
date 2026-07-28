@@ -139,6 +139,24 @@ export const authService = {
   },
 
   /**
+   * Update Volunteer Status in Active Session
+   */
+  updateUserSessionStatus: (status) => {
+    try {
+      const data = localStorage.getItem(AUTH_SESSION_KEY);
+      if (!data) return;
+      const session = JSON.parse(data);
+      if (session && session.user && session.role === 'VOLUNTEER') {
+        session.user.availableStatus = status;
+        localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
+        notifyAuthChanged();
+      }
+    } catch (e) {
+      console.error("Failed to update user session status", e);
+    }
+  },
+
+  /**
    * Login as NGO using Email & Password
    */
   loginNgo: async (email, password) => {

@@ -17,7 +17,7 @@ import { authService } from './services/authService';
 import { RefreshCw, Lock, Key, Mail, ShieldCheck, AlertTriangle, Eye, EyeOff, LogOut } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(authService.getCurrentUser().role === 'GUEST' ? 'ngos' : 'dashboard');
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [loginModalMode, setLoginModalMode] = useState('NGO_LOGIN'); // 'NGO_LOGIN' | 'VOLUNTEER_LOGIN' | 'REGISTER'
@@ -295,13 +295,29 @@ export default function App() {
         {/* Scroll Target Element */}
         <div ref={mainContentRef} className="scroll-mt-24" />
 
-        {/* NGO Rescue Queue */}
+        {/* NGO Rescue Queue (Protected Route) */}
         {activeTab === 'dashboard' && (
           <div className="space-y-6">
-            <NGODashboard 
-              victimRequests={victimRequests} 
-              ngos={ngos} 
-            />
+            {currentAuth.role !== 'GUEST' ? (
+              <NGODashboard 
+                victimRequests={victimRequests} 
+                ngos={ngos} 
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+                <Lock className="w-12 h-12 text-slate-600 mb-2" />
+                <h2 className="text-xl font-black text-slate-300">Authorized Personnel Only</h2>
+                <p className="text-slate-500 max-w-sm">
+                  The Relief Control Room is restricted to verified NGOs and registered Volunteers.
+                </p>
+                <button
+                  onClick={() => setIsLoginModalOpen(true)}
+                  className="mt-4 px-6 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl shadow-lg active:scale-95 transition-all"
+                >
+                  Partner Login
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -341,6 +357,7 @@ export default function App() {
           onClose={() => setIsLoginModalOpen(false)}
           onLoggedIn={() => {
             loadData();
+            handleTabChange('dashboard');
           }}
         />
       )}

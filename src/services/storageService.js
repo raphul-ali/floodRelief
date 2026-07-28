@@ -44,10 +44,14 @@ export const VOLUNTEER_ROLES = [
   "🚤 Free Motorboat / Rescue Boat Service",
   "🚗 Free Car / SUV / 4x4 Transport Service",
   "🚚 Free Goods Truck / Pickup Van",
-  "🩺 Free Medical Doctor / Paramedic",
+  "🩺 Free Medical Doctor / Paramedic"
+];
+
+export const NGO_TYPES = [
+  "🏢 Registered NGO / Relief Organization",
   "📦 Free Food & Water Supply Donor",
   "📢 Social Media Influencer / Fundraiser",
-  "🤝 Individual Volunteer Helper"
+  "🤝 Individual Volunteer Helper / Self Help Worker"
 ];
 
 // Clean Production Storage Keys
@@ -271,8 +275,13 @@ export const storageService = {
   // --- NGO & VOLUNTEER RELIEF DELIVERY LOGS ---
   getDeliveryLogs: (includeUnverified = false) => {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.DELIVERY_LOGS);
-      let logs = data ? JSON.parse(data) : [];
+      let logs = [];
+      if (isSupabaseConfigured && cloudMemoryCache.deliveryLogs !== null) {
+        logs = cloudMemoryCache.deliveryLogs;
+      } else {
+        const data = localStorage.getItem(STORAGE_KEYS.DELIVERY_LOGS);
+        logs = data ? JSON.parse(data) : [];
+      }
       if (!includeUnverified) {
         return logs.filter(log => log.verified === true);
       }
@@ -409,8 +418,13 @@ export const storageService = {
   // --- NGO DIRECTORY METHODS ---
   getNGOs: (includeUnverified = false) => {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.NGOS);
-      let list = data ? JSON.parse(data) : [];
+      let list = [];
+      if (isSupabaseConfigured && cloudMemoryCache.ngos !== null) {
+        list = cloudMemoryCache.ngos;
+      } else {
+        const data = localStorage.getItem(STORAGE_KEYS.NGOS);
+        list = data ? JSON.parse(data) : [];
+      }
       if (!includeUnverified) {
         return list.filter(n => n.verified === true);
       }
@@ -524,8 +538,13 @@ export const storageService = {
   // --- VOLUNTEER DIRECTORY METHODS ---
   getVolunteers: (includeUnverified = false) => {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.VOLUNTEERS);
-      let list = data ? JSON.parse(data) : [];
+      let list = [];
+      if (isSupabaseConfigured && cloudMemoryCache.volunteers !== null) {
+        list = cloudMemoryCache.volunteers;
+      } else {
+        const data = localStorage.getItem(STORAGE_KEYS.VOLUNTEERS);
+        list = data ? JSON.parse(data) : [];
+      }
       if (!includeUnverified) {
         return list.filter(v => v.verified === true);
       }
@@ -601,6 +620,20 @@ export const storageService = {
     if (isSupabaseConfigured && supabase) {
       supabase.from('volunteers').update({ verified: true }).eq('id', volId).then(({ error }) => {
         if (error) console.error("Supabase Volunteer verify error:", error);
+      });
+    }
+
+    notifyDataChanged();
+  },
+
+  updateVolunteerStatus: (volId, status) => {
+    const vols = storageService.getVolunteers(true);
+    const updated = vols.map(v => v.id === volId ? { ...v, availableStatus: status } : v);
+    if (isSupabaseConfigured) { cloudMemoryCache.volunteers = updated; } else { localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(updated)); }
+
+    if (isSupabaseConfigured && supabase) {
+      supabase.from('volunteers').update({ available_status: status }).eq('id', volId).then(({ error }) => {
+        if (error) console.error("Supabase Volunteer status update error:", error);
       });
     }
 
