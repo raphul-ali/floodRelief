@@ -34,6 +34,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
   const [regNgoType, setRegNgoType] = useState('');
   const [regLogoUrl, setRegLogoUrl] = useState('');
   const [logoError, setLogoError] = useState('');
+  const [regShowPhone, setRegShowPhone] = useState(initialRegRole === 'NGO');
 
   // NGO Operating Zones State
   const [regZoneMode, setRegZoneMode] = useState('WHOLE_ASSAM'); // 'WHOLE_ASSAM' | 'CUSTOM_DISTRICTS'
@@ -234,7 +235,8 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
           logoUrl: regLogoUrl,
           address: regAddress || 'Assam Operational Zone',
           operatingZones: finalZones,
-          services: regNgoType
+          services: regNgoType,
+          showPhone: regShowPhone
         }, regPassword);
       } else {
         authService.registerVolunteer({
@@ -243,7 +245,8 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
           phone: fullPhone,
           email: regEmail,
           district: 'Jorhat',
-          offerings: regAddress || 'Local relief volunteer support'
+          offerings: regAddress || 'Local relief volunteer support',
+          showPhone: regShowPhone
         }, regPassword);
       }
 
@@ -535,14 +538,14 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
             <div className="flex items-center gap-2 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-bold">
               <button
                 type="button"
-                onClick={() => setRegRole('NGO')}
+                onClick={() => { setRegRole('NGO'); setRegShowPhone(true); }}
                 className={`flex-1 py-2 rounded-lg text-center min-h-[36px] ${regRole === 'NGO' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400'}`}
               >
                 NGO Account
               </button>
               <button
                 type="button"
-                onClick={() => setRegRole('VOLUNTEER')}
+                onClick={() => { setRegRole('VOLUNTEER'); setRegShowPhone(false); }}
                 className={`flex-1 py-2 rounded-lg text-center min-h-[36px] ${regRole === 'VOLUNTEER' ? 'bg-purple-600 text-white font-black' : 'text-slate-400'}`}
               >
                 Individual Volunteer
@@ -759,6 +762,19 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                         ℹ️ <strong>Notice:</strong> This official NGO phone number will be displayed publicly in the relief directory so victims & volunteers can contact your organization.
                       </p>
                     )}
+                    
+                    <div className="mt-2 flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={regShowPhone}
+                        onChange={(e) => setRegShowPhone(e.target.checked)}
+                        className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-amber-500"
+                        id="regShowPhoneToggle"
+                      />
+                      <label htmlFor="regShowPhoneToggle" className="text-[11px] font-semibold text-slate-300 cursor-pointer">
+                        Show phone number publicly
+                      </label>
+                    </div>
                     {/* Live Inline Phone Error */}
                     {phoneError && (
                       <p className="text-[11px] font-bold text-red-400 mt-1 flex items-center gap-1 animate-fadeIn">

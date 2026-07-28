@@ -4,16 +4,7 @@ import { storageService } from '../services/storageService';
 import { authService } from '../services/authService';
 import DistrictSelect from './DistrictSelect';
 
-const SUPPLY_NEEDS = [
-  "Cooked Meals & Food Packets",
-  "Clean Drinking Water Jars",
-  "Baby Food & Infant Milk Formula",
-  "First Aid & Fever Medicines",
-  "Water Purification Tablets",
-  "Warm Blankets & Dry Clothes",
-  "Tarpaulins & Relief Tents",
-  "Hygiene & Sanitary Kits"
-];
+// Removed SUPPLY_NEEDS array
 
 export default function VictimRequestForm({ onClose, onRequestSubmitted, initialUrgent = true }) {
   const [formData, setFormData] = useState({
@@ -23,6 +14,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
     malesCount: 0,
     femalesCount: 0,
     childrenCount: 0,
+    familiesCount: 0,
     district: '',
     villageName: '',
     pinCode: '',
@@ -30,7 +22,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
     latitude: null,
     longitude: null,
     isUrgentRescue: initialUrgent,
-    needs: initialUrgent ? ['Emergency Motorboat Rescue & Life Evacuation'] : ['Cooked Meals & Food Packets', 'Clean Drinking Water Jars'],
+    customNeeds: initialUrgent ? '' : 'Cooked Meals, Clean Drinking Water',
     details: ''
   });
 
@@ -38,9 +30,8 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
     setFormData(prev => ({
       ...prev,
       isUrgentRescue: initialUrgent,
-      needs: initialUrgent ? ['Emergency Motorboat Rescue & Life Evacuation'] : ['Cooked Meals & Food Packets', 'Clean Drinking Water Jars']
+      customNeeds: initialUrgent ? '' : 'Cooked Meals, Clean Drinking Water'
     }));
-    handleDetectLocation();
   }, [initialUrgent]);
 
   const [isLocating, setIsLocating] = useState(false);
@@ -48,6 +39,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedSuccess, setSubmittedSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [attachGps, setAttachGps] = useState(true);
 
   // HTML5 Geolocation API
   const handleDetectLocation = () => {
@@ -79,16 +71,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
     );
   };
 
-  const toggleNeed = (needItem) => {
-    setFormData(prev => {
-      const exists = prev.needs.includes(needItem);
-      if (exists) {
-        return { ...prev, needs: prev.needs.filter(item => item !== needItem) };
-      } else {
-        return { ...prev, needs: [...prev.needs, needItem] };
-      }
-    });
-  };
+  // Removed toggleNeed function
 
   const totalPeopleCount = (parseInt(formData.malesCount) || 0) + (parseInt(formData.femalesCount) || 0) + (parseInt(formData.childrenCount) || 0);
 
@@ -101,8 +84,8 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
       return;
     }
 
-    if (!formData.latitude || !formData.longitude) {
-      setErrorMessage("📍 GPS Location is MANDATORY! Please click 'Attach GPS Location *' button to auto-detect your location before submitting.");
+    if (attachGps && (!formData.latitude || !formData.longitude)) {
+      setErrorMessage("📍 GPS Location is required when 'Attach GPS' is checked. Please click 'Attach Mandatory GPS Location *' button to auto-detect your location before submitting, or uncheck the 'Attach GPS' option if you don't have internet/GPS.");
       return;
     }
 
@@ -136,7 +119,9 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
         requestedByPhone,
         peopleCount: totalPeopleCount > 0 ? totalPeopleCount : 1,
         locationName: locationAddressFormatted,
-        needs: formData.isUrgentRescue ? ['Emergency Motorboat Rescue & Life Evacuation'] : formData.needs
+        needs: formData.isUrgentRescue ? ['Emergency Motorboat Rescue & Life Evacuation'] : [formData.customNeeds],
+        latitude: attachGps ? formData.latitude : null,
+        longitude: attachGps ? formData.longitude : null
       });
 
       setIsSubmitting(false);
@@ -262,8 +247,9 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400">Demographics:</span>
-                <span className="font-bold text-amber-300">
-                  {totalPeopleCount} Total ({formData.malesCount} Males, {formData.femalesCount} Females, {formData.childrenCount} Children)
+                <span className="font-bold text-amber-300 text-right">
+                  {totalPeopleCount} Total ({formData.malesCount} M, {formData.femalesCount} F, {formData.childrenCount} C)
+                  {formData.familiesCount > 0 ? ` & ${formData.familiesCount} Families` : ''}
                 </span>
               </div>
             </div>
@@ -389,47 +375,86 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
               )}
 
               <div className={formData.isUrgentRescue ? "sm:col-span-1" : "sm:col-span-3"}>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-                  <span>GPS Location *</span>
-                  {!formData.latitude && <span className="text-[10px] text-red-400 font-extrabold animate-pulse">REQUIRED</span>}
-                </label>
-                <button
-                  type="button"
-                  onClick={handleDetectLocation}
-                  disabled={isLocating}
-                  className={`w-full py-2.5 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all min-h-[44px] ${
-                    formData.latitude
-                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50'
-                      : 'bg-red-500/20 text-red-300 border border-red-500/60 shadow-lg shadow-red-950/80 animate-pulse'
-                  }`}
-                >
-                  <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
-                  <span>
-                    {isLocating 
-                      ? 'Acquiring GPS...' 
-                      : formData.latitude 
-                        ? `✅ GPS Pinned (${formData.latitude.toFixed(4)}, ${formData.longitude.toFixed(4)})` 
-                        : '📍 Attach Mandatory GPS Location *'}
-                  </span>
-                </button>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="flex items-center gap-2 cursor-pointer group">
+                    <input 
+                      type="checkbox" 
+                      checked={attachGps}
+                      onChange={(e) => setAttachGps(e.target.checked)}
+                      className="w-3.5 h-3.5 rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-amber-500 focus:ring-offset-slate-950 cursor-pointer"
+                    />
+                    <span className="text-xs font-bold text-slate-300 uppercase tracking-wider group-hover:text-amber-400 transition-colors">
+                      Attach GPS
+                    </span>
+                  </label>
+                  {attachGps && !formData.latitude && <span className="text-[10px] text-red-400 font-extrabold animate-pulse">REQUIRED</span>}
+                </div>
+                
+                {attachGps ? (
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="number"
+                        step="any"
+                        placeholder="Latitude"
+                        value={formData.latitude !== null ? formData.latitude : ''}
+                        onChange={(e) => setFormData(prev => ({ ...prev, latitude: e.target.value === '' ? null : parseFloat(e.target.value) }))}
+                        className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs focus:outline-none focus:border-amber-400"
+                        required={attachGps}
+                      />
+                      <input
+                        type="number"
+                        step="any"
+                        placeholder="Longitude"
+                        value={formData.longitude !== null ? formData.longitude : ''}
+                        onChange={(e) => setFormData(prev => ({ ...prev, longitude: e.target.value === '' ? null : parseFloat(e.target.value) }))}
+                        className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs focus:outline-none focus:border-amber-400"
+                        required={attachGps}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleDetectLocation}
+                      disabled={isLocating}
+                      className={`w-full py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all min-h-[36px] ${
+                        formData.latitude
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50'
+                          : 'bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700'
+                      }`}
+                    >
+                      <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
+                      <span>
+                        {isLocating 
+                          ? 'Acquiring GPS...' 
+                          : formData.latitude 
+                            ? '✅ GPS Pinned (Click to Refetch)' 
+                            : '📍 Fetch Auto Geolocation'}
+                      </span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="w-full py-2.5 px-3 rounded-xl text-xs font-bold text-slate-400 bg-slate-900/50 border border-slate-800 flex items-center justify-center min-h-[44px] italic">
+                    Submitted without GPS
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Demographics: Males, Females, Children Counters */}
+            {/* Demographics: Males, Females, Children, Families Counters */}
             <div className="p-4 bg-slate-950/80 border border-slate-800 rounded-xl space-y-3">
               <div className="flex items-center justify-between border-b border-slate-800 pb-2">
                 <div className="flex items-center gap-2 text-xs font-black text-amber-300 uppercase tracking-wider">
                   <Users className="w-4 h-4 text-amber-400" />
                   <span>Demographics Needing Rescue</span>
                 </div>
-                <span className="text-xs font-black text-white bg-slate-900 px-2.5 py-0.5 rounded-full border border-amber-500/30">
-                  Total: {totalPeopleCount} People
+                <span className="text-[10px] sm:text-xs font-black text-white bg-slate-900 px-2.5 py-0.5 rounded-full border border-amber-500/30">
+                  Total: {totalPeopleCount} People{formData.familiesCount > 0 ? `, ${formData.familiesCount} Families` : ''}
                 </span>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">👨 Males</label>
+                  <label className="block text-[10px] sm:text-xs font-bold text-slate-300 mb-1">👨 Males</label>
                   <input
                     type="number"
                     min="0"
@@ -441,7 +466,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">👩 Females</label>
+                  <label className="block text-[10px] sm:text-xs font-bold text-slate-300 mb-1">👩 Females</label>
                   <input
                     type="number"
                     min="0"
@@ -453,7 +478,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">👶 Children</label>
+                  <label className="block text-[10px] sm:text-xs font-bold text-slate-300 mb-1">👶 Children</label>
                   <input
                     type="number"
                     min="0"
@@ -463,35 +488,35 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                     className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-extrabold text-sm focus:outline-none focus:border-amber-400"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-[10px] sm:text-xs font-bold text-slate-300 mb-1">🏠 Families</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="200"
+                    value={formData.familiesCount}
+                    onChange={(e) => setFormData(prev => ({ ...prev, familiesCount: Math.max(0, parseInt(e.target.value) || 0) }))}
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-extrabold text-sm focus:outline-none focus:border-amber-400"
+                  />
+                </div>
               </div>
             </div>
 
-            {/* ONLY SHOW SUPPLY CHECKLIST IF IN MATERIAL RELIEF MODE */}
+            {/* ONLY SHOW SUPPLY TEXT BOX IF IN MATERIAL RELIEF MODE */}
             {!formData.isUrgentRescue && (
               <div className="space-y-2">
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
-                  Select Materials & Food Needed (Check all that apply)
+                  Materials & Food Needed
                 </label>
-                <div className="flex flex-wrap gap-2">
-                  {SUPPLY_NEEDS.map((item) => {
-                    const isSelected = formData.needs.includes(item);
-                    return (
-                      <button
-                        key={item}
-                        type="button"
-                        onClick={() => toggleNeed(item)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all flex items-center gap-1.5 ${
-                          isSelected
-                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-sm'
-                            : 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-700'
-                        }`}
-                      >
-                        <span>{isSelected ? '✓' : '+'}</span>
-                        <span>{item}</span>
-                      </button>
-                    );
-                  })}
-                </div>
+                <textarea
+                  rows="3"
+                  placeholder="e.g. Cooked Meals, Drinking Water, Blankets, Baby Food..."
+                  value={formData.customNeeds}
+                  onChange={(e) => setFormData(prev => ({ ...prev, customNeeds: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400 text-sm"
+                  required={!formData.isUrgentRescue}
+                />
               </div>
             )}
 

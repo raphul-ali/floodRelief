@@ -241,23 +241,32 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
 
             {/* Call Buttons */}
             <div className="pt-2 border-t border-slate-800/80 flex items-center gap-2">
-              <a
-                href={`tel:${ngo.phone.replace(/[^0-9]/g, '')}`}
-                className="flex-1 py-2 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all min-h-[40px]"
-              >
-                <Phone className="w-3.5 h-3.5" />
-                <span>Call NGO</span>
-              </a>
+              {ngo.showPhone !== false ? (
+                <>
+                  <a
+                    href={`tel:${ngo.phone?.replace(/[^0-9]/g, '')}`}
+                    className="flex-1 py-2 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all min-h-[40px]"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>Call NGO</span>
+                  </a>
 
-              <a
-                href={`https://wa.me/91${(ngo.whatsapp || ngo.phone).replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(ngo.name)},%20we%20need%20flood%20relief%20support.`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 py-2 px-3 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all min-h-[40px]"
-              >
-                <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
-                <span>WhatsApp</span>
-              </a>
+                  <a
+                    href={`https://wa.me/91${(ngo.whatsapp || ngo.phone)?.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(ngo.name)},%20we%20need%20flood%20relief%20support.`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 py-2 px-3 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all min-h-[40px]"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>WhatsApp</span>
+                  </a>
+                </>
+              ) : (
+                <div className="flex-1 py-2 px-3 bg-slate-900/50 border border-slate-800 text-slate-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all min-h-[40px] italic">
+                  <Phone className="w-3.5 h-3.5 opacity-50" />
+                  <span>Number Hidden</span>
+                </div>
+              )}
             </div>
           </div>
         ))}
@@ -291,23 +300,32 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
 
             {/* Call & WhatsApp Buttons */}
             <div className="pt-2 border-t border-slate-800/80 flex items-center gap-2">
-              <a
-                href={`tel:${vol.phone.replace(/[^0-9]/g, '')}`}
-                className="flex-1 py-2 px-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all min-h-[40px]"
-              >
-                <Phone className="w-3.5 h-3.5" />
-                <span>Call Volunteer</span>
-              </a>
+              {vol.showPhone === true ? (
+                <>
+                  <a
+                    href={`tel:${vol.phone?.replace(/[^0-9]/g, '')}`}
+                    className="flex-1 py-2 px-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all min-h-[40px]"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>Call Volunteer</span>
+                  </a>
 
-              <a
-                href={`https://wa.me/91${(vol.whatsapp || vol.phone).replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(vol.name)},%20we%20need%20flood%20relief%20boat/car%20support.`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 py-2 px-3 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all min-h-[40px]"
-              >
-                <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
-                <span>WhatsApp</span>
-              </a>
+                  <a
+                    href={`https://wa.me/91${(vol.whatsapp || vol.phone)?.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(vol.name)},%20we%20need%20flood%20relief%20boat/car%20support.`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 py-2 px-3 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all min-h-[40px]"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>WhatsApp</span>
+                  </a>
+                </>
+              ) : (
+                <div className="flex-1 py-2 px-3 bg-slate-900/50 border border-slate-800 text-slate-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all min-h-[40px] italic">
+                  <Phone className="w-3.5 h-3.5 opacity-50" />
+                  <span>Number Hidden</span>
+                </div>
+              )}
             </div>
           </div>
         ))}

@@ -162,6 +162,7 @@ export const storageService = {
         males_count: newRequest.malesCount,
         females_count: newRequest.femalesCount,
         children_count: newRequest.childrenCount,
+        families_count: newRequest.familiesCount,
         district: newRequest.district,
         village_name: newRequest.villageName,
         pin_code: newRequest.pinCode,
@@ -460,6 +461,7 @@ export const storageService = {
       id: "ngo-assam-" + Date.now(),
       verified: ngoData.verified === true,
       activeTeams: 1,
+      showPhone: ngoData.showPhone !== false, // default true
       ...sanitized
     };
 
@@ -480,6 +482,7 @@ export const storageService = {
         address: newNgo.address,
         verified: newNgo.verified,
         active_teams: newNgo.activeTeams,
+        show_phone: newNgo.showPhone,
         created_at: new Date().toISOString()
       }]).then(({ error }) => {
         if (error) console.error("Supabase NGO insert error:", error);
@@ -580,6 +583,7 @@ export const storageService = {
       id: "vol-" + Date.now(),
       availableStatus: "Active Now",
       verified: volData.verified === true,
+      showPhone: volData.showPhone === true, // default false for volunteer unless explicitly requested
       ...sanitized
     };
 
@@ -599,6 +603,7 @@ export const storageService = {
         offerings: newVol.offerings,
         available_status: newVol.availableStatus,
         verified: newVol.verified,
+        show_phone: newVol.showPhone,
         created_at: new Date().toISOString()
       }]).then(({ error }) => {
         if (error) console.error("Supabase Volunteer insert error:", error);
