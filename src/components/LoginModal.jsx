@@ -223,9 +223,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
       const fullPhone = `+91 ${regPhone}`;
 
       if (regRole === 'NGO') {
-        const finalZones = regZoneMode === 'WHOLE_ASSAM'
-          ? ['Whole Assam (All 35 Districts)']
-          : (regSelectedDistricts.length > 0 ? regSelectedDistricts : ['Whole Assam (All 35 Districts)']);
+        const finalZones = ['Whole Assam (All 35 Districts)'];
 
         authService.registerNgo({
           name: regName,
@@ -669,85 +667,6 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                       <p className="text-[11px] font-bold text-red-400 mt-1 flex items-center gap-1 animate-fadeIn">
                         <span>{logoError}</span>
                       </p>
-                    )}
-                  </div>
-                )}
-
-                {/* NGO Operating Zones Selector */}
-                {regRole === 'NGO' && (
-                  <div className="space-y-2 p-3 bg-slate-950/90 border border-slate-800 rounded-xl">
-                    <label className="block text-xs font-bold text-slate-300">
-                      NGO Operating Zones (Coverage Area) *
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setRegZoneMode('WHOLE_ASSAM')}
-                        className={`flex-1 py-2 px-2.5 rounded-lg text-xs transition-colors border ${
-                          regZoneMode === 'WHOLE_ASSAM'
-                            ? 'bg-amber-500 text-slate-950 border-amber-400 font-black'
-                            : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white font-bold'
-                        }`}
-                      >
-                        🌐 Whole Assam
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setRegZoneMode('CUSTOM_DISTRICTS')}
-                        className={`flex-1 py-2 px-2.5 rounded-lg text-xs transition-colors border ${
-                          regZoneMode === 'CUSTOM_DISTRICTS'
-                            ? 'bg-amber-500 text-slate-950 border-amber-400 font-black'
-                            : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white font-bold'
-                        }`}
-                      >
-                        📍 Specific Districts
-                      </button>
-                    </div>
-
-                    {regZoneMode === 'CUSTOM_DISTRICTS' && (
-                      <div className="space-y-2 pt-2 border-t border-slate-800">
-                        <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-amber-300 font-bold">Selected: {regSelectedDistricts.length} Districts</span>
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => setRegSelectedDistricts(ASSAM_DISTRICTS)}
-                              className="text-emerald-400 font-bold hover:underline"
-                            >
-                              Select All
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setRegSelectedDistricts([])}
-                              className="text-red-400 font-bold hover:underline"
-                            >
-                              Clear
-                            </button>
-                          </div>
-                        </div>
-                        <div className="max-h-36 overflow-y-auto pr-1 grid grid-cols-2 gap-1.5 border border-slate-800 p-2 rounded-lg bg-slate-950 text-xs">
-                          {ASSAM_DISTRICTS.map(dist => {
-                            const isSelected = regSelectedDistricts.includes(dist);
-                            return (
-                              <label key={dist} className="flex items-center gap-1.5 text-[11px] text-slate-300 cursor-pointer select-none">
-                                <input
-                                  type="checkbox"
-                                  checked={isSelected}
-                                  onChange={(e) => {
-                                    if (e.target.checked) {
-                                      setRegSelectedDistricts(prev => [...prev, dist]);
-                                    } else {
-                                      setRegSelectedDistricts(prev => prev.filter(d => d !== dist));
-                                    }
-                                  }}
-                                  className="rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-amber-500"
-                                />
-                                <span className={isSelected ? "text-amber-300 font-bold" : ""}>{dist}</span>
-                              </label>
-                            );
-                          })}
-                        </div>
-                      </div>
                     )}
                   </div>
                 )}
