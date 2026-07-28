@@ -607,7 +607,22 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                             <div className="flex items-center gap-1 text-xs text-amber-400 font-bold mt-0.5">
                               <Users className="w-3.5 h-3.5" />
                               <span>
-                                {req.peopleCount || (males + females + (req.childrenCount || 0))} Total (👨 {males} Males, 👩 {females} Females, 👶 {req.childrenCount || 0} Children)
+                                {(() => {
+                                  const totalPeople = (req.peopleCount || 0) > 0 ? req.peopleCount : ((req.malesCount || 0) + (req.femalesCount || 0) + (req.childrenCount || 0));
+                                  const showPeople = totalPeople > 0;
+                                  const showFamilies = req.familiesCount > 0;
+                                  
+                                  if (!showPeople && !showFamilies) return 'Status Unknown';
+
+                                  return (
+                                    <>
+                                      {showPeople && `${totalPeople} Total (👨 ${req.malesCount || 0} Males, 👩 ${req.femalesCount || 0} Females, 👶 ${req.childrenCount || 0} Children)`}
+                                      {showPeople && showFamilies && ' & '}
+                                      {showFamilies && `${req.familiesCount} Families`}
+                                      {' Need Help'}
+                                    </>
+                                  );
+                                })()}
                               </span>
                             </div>
                           </div>
