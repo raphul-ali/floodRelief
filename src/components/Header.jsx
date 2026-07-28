@@ -99,11 +99,11 @@ export default function Header({
                 <Lock className="w-3.5 h-3.5 text-amber-400" />
                 <span>🔐 Login</span>
               </button>
-            ) : isNgo ? (
+            ) : currentAuth.role !== 'GUEST' ? (
               <button
                 onClick={onLogout}
                 className="flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] sm:min-h-[42px] rounded-xl text-xs font-black bg-red-950/80 hover:bg-red-900 text-red-200 border border-red-500/40 shadow-md active:scale-95 transition-all cursor-pointer shrink-0"
-                title={`Logout ${currentAuth.user?.name || ''}`}
+                title={`Logout ${currentAuth.user?.name || 'Session'}`}
               >
                 <LogOut className="w-3.5 h-3.5 text-red-400 shrink-0" />
                 <span>Logout</span>
