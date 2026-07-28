@@ -362,34 +362,46 @@ export default function AdminDashboard({ onDataUpdated }) {
 
       </div>
 
+      {/* Global Filters */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-900 p-3 rounded-xl border border-slate-800">
+        <div className="flex items-center gap-2 w-full sm:w-auto flex-1">
+          <Search className="w-4 h-4 text-slate-400 shrink-0" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search name, ID, phone, district..."
+            className="bg-transparent border-none text-xs text-white placeholder-slate-500 focus:outline-none w-full min-h-[36px]"
+          />
+        </div>
+        
+        <div className="flex gap-2 w-full sm:w-auto">
+          <select
+            value={selectedDistrict}
+            onChange={(e) => setSelectedDistrict(e.target.value)}
+            className="bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-lg px-3 py-2 focus:outline-none w-full sm:w-auto min-h-[36px]"
+          >
+            <option value="ALL">All Districts</option>
+            {ASSAM_DISTRICTS.map(d => (
+              <option key={d} value={d}>{d}</option>
+            ))}
+          </select>
+
+          <button
+            onClick={() => {
+              window.location.reload();
+            }}
+            className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-purple-400 rounded-lg border border-slate-700 transition-colors flex items-center justify-center min-h-[36px]"
+            title="Refresh Data"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+
       {/* QUEUE 1: PENDING SOS REQUESTS */}
       {activeQueueTab === 'sos' && (
         <div className="space-y-4">
-          
-          {/* Filters */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-900 p-3 rounded-xl border border-slate-800">
-            <div className="flex items-center gap-2 w-full sm:w-auto flex-1">
-              <Search className="w-4 h-4 text-slate-400 shrink-0" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search name, ID, phone..."
-                className="bg-transparent border-none text-xs text-white placeholder-slate-500 focus:outline-none w-full min-h-[36px]"
-              />
-            </div>
-            
-            <select
-              value={selectedDistrict}
-              onChange={(e) => setSelectedDistrict(e.target.value)}
-              className="bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-lg px-3 py-2 focus:outline-none w-full sm:w-auto min-h-[36px]"
-            >
-              <option value="ALL">All Districts ({pendingRequests.length})</option>
-              {ASSAM_DISTRICTS.map(d => (
-                <option key={d} value={d}>{d}</option>
-              ))}
-            </select>
-          </div>
 
           {filteredSos.length === 0 ? (
             <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center space-y-2">
@@ -466,7 +478,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                     </a>
 
                     <a
-                      href={`tel:${req.phone.replace(/[^0-9]/g, '')}`}
+                      href={`tel:${(req.phone || '').replace(/[^0-9]/g, '')}`}
                       className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-xl text-xs font-black flex items-center justify-center gap-1 border border-slate-700 min-h-[44px]"
                     >
                       <Phone className="w-3.5 h-3.5" />
@@ -716,21 +728,10 @@ export default function AdminDashboard({ onDataUpdated }) {
       {activeQueueTab === 'recovery' && (
         <div className="space-y-4">
           {/* Header & Info */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-900 p-3 rounded-xl border border-slate-800">
+          <div className="flex items-center justify-between gap-3 bg-slate-900 p-3 rounded-xl border border-slate-800">
             <div className="flex items-center gap-2">
               <Key className="w-4 h-4 text-cyan-400 shrink-0" />
               <span className="text-xs font-bold text-slate-200">Account Recovery Queue ({pendingRecovery.length} Total)</span>
-            </div>
-            
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <Search className="w-4 h-4 text-slate-400 shrink-0" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search name, phone, email, ID..."
-                className="bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 rounded-lg px-3 py-1.5 focus:outline-none w-full sm:w-48 min-h-[36px]"
-              />
             </div>
           </div>
 
