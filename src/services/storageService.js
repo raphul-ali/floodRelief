@@ -759,7 +759,9 @@ export const storageService = {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (!vErr && Array.isArray(victims) && victims.length > 0) {
+      if (vErr) {
+        console.error("Supabase victim_requests fetch error:", vErr);
+      } else if (Array.isArray(victims)) {
         const formattedVictims = victims.map(v => ({
           id: v.id,
           createdAt: v.created_at,
@@ -795,7 +797,9 @@ export const storageService = {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (!lErr && Array.isArray(logs) && logs.length > 0) {
+      if (lErr) {
+        console.error("Supabase delivery_logs fetch error:", lErr);
+      } else if (Array.isArray(logs)) {
         const formattedLogs = logs.map(l => ({
           logId: l.log_id || l.id,
           createdAt: l.created_at,
@@ -819,7 +823,9 @@ export const storageService = {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (!nErr && Array.isArray(ngos) && ngos.length > 0) {
+      if (nErr) {
+        console.error("Supabase ngos fetch error:", nErr);
+      } else if (Array.isArray(ngos)) {
         const formattedNgos = ngos.map(n => ({
           id: n.id,
           name: n.name,
@@ -843,7 +849,9 @@ export const storageService = {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (!volErr && Array.isArray(vols) && vols.length > 0) {
+      if (volErr) {
+        console.error("Supabase volunteers fetch error:", volErr);
+      } else if (Array.isArray(vols)) {
         const formattedVols = vols.map(v => ({
           id: v.id,
           name: v.name,
