@@ -54,15 +54,6 @@ export const NGO_TYPES = [
   "🤝 Individual Volunteer Helper / Self Help Worker"
 ];
 
-// Clean Production Storage Keys
-const STORAGE_KEYS = {
-  VICTIMS: "flood_portal_victims_prod_v9",
-  NGOS: "flood_portal_ngos_prod_v9",
-  VOLUNTEERS: "flood_portal_volunteers_prod_v9",
-  DELIVERY_LOGS: "flood_portal_delivery_logs_prod_v9",
-  ACCOUNT_RECOVERY: "flood_portal_account_recovery_v1",
-  VOLUNTEER_COLLAB: "flood_portal_vol_collab_v1"
-};
 
 const notifyDataChanged = () => {
   window.dispatchEvent(new Event("flood_data_changed"));
@@ -72,7 +63,9 @@ const cloudMemoryCache = {
   victims: null,
   ngos: null,
   volunteers: null,
-  deliveryLogs: null
+  deliveryLogs: null,
+  accountRecovery: null,
+  volunteerCollab: null
 };
 
 export const storageService = {
@@ -80,13 +73,7 @@ export const storageService = {
   // --- VICTIM SOS REQUESTS ---
   getVictimRequests: (includeUnverified = false) => {
     try {
-      let list = [];
-      if (isSupabaseConfigured && cloudMemoryCache.victims !== null) {
-        list = cloudMemoryCache.victims;
-      } else {
-        const data = localStorage.getItem(STORAGE_KEYS.VICTIMS);
-        list = data ? JSON.parse(data) : [];
-      }
+      const list = cloudMemoryCache.victims || [];
       
       if (!includeUnverified) {
         return list.filter(req => req.verified === true);
@@ -202,7 +189,7 @@ export const storageService = {
       }
       return req;
     });
-    if (isSupabaseConfigured) { cloudMemoryCache.victims = updated; } else { localStorage.setItem(STORAGE_KEYS.VICTIMS, JSON.stringify(updated)); }
+    cloudMemoryCache.victims = updated;
 
     // Supabase Sync
     if (isSupabaseConfigured && supabase) {
@@ -222,11 +209,53 @@ export const storageService = {
   rejectVictimRequest: (requestId) => {
     const requests = storageService.getVictimRequests(true);
     const updated = requests.filter(req => req.id !== requestId);
-    if (isSupabaseConfigured) { cloudMemoryCache.victims = updated; } else { localStorage.setItem(STORAGE_KEYS.VICTIMS, JSON.stringify(updated)); }
+    cloudMemoryCache.victims = updated;
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('victim_requests').delete().eq('id', requestId).then(({ error }) => {
         if (error) console.error("Supabase delete error:", error);
+      });
+    }
+
+    notifyDataChanged();
+  },
+
+  editVictimRequest: (requestId, updatedFields) => {
+    const requests = storageService.getVictimRequests(true);
+    let updatedRequest = null;
+    const updated = requests.map(req => {
+      if (req.id === requestId) {
+        updatedRequest = { ...req, ...updatedFields };
+        return updatedRequest;
+      }
+      return req;
+    });
+
+    cloudMemoryCache.victims = updated;
+
+    if (isSupabaseConfigured && supabase && updatedRequest) {
+      // Map JS camelCase back to Supabase snake_case for the update
+      const dbFields = {
+        name: updatedRequest.name,
+        phone: updatedRequest.phone,
+        alt_phone: updatedRequest.altPhone,
+        people_count: updatedRequest.peopleCount,
+        males_count: updatedRequest.malesCount,
+        females_count: updatedRequest.femalesCount,
+        children_count: updatedRequest.childrenCount,
+        families_count: updatedRequest.familiesCount,
+        district: updatedRequest.district,
+        village_name: updatedRequest.villageName,
+        pin_code: updatedRequest.pinCode,
+        landmark: updatedRequest.landmark,
+        location_name: updatedRequest.locationName,
+        is_urgent_rescue: updatedRequest.isUrgentRescue,
+        needs: updatedRequest.needs,
+        details: updatedRequest.details,
+      };
+      
+      supabase.from('victim_requests').update(dbFields).eq('id', requestId).then(({ error }) => {
+        if (error) console.error("Supabase edit error:", error);
       });
     }
 
@@ -245,7 +274,7 @@ export const storageService = {
       }
       return req;
     });
-    if (isSupabaseConfigured) { cloudMemoryCache.victims = updated; } else { localStorage.setItem(STORAGE_KEYS.VICTIMS, JSON.stringify(updated)); }
+    cloudMemoryCache.victims = updated;
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('victim_requests').update({
@@ -262,7 +291,7 @@ export const storageService = {
   deleteVictimRequest: (requestId) => {
     const requests = storageService.getVictimRequests(true);
     const updated = requests.filter(req => req.id !== requestId);
-    if (isSupabaseConfigured) { cloudMemoryCache.victims = updated; } else { localStorage.setItem(STORAGE_KEYS.VICTIMS, JSON.stringify(updated)); }
+    cloudMemoryCache.victims = updated;
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('victim_requests').delete().eq('id', requestId).then(({ error }) => {
@@ -276,17 +305,11 @@ export const storageService = {
   // --- NGO & VOLUNTEER RELIEF DELIVERY LOGS ---
   getDeliveryLogs: (includeUnverified = false) => {
     try {
-      let logs = [];
-      if (isSupabaseConfigured && cloudMemoryCache.deliveryLogs !== null) {
-        logs = cloudMemoryCache.deliveryLogs;
-      } else {
-        const data = localStorage.getItem(STORAGE_KEYS.DELIVERY_LOGS);
-        logs = data ? JSON.parse(data) : [];
-      }
+      const list = cloudMemoryCache.deliveryLogs || [];
       if (!includeUnverified) {
-        return logs.filter(log => log.verified === true);
+        return list.filter(log => log.verified === true);
       }
-      return logs;
+      return list;
     } catch (e) {
       console.error("Failed to load delivery logs:", e);
       return [];
@@ -328,7 +351,7 @@ export const storageService = {
     };
 
     const updated = [newLog, ...logs];
-    if (isSupabaseConfigured) { cloudMemoryCache.deliveryLogs = updated; } else { localStorage.setItem(STORAGE_KEYS.DELIVERY_LOGS, JSON.stringify(updated)); }
+    cloudMemoryCache.deliveryLogs = updated;
 
     if (isVerified && sanitized.requestId) {
       storageService.updateRequestStatus(
@@ -380,7 +403,7 @@ export const storageService = {
       return log;
     });
 
-    if (isSupabaseConfigured) { cloudMemoryCache.deliveryLogs = updatedLogs; } else { localStorage.setItem(STORAGE_KEYS.DELIVERY_LOGS, JSON.stringify(updatedLogs)); }
+    cloudMemoryCache.deliveryLogs = updatedLogs;
 
     if (targetLog && targetLog.requestId) {
       storageService.updateRequestStatus(
@@ -405,7 +428,7 @@ export const storageService = {
   rejectDeliveryLog: (logId) => {
     const logs = storageService.getDeliveryLogs(true);
     const updated = logs.filter(log => log.logId !== logId);
-    if (isSupabaseConfigured) { cloudMemoryCache.deliveryLogs = updated; } else { localStorage.setItem(STORAGE_KEYS.DELIVERY_LOGS, JSON.stringify(updated)); }
+    cloudMemoryCache.deliveryLogs = updated;
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('delivery_logs').delete().eq('log_id', logId).then(({ error }) => {
@@ -419,13 +442,7 @@ export const storageService = {
   // --- NGO DIRECTORY METHODS ---
   getNGOs: (includeUnverified = false) => {
     try {
-      let list = [];
-      if (isSupabaseConfigured && cloudMemoryCache.ngos !== null) {
-        list = cloudMemoryCache.ngos;
-      } else {
-        const data = localStorage.getItem(STORAGE_KEYS.NGOS);
-        list = data ? JSON.parse(data) : [];
-      }
+      const list = cloudMemoryCache.ngos || [];
       if (!includeUnverified) {
         return list.filter(n => n.verified === true);
       }
@@ -488,7 +505,7 @@ export const storageService = {
         if (error) console.error("Supabase NGO insert error:", error);
       });
     } else {
-      if (isSupabaseConfigured) { cloudMemoryCache.ngos = updated; } else { localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(updated)); }
+      cloudMemoryCache.ngos = updated;
     }
 
     securityService.recordSubmission();
@@ -499,7 +516,7 @@ export const storageService = {
   verifyNGO: (ngoId) => {
     const ngos = storageService.getNGOs(true);
     const updated = ngos.map(n => n.id === ngoId ? { ...n, verified: true } : n);
-    if (isSupabaseConfigured) { cloudMemoryCache.ngos = updated; } else { localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(updated)); }
+    cloudMemoryCache.ngos = updated;
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('ngos').update({ verified: true }).eq('id', ngoId).then(({ error }) => {
@@ -513,7 +530,7 @@ export const storageService = {
   updateNGOOperatingZones: (ngoId, zones) => {
     const ngos = storageService.getNGOs(true);
     const updated = ngos.map(n => n.id === ngoId ? { ...n, operatingZones: zones } : n);
-    if (isSupabaseConfigured) { cloudMemoryCache.ngos = updated; } else { localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(updated)); }
+    cloudMemoryCache.ngos = updated;
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('ngos').update({ operating_zones: zones }).eq('id', ngoId).then(({ error }) => {
@@ -527,7 +544,7 @@ export const storageService = {
   rejectNGO: (ngoId) => {
     const ngos = storageService.getNGOs(true);
     const updated = ngos.filter(n => n.id !== ngoId);
-    if (isSupabaseConfigured) { cloudMemoryCache.ngos = updated; } else { localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(updated)); }
+    cloudMemoryCache.ngos = updated;
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('ngos').delete().eq('id', ngoId).then(({ error }) => {
@@ -541,13 +558,7 @@ export const storageService = {
   // --- VOLUNTEER DIRECTORY METHODS ---
   getVolunteers: (includeUnverified = false) => {
     try {
-      let list = [];
-      if (isSupabaseConfigured && cloudMemoryCache.volunteers !== null) {
-        list = cloudMemoryCache.volunteers;
-      } else {
-        const data = localStorage.getItem(STORAGE_KEYS.VOLUNTEERS);
-        list = data ? JSON.parse(data) : [];
-      }
+      const list = cloudMemoryCache.volunteers || [];
       if (!includeUnverified) {
         return list.filter(v => v.verified === true);
       }
@@ -609,7 +620,7 @@ export const storageService = {
         if (error) console.error("Supabase Volunteer insert error:", error);
       });
     } else {
-      if (isSupabaseConfigured) { cloudMemoryCache.volunteers = updated; } else { localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(updated)); }
+      cloudMemoryCache.volunteers = updated;
     }
 
     securityService.recordSubmission();
@@ -620,7 +631,7 @@ export const storageService = {
   verifyVolunteer: (volId) => {
     const vols = storageService.getVolunteers(true);
     const updated = vols.map(v => v.id === volId ? { ...v, verified: true } : v);
-    if (isSupabaseConfigured) { cloudMemoryCache.volunteers = updated; } else { localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(updated)); }
+    cloudMemoryCache.volunteers = updated;
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('volunteers').update({ verified: true }).eq('id', volId).then(({ error }) => {
@@ -634,7 +645,7 @@ export const storageService = {
   updateVolunteerStatus: (volId, status) => {
     const vols = storageService.getVolunteers(true);
     const updated = vols.map(v => v.id === volId ? { ...v, availableStatus: status } : v);
-    if (isSupabaseConfigured) { cloudMemoryCache.volunteers = updated; } else { localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(updated)); }
+    cloudMemoryCache.volunteers = updated;
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('volunteers').update({ available_status: status }).eq('id', volId).then(({ error }) => {
@@ -648,7 +659,7 @@ export const storageService = {
   rejectVolunteer: (volId) => {
     const vols = storageService.getVolunteers(true);
     const updated = vols.filter(v => v.id !== volId);
-    if (isSupabaseConfigured) { cloudMemoryCache.volunteers = updated; } else { localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(updated)); }
+    cloudMemoryCache.volunteers = updated;
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('volunteers').delete().eq('id', volId).then(({ error }) => {
@@ -662,8 +673,7 @@ export const storageService = {
   // --- ACCOUNT RECOVERY REQUESTS (FORGOT PASSWORD / FORGOT EMAIL) ---
   getAccountRecoveryRequests: (includeResolved = true) => {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.ACCOUNT_RECOVERY);
-      const list = data ? JSON.parse(data) : [];
+      const list = cloudMemoryCache.accountRecovery || [];
       if (!includeResolved) {
         return list.filter(r => r.status !== 'RESOLVED');
       }
@@ -694,7 +704,7 @@ export const storageService = {
     };
 
     list.unshift(newReq);
-    localStorage.setItem(STORAGE_KEYS.ACCOUNT_RECOVERY, JSON.stringify(list));
+    cloudMemoryCache.accountRecovery = list;
     notifyDataChanged();
     return newReq;
   },
@@ -702,14 +712,14 @@ export const storageService = {
   resolveAccountRecoveryRequest: (id, notes = '') => {
     const list = storageService.getAccountRecoveryRequests(true);
     const updated = list.map(r => r.id === id ? { ...r, status: 'RESOLVED', adminNotes: notes } : r);
-    localStorage.setItem(STORAGE_KEYS.ACCOUNT_RECOVERY, JSON.stringify(updated));
+    cloudMemoryCache.accountRecovery = updated;
     notifyDataChanged();
   },
 
   deleteAccountRecoveryRequest: (id) => {
     const list = storageService.getAccountRecoveryRequests(true);
     const updated = list.filter(r => r.id !== id);
-    localStorage.setItem(STORAGE_KEYS.ACCOUNT_RECOVERY, JSON.stringify(updated));
+    cloudMemoryCache.accountRecovery = updated;
     notifyDataChanged();
   },
 
@@ -738,8 +748,7 @@ export const storageService = {
   // --- VOLUNTEER & NGO LOGISTICS COLLABORATION REQUESTS ---
   getVolunteerCollabRequests: (ngoId = null, volId = null) => {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.VOLUNTEER_COLLAB);
-      let list = data ? JSON.parse(data) : [];
+      let list = cloudMemoryCache.volunteerCollab || [];
       if (ngoId) {
         list = list.filter(r => r.ngoId === ngoId);
       }
@@ -774,7 +783,7 @@ export const storageService = {
     };
 
     list.unshift(newReq);
-    localStorage.setItem(STORAGE_KEYS.VOLUNTEER_COLLAB, JSON.stringify(list));
+    cloudMemoryCache.volunteerCollab = list;
     notifyDataChanged();
     return newReq;
   },
@@ -782,31 +791,25 @@ export const storageService = {
   acceptVolunteerCollabRequest: (id) => {
     const list = storageService.getVolunteerCollabRequests();
     const updated = list.map(r => r.id === id ? { ...r, status: 'ACCEPTED' } : r);
-    localStorage.setItem(STORAGE_KEYS.VOLUNTEER_COLLAB, JSON.stringify(updated));
+    cloudMemoryCache.volunteerCollab = updated;
     notifyDataChanged();
   },
 
   declineVolunteerCollabRequest: (id) => {
     const list = storageService.getVolunteerCollabRequests();
     const updated = list.map(r => r.id === id ? { ...r, status: 'DECLINED' } : r);
-    localStorage.setItem(STORAGE_KEYS.VOLUNTEER_COLLAB, JSON.stringify(updated));
+    cloudMemoryCache.volunteerCollab = updated;
     notifyDataChanged();
   },
 
   deleteVolunteerCollabRequest: (id) => {
     const list = storageService.getVolunteerCollabRequests();
     const updated = list.filter(r => r.id !== id);
-    localStorage.setItem(STORAGE_KEYS.VOLUNTEER_COLLAB, JSON.stringify(updated));
+    cloudMemoryCache.volunteerCollab = updated;
     notifyDataChanged();
   },
 
   resetToDefaultSeed: () => {
-    localStorage.removeItem(STORAGE_KEYS.VICTIMS);
-    localStorage.removeItem(STORAGE_KEYS.DELIVERY_LOGS);
-    localStorage.removeItem(STORAGE_KEYS.NGOS);
-    localStorage.removeItem(STORAGE_KEYS.VOLUNTEERS);
-    localStorage.removeItem(STORAGE_KEYS.ACCOUNT_RECOVERY);
-    localStorage.removeItem(STORAGE_KEYS.VOLUNTEER_COLLAB);
     notifyDataChanged();
   },
 
@@ -833,6 +836,7 @@ export const storageService = {
           malesCount: v.males_count,
           femalesCount: v.females_count,
           childrenCount: v.children_count,
+          familiesCount: v.families_count,
           district: v.district,
           villageName: v.village_name,
           pinCode: v.pin_code,
@@ -849,7 +853,7 @@ export const storageService = {
           requestedByName: v.requested_by_name || v.name,
           requestedByPhone: v.requested_by_phone || v.phone
         }));
-        if (isSupabaseConfigured) { cloudMemoryCache.victims = formattedVictims; } else { localStorage.setItem(STORAGE_KEYS.VICTIMS, JSON.stringify(formattedVictims)); }
+        cloudMemoryCache.victims = formattedVictims;
       }
     } catch (err) {
       console.error("Supabase victim_requests processing error:", err);
@@ -881,7 +885,7 @@ export const storageService = {
           statusUpdate: l.status_update,
           verified: l.verified
         }));
-        if (isSupabaseConfigured) { cloudMemoryCache.deliveryLogs = formattedLogs; } else { localStorage.setItem(STORAGE_KEYS.DELIVERY_LOGS, JSON.stringify(formattedLogs)); }
+        cloudMemoryCache.deliveryLogs = formattedLogs;
       }
     } catch (err) {
       console.error("Supabase delivery_logs processing error:", err);
@@ -911,7 +915,7 @@ export const storageService = {
           verified: n.verified,
           activeTeams: n.active_teams || 1
         }));
-        if (isSupabaseConfigured) { cloudMemoryCache.ngos = formattedNgos; } else { localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(formattedNgos)); }
+        cloudMemoryCache.ngos = formattedNgos;
       }
     } catch (err) {
       console.error("Supabase ngos processing error:", err);
@@ -941,7 +945,7 @@ export const storageService = {
           createdAt: v.created_at,
           verified: v.verified
         }));
-        if (isSupabaseConfigured) { cloudMemoryCache.volunteers = formattedVols; } else { localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(formattedVols)); }
+        cloudMemoryCache.volunteers = formattedVols;
       }
     } catch (err) {
       console.error("Supabase volunteers processing error:", err);
