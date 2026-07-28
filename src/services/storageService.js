@@ -300,9 +300,11 @@ export const storageService = {
       district: securityService.sanitizeText(logData.district),
       deliveredBy: securityService.limitLength(securityService.sanitizeText(logData.deliveredBy), 100),
       volunteerPhone: securityService.limitLength(securityService.sanitizeText(logData.volunteerPhone), 20),
-      itemsDelivered: securityService.limitLength(securityService.sanitizeText(logData.itemsDelivered), 300),
-      deliveryNotes: securityService.limitLength(securityService.sanitizeText(logData.deliveryNotes), 400),
-      statusUpdate: securityService.sanitizeText(logData.statusUpdate || "In Progress")
+      itemsDelivered: logData.itemsDelivered ? securityService.limitLength(securityService.sanitizeText(logData.itemsDelivered), 300) : null,
+      deliveryNotes: logData.deliveryNotes ? securityService.limitLength(securityService.sanitizeText(logData.deliveryNotes), 400) : null,
+      statusUpdate: securityService.sanitizeText(logData.statusUpdate || "In Progress"),
+      rescuedCount: logData.rescuedCount ? parseInt(logData.rescuedCount, 10) : null,
+      remainingCount: logData.remainingCount !== undefined ? parseInt(logData.remainingCount, 10) : null
     };
 
     const isVerified = isAutoVerified || logData.verified === true;
@@ -339,6 +341,8 @@ export const storageService = {
         status_update: newLog.statusUpdate,
         verified: isVerified,
         verified_by: newLog.verifiedBy,
+        rescued_count: newLog.rescuedCount,
+        remaining_count: newLog.remainingCount,
         created_at: newLog.createdAt
       }]).then(({ error }) => {
         if (error) console.error("Supabase delivery log insert error:", error);

@@ -98,19 +98,42 @@ export default function DeliveryUpdatesTreeModal({ request, deliveryLogs = [], o
                   </div>
 
                   <div className="space-y-1.5 text-slate-300">
-                    <div className="flex items-start gap-2">
-                      <Package className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-white">Supplies Delivered:</strong>
-                        <p className="text-amber-200 font-bold mt-0.5 text-xs">{log.itemsDelivered}</p>
+                    {log.rescuedCount !== undefined && log.rescuedCount !== null ? (
+                      <div className="space-y-1.5">
+                        <div className="flex items-start gap-2">
+                          <span className="text-xl">🛟</span>
+                          <div>
+                            <strong className="text-white">People Rescued:</strong>
+                            <p className="text-emerald-400 font-bold mt-0.5 text-sm">{log.rescuedCount}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2 pt-1">
+                          <span className="text-lg">⚠️</span>
+                          <div>
+                            <strong className="text-white">People Remaining:</strong>
+                            <p className="text-amber-400 font-bold mt-0.5 text-sm">{log.remainingCount}</p>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <>
+                        {log.itemsDelivered && (
+                          <div className="flex items-start gap-2">
+                            <Package className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                            <div>
+                              <strong className="text-white">Supplies Delivered:</strong>
+                              <p className="text-amber-200 font-bold mt-0.5 text-xs">{log.itemsDelivered}</p>
+                            </div>
+                          </div>
+                        )}
 
-                    {log.peopleImpacted && (
-                      <div className="flex items-center gap-2 text-xs pt-1">
-                        <Users className="w-4 h-4 text-cyan-400 shrink-0" />
-                        <span><strong className="text-white">People Impacted / Beneficiaries:</strong> <span className="text-cyan-300 font-black">{log.peopleImpacted}</span></span>
-                      </div>
+                        {log.peopleImpacted && (
+                          <div className="flex items-center gap-2 text-xs pt-1">
+                            <Users className="w-4 h-4 text-cyan-400 shrink-0" />
+                            <span><strong className="text-white">People Impacted / Beneficiaries:</strong> <span className="text-cyan-300 font-black">{log.peopleImpacted}</span></span>
+                          </div>
+                        )}
+                      </>
                     )}
 
                     {log.deliveryNotes && (

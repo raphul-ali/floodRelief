@@ -15,11 +15,15 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
   );
   const [itemsDelivered, setItemsDelivered] = useState('');
   const [peopleImpacted, setPeopleImpacted] = useState('');
+  const [rescuedCount, setRescuedCount] = useState('');
+  const [remainingCount, setRemainingCount] = useState('');
   const [deliveryNotes, setDeliveryNotes] = useState('');
   const [statusUpdate, setStatusUpdate] = useState('In Progress');
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isRescue = request.isUrgentRescue || request.is_urgent_rescue;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -33,8 +37,16 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
       setError('Please provide a contact phone number for verification.');
       return;
     }
-    if (!itemsDelivered.trim()) {
+    if (!isRescue && !itemsDelivered.trim()) {
       setError('Please specify the exact items delivered (e.g. 50 food packets, 10 water jars).');
+      return;
+    }
+    if (isRescue && !rescuedCount.toString().trim()) {
+      setError('Please enter the number of people rescued.');
+      return;
+    }
+    if (isRescue && !remainingCount.toString().trim()) {
+      setError('Please enter the number of people remaining. Enter 0 if everyone was rescued.');
       return;
     }
 
@@ -50,8 +62,10 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
         district: request.district,
         deliveredBy,
         volunteerPhone,
-        itemsDelivered,
-        peopleImpacted: peopleImpacted || `${request.peopleCount || 1} People`,
+        itemsDelivered: isRescue ? null : itemsDelivered,
+        peopleImpacted: isRescue ? null : (peopleImpacted || `${request.peopleCount || 1} People`),
+        rescuedCount: isRescue ? rescuedCount : null,
+        remainingCount: isRescue ? remainingCount : null,
         deliveryNotes,
         statusUpdate,
         verifiedBy: isAutoVerified ? `Verified NGO: ${currentUser.user.name}` : null
@@ -87,15 +101,15 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
 
         {/* Header */}
         <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
-          <div className="p-3 bg-amber-500/20 text-amber-400 rounded-xl border border-amber-500/30">
+          <div className={`p-3 rounded-xl border ${isRescue ? 'bg-red-500/20 text-red-400 border-red-500/30' : 'bg-amber-500/20 text-amber-400 border-amber-500/30'}`}>
             <Package className="w-6 h-6" />
           </div>
           <div>
             <h3 className="text-lg font-black text-white flex items-center gap-2">
-              Log Relief Delivery
+              {isRescue ? 'Log Rescue Operation' : 'Log Relief Delivery'}
             </h3>
             <p className="text-xs text-slate-400">
-              Update supply delivery status for <span className="text-amber-300 font-bold">{request.name}</span> ({request.id})
+              Update {isRescue ? 'rescue' : 'supply delivery'} status for <span className="text-amber-300 font-bold">{request.name}</span> ({request.id})
             </p>
           </div>
         </div>
@@ -174,44 +188,82 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
               </div>
             </div>
 
-            {/* Items Delivered */}
-            <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1">
-                Relief Supplies Delivered *
-              </label>
-              <textarea
-                value={itemsDelivered}
-                onChange={(e) => setItemsDelivered(e.target.value)}
-                placeholder="e.g. 30 Water Jars (20L), 100 Cooked Food Packets, 1 Paramedic First Aid Kit"
-                rows={2}
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500"
-                required
-              />
-            </div>
+            {/* Conditional Fields based on Request Type */}
+            {isRescue ? (
+              <div className="grid grid-cols-2 gap-4">
+                {/* Rescued Count */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Number of People Rescued *
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={rescuedCount}
+                    onChange={(e) => setRescuedCount(e.target.value)}
+                    placeholder="e.g. 5"
+                    className="w-full bg-slate-950 border border-red-500/40 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500"
+                    required={isRescue}
+                  />
+                </div>
+                {/* Remaining Count */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    People Still Remaining *
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={remainingCount}
+                    onChange={(e) => setRemainingCount(e.target.value)}
+                    placeholder="e.g. 2"
+                    className="w-full bg-slate-950 border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
+                    required={isRescue}
+                  />
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Items Delivered */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Relief Supplies Delivered *
+                  </label>
+                  <textarea
+                    value={itemsDelivered}
+                    onChange={(e) => setItemsDelivered(e.target.value)}
+                    placeholder="e.g. 30 Water Jars (20L), 100 Cooked Food Packets, 1 Paramedic First Aid Kit"
+                    rows={2}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500"
+                    required={!isRescue}
+                  />
+                </div>
 
-            {/* People Impacted */}
-            <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1">
-                People Impacted / Beneficiaries
-              </label>
-              <input
-                type="text"
-                value={peopleImpacted}
-                onChange={(e) => setPeopleImpacted(e.target.value)}
-                placeholder={`e.g. ${request.peopleCount || 50} People / 20 Families`}
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
-              />
-            </div>
+                {/* People Impacted */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    People Impacted / Beneficiaries
+                  </label>
+                  <input
+                    type="text"
+                    value={peopleImpacted}
+                    onChange={(e) => setPeopleImpacted(e.target.value)}
+                    placeholder={`e.g. ${request.peopleCount || 50} People / 20 Families`}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+              </>
+            )}
 
             {/* Delivery Notes */}
             <div>
               <label className="block text-xs font-bold text-slate-300 mb-1">
-                Delivery Notes & Location Description
+                {isRescue ? 'Rescue Notes & Description (Optional)' : 'Delivery Notes & Location Description'}
               </label>
               <textarea
                 value={deliveryNotes}
                 onChange={(e) => setDeliveryNotes(e.target.value)}
-                placeholder="e.g. Handed over directly to school shelter manager. Water level dropped by 1 ft."
+                placeholder={isRescue ? "e.g. Rescued 5 individuals by motorboat, 2 more stranded on higher ground, sending backup." : "e.g. Handed over directly to school shelter manager. Water level dropped by 1 ft."}
                 rows={2}
                 className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500"
               />
