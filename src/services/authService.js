@@ -5,6 +5,7 @@
  */
 import { storageService } from './storageService';
 import { securityService } from './securityService';
+import { supabase, isSupabaseConfigured } from './supabaseClient';
 
 const AUTH_SESSION_KEY = "flood_portal_auth_session_v1";
 const OTP_STORAGE_KEY = "flood_portal_active_otps_v1";
