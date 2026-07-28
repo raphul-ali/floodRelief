@@ -142,7 +142,6 @@ export const storageService = {
       ...sanitized
     };
 
-    const requests = storageService.getVictimRequests(true);
     const updated = [newRequest, ...requests];
 
     if (isSupabaseConfigured && supabase) {
