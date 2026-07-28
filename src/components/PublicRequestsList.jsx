@@ -77,7 +77,7 @@ export default function PublicRequestsList({ victimRequests = [] }) {
                           {totalPeopleCount > 0 ? `${totalPeopleCount} People` : ''} 
                           {totalPeopleCount > 0 && req.familiesCount > 0 ? ' & ' : ''}
                           {req.familiesCount > 0 ? `${req.familiesCount} Families` : ''} 
-                          {' Affected'}
+                          {' Need Help'}
                         </span>
                       </div>
                     )}
