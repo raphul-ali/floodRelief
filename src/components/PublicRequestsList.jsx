@@ -70,10 +70,17 @@ export default function PublicRequestsList({ victimRequests = [] }) {
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-1 text-xs text-amber-400 font-bold bg-amber-950/20 p-2 rounded-lg border border-amber-900/30 w-fit">
-                      <Users className="w-3.5 h-3.5" />
-                      <span>{totalPeopleCount} People Affected</span>
-                    </div>
+                    {(totalPeopleCount > 0 || req.familiesCount > 0) && (
+                      <div className="flex items-center gap-1 text-xs text-amber-400 font-bold bg-amber-950/20 p-2 rounded-lg border border-amber-900/30 w-fit">
+                        <Users className="w-3.5 h-3.5" />
+                        <span>
+                          {totalPeopleCount > 0 ? `${totalPeopleCount} People` : ''} 
+                          {totalPeopleCount > 0 && req.familiesCount > 0 ? ' & ' : ''}
+                          {req.familiesCount > 0 ? `${req.familiesCount} Families` : ''} 
+                          {' Affected'}
+                        </span>
+                      </div>
+                    )}
                     
                     <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-1.5">
                       <div className="flex items-start gap-2">
