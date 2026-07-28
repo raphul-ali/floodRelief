@@ -4,6 +4,7 @@ import {
   Search, RefreshCw, Lock, Key, Clock, Package, HeartHandshake, UserCheck, AlertTriangle, ExternalLink, Bell
 } from 'lucide-react';
 import { storageService, ASSAM_DISTRICTS } from '../services/storageService';
+import { isSupabaseConfigured } from '../services/supabaseClient';
 
 export default function AdminDashboard({ onDataUpdated }) {
   const [activeQueueTab, setActiveQueueTab] = useState('sos'); // 'sos' | 'deliveries' | 'ngos' | 'volunteers' | 'recovery'
@@ -245,6 +246,24 @@ export default function AdminDashboard({ onDataUpdated }) {
               <span>🌐 ALL LIVE RECORDS ({allRequests.length} Requests | {allNgos.length} NGOs)</span>
             </button>
           </div>
+        </div>
+
+        {/* Supabase Cloud Connection Status Indicator */}
+        <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs">
+          {isSupabaseConfigured ? (
+            <div className="flex items-center gap-2 text-emerald-300 font-bold bg-emerald-950/80 border border-emerald-500/40 px-3 py-2 rounded-xl w-full">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping shrink-0"></span>
+              <span>⚡ Supabase Cloud Database: <strong className="text-emerald-300">CONNECTED & LIVE</strong> (Global real-time sync active across all IPs & devices)</span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between gap-2 text-amber-300 font-bold bg-amber-500/10 border border-amber-500/30 px-3 py-2 rounded-xl w-full">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0"></span>
+                <span>💻 Offline Local Storage Mode: Supabase Database Not Connected.</span>
+              </div>
+              <span className="text-[11px] font-semibold text-slate-300 hidden sm:inline">Add VITE_SUPABASE_URL & VITE_SUPABASE_ANON_KEY to hosting platform</span>
+            </div>
+          )}
         </div>
       </div>
 
