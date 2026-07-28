@@ -66,7 +66,7 @@ export default function PublicRequestsList({ victimRequests = [] }) {
                         </p>
                       </div>
                       <span className="text-[10px] font-mono text-slate-500 shrink-0 bg-slate-950 px-2 py-1 rounded border border-slate-800">
-                        {new Date(req.createdAt).toLocaleDateString()}
+                        {new Date(req.createdAt).toLocaleString()}
                       </span>
                     </div>
 

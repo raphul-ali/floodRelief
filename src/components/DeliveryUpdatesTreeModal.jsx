@@ -67,8 +67,9 @@ export default function DeliveryUpdatesTreeModal({ request, deliveryLogs = [], o
                 <span className="font-extrabold text-amber-300 uppercase tracking-wider text-[10px]">
                   📌 Distress Relief Demand Registered
                 </span>
-                <span className="text-[10px] text-slate-400 font-mono">
-                  {request.createdAt ? new Date(request.createdAt).toLocaleDateString() : 'Active'}
+                <span className="flex items-center gap-1 text-[10px] text-slate-400 font-mono">
+                  <Clock className="w-3 h-3 text-emerald-400 shrink-0" />
+                  {request.createdAt ? new Date(request.createdAt).toLocaleString() : 'Active'}
                 </span>
               </div>
               <p className="font-black text-white text-xs sm:text-sm">{request.name}</p>
