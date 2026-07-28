@@ -85,8 +85,14 @@ CREATE TABLE delivery_logs (
     verified BOOLEAN DEFAULT FALSE
 );
 
--- Disable Row Level Security (RLS) so the React app can read/write freely without authentication tokens
-ALTER TABLE victim_requests DISABLE ROW LEVEL SECURITY;
-ALTER TABLE ngos DISABLE ROW LEVEL SECURITY;
-ALTER TABLE volunteers DISABLE ROW LEVEL SECURITY;
-ALTER TABLE delivery_logs DISABLE ROW LEVEL SECURITY;
+-- Ensure RLS is enabled so we can apply secure open policies
+ALTER TABLE victim_requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ngos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE volunteers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE delivery_logs ENABLE ROW LEVEL SECURITY;
+
+-- Safely allow the frontend (anon key) to freely insert, read, update, and delete
+CREATE POLICY "Allow public all on victim_requests" ON victim_requests FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Allow public all on ngos" ON ngos FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Allow public all on volunteers" ON volunteers FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Allow public all on delivery_logs" ON delivery_logs FOR ALL TO anon USING (true) WITH CHECK (true);
