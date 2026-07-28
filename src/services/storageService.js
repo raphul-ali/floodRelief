@@ -774,8 +774,9 @@ export const storageService = {
 
   syncWithSupabase: async () => {
     if (!isSupabaseConfigured || !supabase) return;
+    
+    // 1. Fetch Victim SOS Requests from Supabase
     try {
-      // 1. Fetch Victim SOS Requests from Supabase
       const { data: victims, error: vErr } = await supabase
         .from('victim_requests')
         .select('*')
@@ -812,8 +813,12 @@ export const storageService = {
         }));
         if (isSupabaseConfigured) { cloudMemoryCache.victims = formattedVictims; } else { localStorage.setItem(STORAGE_KEYS.VICTIMS, JSON.stringify(formattedVictims)); }
       }
+    } catch (err) {
+      console.error("Supabase victim_requests processing error:", err);
+    }
 
-      // 2. Fetch Delivery Logs from Supabase
+    // 2. Fetch Delivery Logs from Supabase
+    try {
       const { data: logs, error: lErr } = await supabase
         .from('delivery_logs')
         .select('*')
@@ -832,14 +837,20 @@ export const storageService = {
           volunteerPhone: l.volunteer_phone,
           itemsDelivered: l.items_delivered,
           peopleImpacted: l.people_impacted,
+          rescuedCount: l.rescued_count,
+          remainingCount: l.remaining_count,
           deliveryNotes: l.delivery_notes,
           statusUpdate: l.status_update,
           verified: l.verified
         }));
         if (isSupabaseConfigured) { cloudMemoryCache.deliveryLogs = formattedLogs; } else { localStorage.setItem(STORAGE_KEYS.DELIVERY_LOGS, JSON.stringify(formattedLogs)); }
       }
+    } catch (err) {
+      console.error("Supabase delivery_logs processing error:", err);
+    }
 
-      // 3. Fetch NGOs from Supabase
+    // 3. Fetch NGOs from Supabase
+    try {
       const { data: ngos, error: nErr } = await supabase
         .from('ngos')
         .select('*')
@@ -864,8 +875,12 @@ export const storageService = {
         }));
         if (isSupabaseConfigured) { cloudMemoryCache.ngos = formattedNgos; } else { localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(formattedNgos)); }
       }
+    } catch (err) {
+      console.error("Supabase ngos processing error:", err);
+    }
 
-      // 4. Fetch Volunteers from Supabase
+    // 4. Fetch Volunteers from Supabase
+    try {
       const { data: vols, error: volErr } = await supabase
         .from('volunteers')
         .select('*')
@@ -883,14 +898,21 @@ export const storageService = {
           password: v.password,
           district: v.district,
           offerings: v.offerings,
+          socialLink: v.social_link,
+          availableStatus: v.available_status,
+          createdAt: v.created_at,
           verified: v.verified
         }));
         if (isSupabaseConfigured) { cloudMemoryCache.volunteers = formattedVols; } else { localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(formattedVols)); }
       }
+    } catch (err) {
+      console.error("Supabase volunteers processing error:", err);
+    }
 
+    try {
       notifyDataChanged();
     } catch (err) {
-      console.error("Supabase live sync error:", err);
+      console.error("Supabase notifyDataChanged error:", err);
     }
   }
 };
