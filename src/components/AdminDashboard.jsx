@@ -623,7 +623,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                       </button>
                     ) : (
                       <a
-                        href={`tel:${ngo.phone.replace(/[^0-9]/g, '')}`}
+                        href={`tel:${(ngo.phone || '').replace(/[^0-9]/g, '')}`}
                         className="py-2.5 px-3 bg-slate-800 text-emerald-300 border border-slate-700 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
                       >
                         <Phone className="w-3.5 h-3.5" />
@@ -689,7 +689,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                       </button>
                     ) : (
                       <a
-                        href={`tel:${vol.phone.replace(/[^0-9]/g, '')}`}
+                        href={`tel:${(vol.phone || '').replace(/[^0-9]/g, '')}`}
                         className="py-2.5 px-3 bg-slate-800 text-purple-300 border border-slate-700 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
                       >
                         <Phone className="w-3.5 h-3.5" />
