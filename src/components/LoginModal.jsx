@@ -110,14 +110,14 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
   }, [regPassword, passwordTouched]);
 
   // Submit NGO / Volunteer Login
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setLoginError('');
     try {
       if (activeMode === 'NGO_LOGIN') {
-        authService.loginNgo(email, password);
+        await authService.loginNgo(email, password);
       } else {
-        authService.loginVolunteer(email, password);
+        await authService.loginVolunteer(email, password);
       }
       if (onLoggedIn) onLoggedIn();
       onClose();

@@ -140,15 +140,38 @@ export const authService = {
   /**
    * Login as NGO using Email & Password
    */
-  loginNgo: (email, password) => {
+  loginNgo: async (email, password) => {
     const cleanEmail = (email || '').trim().toLowerCase();
     const cleanPass = (password || '').trim();
 
-    const ngos = storageService.getNGOs(true); // Include all NGOs
-    const foundNgo = ngos.find(n => 
-      n.email && n.email.toLowerCase() === cleanEmail && 
-      (n.password ? n.password === cleanPass : true) // Allow demo pass matching
-    );
+    let foundNgo = null;
+
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase
+        .from('ngos')
+        .select('*')
+        .eq('email', cleanEmail)
+        .eq('password', cleanPass)
+        .single();
+      
+      if (!error && data) {
+        foundNgo = {
+          id: data.id,
+          name: data.name,
+          contactPerson: data.contact_person,
+          phone: data.phone,
+          email: data.email,
+          operatingZones: data.operating_zones,
+          verified: data.verified
+        };
+      }
+    } else {
+      const ngos = storageService.getNGOs(true);
+      foundNgo = ngos.find(n => 
+        n.email && n.email.toLowerCase() === cleanEmail && 
+        (n.password ? n.password === cleanPass : true)
+      );
+    }
 
     if (!foundNgo) {
       throw new Error("Invalid NGO email or password. Please check your credentials or register your organization.");
@@ -182,15 +205,36 @@ export const authService = {
   /**
    * Login as Volunteer using Email & Password
    */
-  loginVolunteer: (email, password) => {
+  loginVolunteer: async (email, password) => {
     const cleanEmail = (email || '').trim().toLowerCase();
     const cleanPass = (password || '').trim();
 
-    const volunteers = storageService.getVolunteers(true);
-    const foundVol = volunteers.find(v => 
-      v.email && v.email.toLowerCase() === cleanEmail && 
-      (v.password ? v.password === cleanPass : true)
-    );
+    let foundVol = null;
+
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase
+        .from('volunteers')
+        .select('*')
+        .eq('email', cleanEmail)
+        .eq('password', cleanPass)
+        .single();
+      
+      if (!error && data) {
+        foundVol = {
+          id: data.id,
+          name: data.name,
+          phone: data.phone,
+          email: data.email,
+          verified: data.verified
+        };
+      }
+    } else {
+      const volunteers = storageService.getVolunteers(true);
+      foundVol = volunteers.find(v => 
+        v.email && v.email.toLowerCase() === cleanEmail && 
+        (v.password ? v.password === cleanPass : true)
+      );
+    }
 
     if (!foundVol) {
       throw new Error("Invalid Volunteer email or password. Please check your credentials or register.");

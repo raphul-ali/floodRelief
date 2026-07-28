@@ -31,7 +31,8 @@ CREATE TABLE victim_requests (
     verified_by TEXT,
     requested_by_role TEXT,
     requested_by_name TEXT,
-    requested_by_phone TEXT
+    requested_by_phone TEXT,
+    assigned_ngo TEXT
 );
 
 -- 2. Create NGOs Table

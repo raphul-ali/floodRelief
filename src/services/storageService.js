@@ -197,7 +197,7 @@ export const storageService = {
       }
       return req;
     });
-    localStorage.setItem(STORAGE_KEYS.VICTIMS, JSON.stringify(updated));
+    if (isSupabaseConfigured) { cloudMemoryCache.victims = updated; } else { localStorage.setItem(STORAGE_KEYS.VICTIMS, JSON.stringify(updated)); }
 
     // Supabase Sync
     if (isSupabaseConfigured && supabase) {
@@ -217,7 +217,7 @@ export const storageService = {
   rejectVictimRequest: (requestId) => {
     const requests = storageService.getVictimRequests(true);
     const updated = requests.filter(req => req.id !== requestId);
-    localStorage.setItem(STORAGE_KEYS.VICTIMS, JSON.stringify(updated));
+    if (isSupabaseConfigured) { cloudMemoryCache.victims = updated; } else { localStorage.setItem(STORAGE_KEYS.VICTIMS, JSON.stringify(updated)); }
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('victim_requests').delete().eq('id', requestId).then(({ error }) => {
@@ -240,7 +240,7 @@ export const storageService = {
       }
       return req;
     });
-    localStorage.setItem(STORAGE_KEYS.VICTIMS, JSON.stringify(updated));
+    if (isSupabaseConfigured) { cloudMemoryCache.victims = updated; } else { localStorage.setItem(STORAGE_KEYS.VICTIMS, JSON.stringify(updated)); }
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('victim_requests').update({
@@ -257,7 +257,7 @@ export const storageService = {
   deleteVictimRequest: (requestId) => {
     const requests = storageService.getVictimRequests(true);
     const updated = requests.filter(req => req.id !== requestId);
-    localStorage.setItem(STORAGE_KEYS.VICTIMS, JSON.stringify(updated));
+    if (isSupabaseConfigured) { cloudMemoryCache.victims = updated; } else { localStorage.setItem(STORAGE_KEYS.VICTIMS, JSON.stringify(updated)); }
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('victim_requests').delete().eq('id', requestId).then(({ error }) => {
@@ -316,7 +316,7 @@ export const storageService = {
     };
 
     const updated = [newLog, ...logs];
-    localStorage.setItem(STORAGE_KEYS.DELIVERY_LOGS, JSON.stringify(updated));
+    if (isSupabaseConfigured) { cloudMemoryCache.deliveryLogs = updated; } else { localStorage.setItem(STORAGE_KEYS.DELIVERY_LOGS, JSON.stringify(updated)); }
 
     if (isVerified && sanitized.requestId) {
       storageService.updateRequestStatus(
@@ -366,7 +366,7 @@ export const storageService = {
       return log;
     });
 
-    localStorage.setItem(STORAGE_KEYS.DELIVERY_LOGS, JSON.stringify(updatedLogs));
+    if (isSupabaseConfigured) { cloudMemoryCache.deliveryLogs = updatedLogs; } else { localStorage.setItem(STORAGE_KEYS.DELIVERY_LOGS, JSON.stringify(updatedLogs)); }
 
     if (targetLog && targetLog.requestId) {
       storageService.updateRequestStatus(
@@ -391,7 +391,7 @@ export const storageService = {
   rejectDeliveryLog: (logId) => {
     const logs = storageService.getDeliveryLogs(true);
     const updated = logs.filter(log => log.logId !== logId);
-    localStorage.setItem(STORAGE_KEYS.DELIVERY_LOGS, JSON.stringify(updated));
+    if (isSupabaseConfigured) { cloudMemoryCache.deliveryLogs = updated; } else { localStorage.setItem(STORAGE_KEYS.DELIVERY_LOGS, JSON.stringify(updated)); }
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('delivery_logs').delete().eq('log_id', logId).then(({ error }) => {
@@ -467,7 +467,7 @@ export const storageService = {
         if (error) console.error("Supabase NGO insert error:", error);
       });
     } else {
-      localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(updated));
+      if (isSupabaseConfigured) { cloudMemoryCache.ngos = updated; } else { localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(updated)); }
     }
 
     securityService.recordSubmission();
@@ -478,7 +478,7 @@ export const storageService = {
   verifyNGO: (ngoId) => {
     const ngos = storageService.getNGOs(true);
     const updated = ngos.map(n => n.id === ngoId ? { ...n, verified: true } : n);
-    localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(updated));
+    if (isSupabaseConfigured) { cloudMemoryCache.ngos = updated; } else { localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(updated)); }
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('ngos').update({ verified: true }).eq('id', ngoId).then(({ error }) => {
@@ -492,7 +492,7 @@ export const storageService = {
   updateNGOOperatingZones: (ngoId, zones) => {
     const ngos = storageService.getNGOs(true);
     const updated = ngos.map(n => n.id === ngoId ? { ...n, operatingZones: zones } : n);
-    localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(updated));
+    if (isSupabaseConfigured) { cloudMemoryCache.ngos = updated; } else { localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(updated)); }
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('ngos').update({ operating_zones: zones }).eq('id', ngoId).then(({ error }) => {
@@ -506,7 +506,7 @@ export const storageService = {
   rejectNGO: (ngoId) => {
     const ngos = storageService.getNGOs(true);
     const updated = ngos.filter(n => n.id !== ngoId);
-    localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(updated));
+    if (isSupabaseConfigured) { cloudMemoryCache.ngos = updated; } else { localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(updated)); }
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('ngos').delete().eq('id', ngoId).then(({ error }) => {
@@ -581,7 +581,7 @@ export const storageService = {
         if (error) console.error("Supabase Volunteer insert error:", error);
       });
     } else {
-      localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(updated));
+      if (isSupabaseConfigured) { cloudMemoryCache.volunteers = updated; } else { localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(updated)); }
     }
 
     securityService.recordSubmission();
@@ -592,7 +592,7 @@ export const storageService = {
   verifyVolunteer: (volId) => {
     const vols = storageService.getVolunteers(true);
     const updated = vols.map(v => v.id === volId ? { ...v, verified: true } : v);
-    localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(updated));
+    if (isSupabaseConfigured) { cloudMemoryCache.volunteers = updated; } else { localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(updated)); }
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('volunteers').update({ verified: true }).eq('id', volId).then(({ error }) => {
@@ -606,7 +606,7 @@ export const storageService = {
   rejectVolunteer: (volId) => {
     const vols = storageService.getVolunteers(true);
     const updated = vols.filter(v => v.id !== volId);
-    localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(updated));
+    if (isSupabaseConfigured) { cloudMemoryCache.volunteers = updated; } else { localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(updated)); }
 
     if (isSupabaseConfigured && supabase) {
       supabase.from('volunteers').delete().eq('id', volId).then(({ error }) => {
@@ -806,7 +806,7 @@ export const storageService = {
           requestedByName: v.requested_by_name || v.name,
           requestedByPhone: v.requested_by_phone || v.phone
         }));
-        localStorage.setItem(STORAGE_KEYS.VICTIMS, JSON.stringify(formattedVictims));
+        if (isSupabaseConfigured) { cloudMemoryCache.victims = formattedVictims; } else { localStorage.setItem(STORAGE_KEYS.VICTIMS, JSON.stringify(formattedVictims)); }
       }
 
       // 2. Fetch Delivery Logs from Supabase
@@ -832,7 +832,7 @@ export const storageService = {
           statusUpdate: l.status_update,
           verified: l.verified
         }));
-        localStorage.setItem(STORAGE_KEYS.DELIVERY_LOGS, JSON.stringify(formattedLogs));
+        if (isSupabaseConfigured) { cloudMemoryCache.deliveryLogs = formattedLogs; } else { localStorage.setItem(STORAGE_KEYS.DELIVERY_LOGS, JSON.stringify(formattedLogs)); }
       }
 
       // 3. Fetch NGOs from Supabase
@@ -858,7 +858,7 @@ export const storageService = {
           verified: n.verified,
           activeTeams: n.active_teams || 1
         }));
-        localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(formattedNgos));
+        if (isSupabaseConfigured) { cloudMemoryCache.ngos = formattedNgos; } else { localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(formattedNgos)); }
       }
 
       // 4. Fetch Volunteers from Supabase
@@ -881,7 +881,7 @@ export const storageService = {
           offerings: v.offerings,
           verified: v.verified
         }));
-        localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(formattedVols));
+        if (isSupabaseConfigured) { cloudMemoryCache.volunteers = formattedVols; } else { localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(formattedVols)); }
       }
 
       notifyDataChanged();
