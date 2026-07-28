@@ -458,7 +458,6 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                   <input
                     type="number"
                     min="0"
-                    max="200"
                     value={formData.malesCount}
                     onChange={(e) => setFormData(prev => ({ ...prev, malesCount: Math.max(0, parseInt(e.target.value) || 0) }))}
                     className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-extrabold text-sm focus:outline-none focus:border-amber-400"
@@ -470,7 +469,6 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                   <input
                     type="number"
                     min="0"
-                    max="200"
                     value={formData.femalesCount}
                     onChange={(e) => setFormData(prev => ({ ...prev, femalesCount: Math.max(0, parseInt(e.target.value) || 0) }))}
                     className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-extrabold text-sm focus:outline-none focus:border-amber-400"
@@ -482,7 +480,6 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                   <input
                     type="number"
                     min="0"
-                    max="200"
                     value={formData.childrenCount}
                     onChange={(e) => setFormData(prev => ({ ...prev, childrenCount: Math.max(0, parseInt(e.target.value) || 0) }))}
                     className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-extrabold text-sm focus:outline-none focus:border-amber-400"
@@ -494,7 +491,6 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                   <input
                     type="number"
                     min="0"
-                    max="200"
                     value={formData.familiesCount}
                     onChange={(e) => setFormData(prev => ({ ...prev, familiesCount: Math.max(0, parseInt(e.target.value) || 0) }))}
                     className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-extrabold text-sm focus:outline-none focus:border-amber-400"

@@ -92,6 +92,13 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
     );
   };
 
+  const getWhatsAppLink = (phone, text) => {
+    if (!phone) return '#';
+    let formatted = phone.replace(/[^0-9]/g, '');
+    if (formatted.length === 10) formatted = '91' + formatted;
+    return `https://wa.me/${formatted}?text=${encodeURIComponent(text)}`;
+  };
+
   return (
     <div className="space-y-5">
       
@@ -252,7 +259,7 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
                   </a>
 
                   <a
-                    href={`https://wa.me/91${(ngo.whatsapp || ngo.phone)?.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(ngo.name)},%20we%20need%20flood%20relief%20support.`}
+                    href={getWhatsAppLink(ngo.whatsapp || ngo.phone, `Hello ${ngo.name}, we need flood relief support.`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-1 py-2 px-3 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all min-h-[40px]"
@@ -311,7 +318,7 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
                   </a>
 
                   <a
-                    href={`https://wa.me/91${(vol.whatsapp || vol.phone)?.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(vol.name)},%20we%20need%20flood%20relief%20boat/car%20support.`}
+                    href={getWhatsAppLink(vol.whatsapp || vol.phone, `Hello ${vol.name}, we need flood relief boat/car support.`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-1 py-2 px-3 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all min-h-[40px]"

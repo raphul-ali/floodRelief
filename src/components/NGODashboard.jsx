@@ -208,6 +208,13 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
   };
 
+  const getWhatsAppLink = (phone, text) => {
+    if (!phone) return '#';
+    let formatted = phone.replace(/[^0-9]/g, '');
+    if (formatted.length === 10) formatted = '91' + formatted;
+    return `https://wa.me/${formatted}?text=${encodeURIComponent(text)}`;
+  };
+
   return (
     <div className="space-y-6">
       
@@ -688,7 +695,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
 
                                 {req.phone && (
                                   <a
-                                    href={`https://wa.me/${req.phone.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(req.name)},%20this%20is%20${encodeURIComponent(ngoUserDetail.name)}%20Relief%20Team.`}
+                                    href={getWhatsAppLink(req.phone, `Hello ${req.name}, this is ${ngoUserDetail.name} Relief Team.`)}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="p-1.5 bg-emerald-950 border border-emerald-700 text-emerald-400 hover:bg-emerald-900 rounded-lg text-xs font-bold transition-colors"
@@ -950,7 +957,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                         {/* Direct Communication Buttons */}
                         <div className="grid grid-cols-2 gap-2 pt-1">
                           <a
-                            href={`https://wa.me/${req.volPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hello ${req.volName}, this is ${req.ngoName} regarding our accepted logistics dispatch request (${req.id}).`)}`}
+                            href={getWhatsAppLink(req.volPhone, `Hello ${req.volName}, this is ${req.ngoName} regarding our accepted logistics dispatch request (${req.id}).`)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="py-2 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 min-h-[44px]"
