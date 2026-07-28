@@ -6,6 +6,7 @@ export default function DeliveryUpdatesTreeModal({ request, deliveryLogs = [], o
 
   // Filter logs for this specific request ID or district matching
   const requestLogs = deliveryLogs.filter(log => log.requestId === request.id || (log.district === request.district && log.recipientName === request.name));
+  const isRescue = request.isUrgentRescue || request.is_urgent_rescue;
 
   const totalDeliveries = requestLogs.length;
 
@@ -21,7 +22,7 @@ export default function DeliveryUpdatesTreeModal({ request, deliveryLogs = [], o
             </div>
             <div>
               <h3 className="text-base sm:text-xl font-black text-white tracking-tight flex items-center gap-2">
-                Relief Delivery & Impact Tree
+                {isRescue ? "Emergency Rescue & Impact Tree" : "Relief Delivery & Impact Tree"}
               </h3>
               <p className="text-xs text-amber-300 font-semibold">
                 📍 {request.district}: {request.villageName || request.locationName}
@@ -43,11 +44,11 @@ export default function DeliveryUpdatesTreeModal({ request, deliveryLogs = [], o
             <p className="text-xs sm:text-sm font-black text-amber-300">👥 {request.peopleCount || 1} People</p>
           </div>
           <div className="p-3 bg-slate-950 border border-slate-800 rounded-2xl space-y-1">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase">Dispatches Logged</span>
-            <p className="text-xs sm:text-sm font-black text-emerald-400">📦 {totalDeliveries} Deliveries</p>
+            <span className="text-[10px] font-extrabold text-slate-400 uppercase">{isRescue ? 'Rescue Operations Logged' : 'Dispatches Logged'}</span>
+            <p className="text-xs sm:text-sm font-black text-emerald-400">{isRescue ? '🛟' : '📦'} {totalDeliveries} {isRescue ? 'Operations' : 'Deliveries'}</p>
           </div>
           <div className="col-span-2 sm:col-span-1 p-3 bg-slate-950 border border-slate-800 rounded-2xl space-y-1">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase">Delivery Status</span>
+            <span className="text-[10px] font-extrabold text-slate-400 uppercase">{isRescue ? 'Rescue Status' : 'Delivery Status'}</span>
             <p className="text-xs font-black text-white flex items-center gap-1.5">
               <span className={`w-2 h-2 rounded-full ${request.status === 'Rescued' ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse'}`}></span>
               {request.status === 'Rescued' ? 'Fulfilled' : request.status || 'Active Demand'}
@@ -154,9 +155,9 @@ export default function DeliveryUpdatesTreeModal({ request, deliveryLogs = [], o
             <div className="pl-6 pt-1">
               <div className="p-5 bg-slate-950 border border-slate-800 rounded-2xl text-center space-y-2 text-xs">
                 <Clock className="w-7 h-7 text-amber-400 mx-auto animate-pulse" />
-                <p className="font-bold text-white text-sm">No Delivery Updates Logged Yet</p>
+                <p className="font-bold text-white text-sm">{isRescue ? 'No Rescue Updates Logged Yet' : 'No Delivery Updates Logged Yet'}</p>
                 <p className="text-slate-400 max-w-sm mx-auto">
-                  Verified NGOs & logistics volunteers will log supply dispatches for this area here as aid is delivered.
+                  {isRescue ? 'Verified NGOs and rescue teams will log evacuation updates here as they happen.' : 'Verified NGOs & logistics volunteers will log supply dispatches for this area here as aid is delivered.'}
                 </p>
               </div>
             </div>
@@ -169,7 +170,7 @@ export default function DeliveryUpdatesTreeModal({ request, deliveryLogs = [], o
           onClick={onClose}
           className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs sm:text-sm transition-colors shrink-0 min-h-[44px]"
         >
-          Close Delivery Tree
+          {isRescue ? 'Close Rescue Tree' : 'Close Delivery Tree'}
         </button>
 
       </div>
