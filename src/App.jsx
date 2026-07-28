@@ -12,6 +12,7 @@ import AdminDashboard from './components/AdminDashboard';
 import LoginModal from './components/LoginModal';
 import FloatingSOSButton from './components/FloatingSOSButton';
 import EmergencyServices from './components/EmergencyServices';
+import PublicRequestsList from './components/PublicRequestsList';
 import { storageService } from './services/storageService';
 import { authService } from './services/authService';
 import { RefreshCw, Lock, Key, Mail, ShieldCheck, AlertTriangle, Eye, EyeOff, LogOut } from 'lucide-react';
@@ -330,6 +331,10 @@ export default function App() {
 
         {activeTab === 'emergency' && (
           <EmergencyServices />
+        )}
+
+        {activeTab === 'public_requests' && (
+          <PublicRequestsList victimRequests={victimRequests} />
         )}
 
         {activeTab === 'ngos' && (

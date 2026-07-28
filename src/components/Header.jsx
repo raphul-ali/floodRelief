@@ -158,6 +158,20 @@ export default function Header({
               </button>
             )}
 
+            {currentAuth.role === 'GUEST' && (
+              <button
+                onClick={() => setActiveTab('public_requests')}
+                className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all truncate text-center min-h-[38px] ${
+                  activeTab === 'public_requests'
+                    ? 'bg-blue-900 text-blue-300 border border-blue-500/40 shadow-md font-black'
+                    : 'text-slate-300 bg-slate-900/80 hover:bg-slate-800 border border-slate-800 font-bold'
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                <span className="truncate">CHECK REQUESTS</span>
+              </button>
+            )}
+
             <button
               onClick={() => setActiveTab('ngos')}
               className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all truncate text-center min-h-[38px] ${

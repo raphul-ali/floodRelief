@@ -61,6 +61,13 @@ export default function VolunteerDirectory({ volunteers = [] }) {
     return <Sparkles className="w-4 h-4 text-amber-400" />;
   };
 
+  const getWhatsAppLink = (phone, text) => {
+    if (!phone) return '#';
+    let formatted = phone.replace(/[^0-9]/g, '');
+    if (formatted.length === 10) formatted = '91' + formatted;
+    return `https://wa.me/${formatted}?text=${encodeURIComponent(text)}`;
+  };
+
   return (
     <div className="space-y-6">
       
@@ -175,7 +182,7 @@ export default function VolunteerDirectory({ volunteers = [] }) {
 
               {vol.whatsapp && (
                 <a
-                  href={`https://wa.me/${vol.whatsapp.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(vol.name)},%20reaching%20out%20regarding%20Assam%20flood%20relief.`}
+                  href={getWhatsAppLink(vol.whatsapp || vol.phone, `Hello ${vol.name}, reaching out regarding Assam flood relief.`)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="py-2.5 px-3.5 bg-emerald-950 border border-emerald-700 text-emerald-400 hover:bg-emerald-900 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
