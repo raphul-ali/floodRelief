@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, ShieldAlert, MessageSquare, Phone, CheckCircle2, XCircle, 
-  Search, RefreshCw, Lock, Key, Clock, Package, HeartHandshake, UserCheck, AlertTriangle, ExternalLink, Bell
+  Search, RefreshCw, Lock, Key, Clock, Package, HeartHandshake, UserCheck, AlertTriangle, ExternalLink, Bell, Edit2, Save, X
 } from 'lucide-react';
 import { storageService, ASSAM_DISTRICTS } from '../services/storageService';
 import { isSupabaseConfigured } from '../services/supabaseClient';
@@ -24,6 +24,9 @@ export default function AdminDashboard({ onDataUpdated }) {
   
   const [selectedDistrict, setSelectedDistrict] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+
+  const [editingSosId, setEditingSosId] = useState(null);
+  const [editSosData, setEditSosData] = useState({});
 
   const loadAdminData = () => {
     setPendingRequests(storageService.getPendingVictimRequests());
@@ -57,6 +60,37 @@ export default function AdminDashboard({ onDataUpdated }) {
       loadAdminData();
       if (onDataUpdated) onDataUpdated();
     }
+  };
+
+  const handleEditSos = (req) => {
+    setEditingSosId(req.id);
+    setEditSosData({
+      ...req,
+      malesCount: req.malesCount || 0,
+      femalesCount: req.femalesCount || 0,
+      childrenCount: req.childrenCount || 0,
+      familiesCount: req.familiesCount || 0,
+    });
+  };
+
+  const handleSaveSos = (e) => {
+    e.preventDefault();
+    
+    // Recalculate total people
+    const totalPeople = (parseInt(editSosData.malesCount) || 0) + 
+                       (parseInt(editSosData.femalesCount) || 0) + 
+                       (parseInt(editSosData.childrenCount) || 0);
+                       
+    const payload = {
+      ...editSosData,
+      peopleCount: totalPeople > 0 ? totalPeople : (parseInt(editSosData.familiesCount) > 0 ? 0 : 1)
+    };
+    
+    storageService.editVictimRequest(editingSosId, payload);
+    setEditingSosId(null);
+    setEditSosData({});
+    loadAdminData();
+    if (onDataUpdated) onDataUpdated();
   };
 
   const handleApproveDelivery = (logId) => {
@@ -460,7 +494,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                   </div>
 
                   <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1">
-                    <p className="text-slate-300"><strong className="text-white">People Trapped:</strong> {req.peopleCount || 1} Total</p>
+                    <p className="text-slate-300"><strong className="text-white">Affected:</strong> {(req.peopleCount || 0) > 0 ? req.peopleCount : ((req.malesCount || 0) + (req.femalesCount || 0) + (req.childrenCount || 0))} People {req.familiesCount > 0 ? `& ${req.familiesCount} Families` : ''}</p>
                     <p className="text-slate-300"><strong className="text-white">Phone:</strong> {req.phone}</p>
                     {req.details && <p className="text-slate-400 italic">"{req.details}"</p>}
                   </div>
@@ -484,7 +518,6 @@ export default function AdminDashboard({ onDataUpdated }) {
                       <Phone className="w-3.5 h-3.5" />
                       <span>Call Victim</span>
                     </a>
-
                     {!req.verified && (
                       <button
                         onClick={() => handleApproveSos(req.id)}
@@ -494,13 +527,21 @@ export default function AdminDashboard({ onDataUpdated }) {
                         <span>✓ APPROVE & PUBLISH LIVE</span>
                       </button>
                     )}
+                    
+                    <button
+                      onClick={() => handleEditSos(req)}
+                      className="py-2 px-3 bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 min-h-[38px]"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                      <span>Edit</span>
+                    </button>
 
                     <button
                       onClick={() => handleRejectSos(req.id)}
-                      className="col-span-2 py-2 px-3 bg-red-950 hover:bg-red-900 text-red-300 border border-red-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 min-h-[38px]"
+                      className="py-2 px-3 bg-red-950 hover:bg-red-900 text-red-300 border border-red-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 min-h-[38px]"
                     >
                       <XCircle className="w-3.5 h-3.5" />
-                      <span>{req.verified ? "Delete Record" : "Reject & Delete"}</span>
+                      <span>{req.verified ? "Delete" : "Reject"}</span>
                     </button>
                   </div>
                 </div>
@@ -879,6 +920,78 @@ export default function AdminDashboard({ onDataUpdated }) {
                 })}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Edit Request Modal */}
+      {editingSosId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-slate-950/85 backdrop-blur-lg overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-slate-900 border-2 border-amber-500/40 shadow-2xl rounded-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col">
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b shrink-0 bg-gradient-to-r from-amber-950 via-slate-950 to-slate-950 border-amber-800">
+              <h3 className="text-sm sm:text-lg font-black text-white uppercase flex items-center gap-2">
+                <Edit2 className="w-5 h-5 text-amber-400" />
+                Edit SOS Request: {editSosData.id}
+              </h3>
+              <button onClick={() => setEditingSosId(null)} className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSaveSos} className="p-6 space-y-4 overflow-y-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Victim Name</label>
+                  <input type="text" required value={editSosData.name || ''} onChange={e => setEditSosData({...editSosData, name: e.target.value})} className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Phone Number</label>
+                  <input type="tel" required value={editSosData.phone || ''} onChange={e => setEditSosData({...editSosData, phone: e.target.value})} className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Village / Area</label>
+                  <input type="text" required value={editSosData.villageName || ''} onChange={e => setEditSosData({...editSosData, villageName: e.target.value})} className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5">District</label>
+                  <select value={editSosData.district || ''} onChange={e => setEditSosData({...editSosData, district: e.target.value})} className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm">
+                    {ASSAM_DISTRICTS.map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                </div>
+                
+                {/* Demographics row */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Males Count</label>
+                  <input type="number" min="0" value={editSosData.malesCount} onChange={e => setEditSosData({...editSosData, malesCount: e.target.value})} className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Females Count</label>
+                  <input type="number" min="0" value={editSosData.femalesCount} onChange={e => setEditSosData({...editSosData, femalesCount: e.target.value})} className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Children Count</label>
+                  <input type="number" min="0" value={editSosData.childrenCount} onChange={e => setEditSosData({...editSosData, childrenCount: e.target.value})} className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Families Count</label>
+                  <input type="number" min="0" value={editSosData.familiesCount} onChange={e => setEditSosData({...editSosData, familiesCount: e.target.value})} className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm" />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1.5">Request Details</label>
+                <textarea rows="3" value={editSosData.details || ''} onChange={e => setEditSosData({...editSosData, details: e.target.value})} className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm"></textarea>
+              </div>
+
+              <div className="pt-4 border-t border-slate-800 flex justify-end gap-3">
+                <button type="button" onClick={() => setEditingSosId(null)} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-bold">
+                  Cancel
+                </button>
+                <button type="submit" className="px-6 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-sm font-black flex items-center gap-2">
+                  <Save className="w-4 h-4" /> Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
