@@ -84,7 +84,8 @@ CREATE TABLE delivery_logs (
     people_impacted INT,
     delivery_notes TEXT,
     status_update TEXT,
-    verified BOOLEAN DEFAULT FALSE
+    verified BOOLEAN DEFAULT FALSE,
+    verified_by TEXT
 );
 
 -- Ensure RLS is enabled so we can apply secure open policies
