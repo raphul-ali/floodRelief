@@ -63,6 +63,14 @@ export default function App() {
     checkPath();
     loadData();
 
+    // Trigger immediate Supabase Cloud Data Sync if configured
+    storageService.syncWithSupabase();
+
+    // Periodic Supabase Cloud Polling Sync every 15 seconds
+    const pollInterval = setInterval(() => {
+      storageService.syncWithSupabase();
+    }, 15000);
+
     const stopAutoRefresh = authService.startSessionAutoRefresh();
 
     const handleDataChanged = () => loadData();
@@ -79,6 +87,7 @@ export default function App() {
     window.addEventListener('flood_auth_changed', handleAuthChanged);
     
     return () => {
+      clearInterval(pollInterval);
       stopAutoRefresh();
       window.removeEventListener('popstate', handlePopState);
       window.removeEventListener('hashchange', handlePopState);

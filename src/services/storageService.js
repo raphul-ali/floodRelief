@@ -155,7 +155,10 @@ export const storageService = {
         needs: newRequest.needs,
         details: newRequest.details,
         status: newRequest.status,
-        verified: false
+        verified: newRequest.verified || false,
+        requested_by_role: newRequest.requestedByRole || 'CITIZEN',
+        requested_by_name: newRequest.requestedByName || newRequest.name,
+        requested_by_phone: newRequest.requestedByPhone || newRequest.phone
       }]).then(({ error }) => {
         if (error) console.error("Supabase insert error:", error);
       });
@@ -745,5 +748,119 @@ export const storageService = {
     localStorage.removeItem(STORAGE_KEYS.ACCOUNT_RECOVERY);
     localStorage.removeItem(STORAGE_KEYS.VOLUNTEER_COLLAB);
     notifyDataChanged();
+  },
+
+  syncWithSupabase: async () => {
+    if (!isSupabaseConfigured || !supabase) return;
+    try {
+      // 1. Fetch Victim SOS Requests from Supabase
+      const { data: victims, error: vErr } = await supabase
+        .from('victim_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!vErr && Array.isArray(victims) && victims.length > 0) {
+        const formattedVictims = victims.map(v => ({
+          id: v.id,
+          createdAt: v.created_at,
+          name: v.name,
+          phone: v.phone,
+          altPhone: v.alt_phone,
+          peopleCount: v.people_count,
+          malesCount: v.males_count,
+          femalesCount: v.females_count,
+          childrenCount: v.children_count,
+          district: v.district,
+          villageName: v.village_name,
+          pinCode: v.pin_code,
+          landmark: v.landmark,
+          locationName: v.location_name,
+          latitude: v.latitude,
+          longitude: v.longitude,
+          isUrgentRescue: v.is_urgent_rescue,
+          needs: v.needs,
+          details: v.details,
+          status: v.status,
+          verified: v.verified,
+          requestedByRole: v.requested_by_role || 'CITIZEN',
+          requestedByName: v.requested_by_name || v.name,
+          requestedByPhone: v.requested_by_phone || v.phone
+        }));
+        localStorage.setItem(STORAGE_KEYS.VICTIMS, JSON.stringify(formattedVictims));
+      }
+
+      // 2. Fetch Delivery Logs from Supabase
+      const { data: logs, error: lErr } = await supabase
+        .from('delivery_logs')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!lErr && Array.isArray(logs) && logs.length > 0) {
+        const formattedLogs = logs.map(l => ({
+          logId: l.log_id || l.id,
+          createdAt: l.created_at,
+          requestId: l.request_id,
+          recipientName: l.recipient_name,
+          district: l.district,
+          deliveredBy: l.delivered_by,
+          volunteerPhone: l.volunteer_phone,
+          itemsDelivered: l.items_delivered,
+          peopleImpacted: l.people_impacted,
+          deliveryNotes: l.delivery_notes,
+          statusUpdate: l.status_update,
+          verified: l.verified
+        }));
+        localStorage.setItem(STORAGE_KEYS.DELIVERY_LOGS, JSON.stringify(formattedLogs));
+      }
+
+      // 3. Fetch NGOs from Supabase
+      const { data: ngos, error: nErr } = await supabase
+        .from('ngos')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!nErr && Array.isArray(ngos) && ngos.length > 0) {
+        const formattedNgos = ngos.map(n => ({
+          id: n.id,
+          name: n.name,
+          contactPerson: n.contact_person,
+          phone: n.phone,
+          email: n.email,
+          password: n.password,
+          logoUrl: n.logo_url,
+          operatingZones: n.operating_zones,
+          services: n.services,
+          address: n.address,
+          verified: n.verified,
+          activeTeams: n.active_teams || 1
+        }));
+        localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(formattedNgos));
+      }
+
+      // 4. Fetch Volunteers from Supabase
+      const { data: vols, error: volErr } = await supabase
+        .from('volunteers')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!volErr && Array.isArray(vols) && vols.length > 0) {
+        const formattedVols = vols.map(v => ({
+          id: v.id,
+          name: v.name,
+          roleType: v.role_type,
+          phone: v.phone,
+          email: v.email,
+          password: v.password,
+          district: v.district,
+          offerings: v.offerings,
+          verified: v.verified
+        }));
+        localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(formattedVols));
+      }
+
+      notifyDataChanged();
+    } catch (err) {
+      console.error("Supabase live sync error:", err);
+    }
   }
 };
