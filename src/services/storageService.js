@@ -446,9 +446,9 @@ export const storageService = {
     };
 
     const updated = [newNgo, ...ngos];
-    localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(updated));
-
+    
     if (isSupabaseConfigured && supabase) {
+      cloudMemoryCache.ngos = updated;
       supabase.from('ngos').insert([{
         id: newNgo.id,
         name: newNgo.name,
@@ -466,6 +466,8 @@ export const storageService = {
       }]).then(({ error }) => {
         if (error) console.error("Supabase NGO insert error:", error);
       });
+    } else {
+      localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(updated));
     }
 
     securityService.recordSubmission();
@@ -559,9 +561,9 @@ export const storageService = {
     };
 
     const updated = [newVol, ...vols];
-    localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(updated));
-
+    
     if (isSupabaseConfigured && supabase) {
+      cloudMemoryCache.volunteers = updated;
       supabase.from('volunteers').insert([{
         id: newVol.id,
         name: newVol.name,
@@ -578,6 +580,8 @@ export const storageService = {
       }]).then(({ error }) => {
         if (error) console.error("Supabase Volunteer insert error:", error);
       });
+    } else {
+      localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(updated));
     }
 
     securityService.recordSubmission();

@@ -63,7 +63,9 @@ CREATE TABLE volunteers (
     email TEXT,
     password TEXT,
     district TEXT,
+    social_link TEXT,
     offerings JSONB,
+    available_status TEXT DEFAULT 'Active Now',
     verified BOOLEAN DEFAULT FALSE,
     verified_at TIMESTAMPTZ,
     verified_by TEXT
