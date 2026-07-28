@@ -14,7 +14,7 @@ import FloatingSOSButton from './components/FloatingSOSButton';
 import EmergencyServices from './components/EmergencyServices';
 import { storageService } from './services/storageService';
 import { authService } from './services/authService';
-import { RefreshCw, Lock, Key, Mail, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { RefreshCw, Lock, Key, Mail, ShieldCheck, AlertTriangle, Eye, EyeOff, LogOut } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -35,6 +35,7 @@ export default function App() {
   const [isAdminPath, setIsAdminPath] = useState(false);
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
+  const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [adminLoginError, setAdminLoginError] = useState('');
   const mainContentRef = useRef(null);
 
@@ -54,12 +55,15 @@ export default function App() {
     const pendingLogs = storageService.getPendingDeliveryLogs().length;
     const pendingNgos = storageService.getPendingNGOs().length;
     const pendingVols = storageService.getPendingVolunteers().length;
-    setPendingCount(pendingReqs + pendingLogs + pendingNgos + pendingVols);
+    const pendingRecs = storageService.getPendingAccountRecoveryRequests().length;
+    setPendingCount(pendingReqs + pendingLogs + pendingNgos + pendingVols + pendingRecs);
   };
 
   useEffect(() => {
     checkPath();
     loadData();
+
+    const stopAutoRefresh = authService.startSessionAutoRefresh();
 
     const handleDataChanged = () => loadData();
     const handleAuthChanged = () => {
@@ -75,6 +79,7 @@ export default function App() {
     window.addEventListener('flood_auth_changed', handleAuthChanged);
     
     return () => {
+      stopAutoRefresh();
       window.removeEventListener('popstate', handlePopState);
       window.removeEventListener('hashchange', handlePopState);
       window.removeEventListener('flood_data_changed', handleDataChanged);
@@ -152,9 +157,11 @@ export default function App() {
               </div>
               <button
                 onClick={handleLogout}
-                className="px-3 py-1.5 bg-red-900 hover:bg-red-800 text-white rounded-xl text-xs font-black border border-red-500/40 shrink-0 min-h-[38px] flex items-center justify-center"
+                className="px-3.5 py-1.5 bg-red-900 hover:bg-red-800 text-white rounded-xl text-xs font-black border border-red-500/40 shrink-0 min-h-[38px] flex items-center justify-center gap-1.5 cursor-pointer shadow-md active:scale-95 transition-all"
+                title="Logout of Admin session"
               >
-                Logout Super Admin
+                <LogOut className="w-3.5 h-3.5 text-white" />
+                <span>Logout</span>
               </button>
             </div>
 
@@ -206,13 +213,21 @@ export default function App() {
                 <div className="relative">
                   <Key className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
                   <input
-                    type="password"
+                    type={showAdminPassword ? "text" : "password"}
                     value={adminPassword}
                     onChange={(e) => setAdminPassword(e.target.value)}
                     placeholder="Enter password"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-3 text-sm text-white focus:outline-none focus:border-red-500 min-h-[44px]"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-10 py-3 text-sm text-white focus:outline-none focus:border-red-500 min-h-[44px]"
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowAdminPassword(!showAdminPassword)}
+                    className="absolute right-3 top-3 text-slate-400 hover:text-white p-1 rounded-lg focus:outline-none"
+                    title={showAdminPassword ? "Hide password" : "Show password"}
+                  >
+                    {showAdminPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
 
@@ -267,10 +282,10 @@ export default function App() {
       />
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <main className={`flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 ${currentAuth.role !== 'GUEST' ? 'py-2 space-y-3' : 'py-6 space-y-6'}`}>
         
-        {/* Official ASDMA Emergency Helplines Notice */}
-        <ASDMAHelplines />
+        {/* Official ASDMA Emergency Helplines Notice (Only shown for Guest citizens) */}
+        {currentAuth.role === 'GUEST' && <ASDMAHelplines />}
 
         {/* Scroll Target Element */}
         <div ref={mainContentRef} className="scroll-mt-24" />

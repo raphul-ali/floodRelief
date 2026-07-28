@@ -14,6 +14,7 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
     isNgoAuthenticated ? (currentUser.user.phone || '') : ''
   );
   const [itemsDelivered, setItemsDelivered] = useState('');
+  const [peopleImpacted, setPeopleImpacted] = useState('');
   const [deliveryNotes, setDeliveryNotes] = useState('');
   const [statusUpdate, setStatusUpdate] = useState('In Progress');
   const [error, setError] = useState('');
@@ -50,6 +51,7 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
         deliveredBy,
         volunteerPhone,
         itemsDelivered,
+        peopleImpacted: peopleImpacted || `${request.peopleCount || 1} People`,
         deliveryNotes,
         statusUpdate,
         verifiedBy: isAutoVerified ? `Verified NGO: ${currentUser.user.name}` : null
@@ -58,7 +60,7 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
       if (isAutoVerified) {
         setSuccessMsg('⚡ Verified NGO Dispatch Logged! Your delivery has been auto-verified and published directly to the live request timeline.');
       } else {
-        setSuccessMsg('✅ Relief delivery log submitted! The Admin Control Room will connect with you via WhatsApp for photo verification before publishing to the live timeline.');
+        setSuccessMsg('✅ Relief delivery log submitted! The Admin Verification Team will connect with you via WhatsApp for photo verification before publishing to the live timeline.');
       }
 
       setTimeout(() => {
@@ -184,6 +186,20 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
                 rows={2}
                 className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500"
                 required
+              />
+            </div>
+
+            {/* People Impacted */}
+            <div>
+              <label className="block text-xs font-bold text-slate-300 mb-1">
+                People Impacted / Beneficiaries
+              </label>
+              <input
+                type="text"
+                value={peopleImpacted}
+                onChange={(e) => setPeopleImpacted(e.target.value)}
+                placeholder={`e.g. ${request.peopleCount || 50} People / 20 Families`}
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
               />
             </div>
 

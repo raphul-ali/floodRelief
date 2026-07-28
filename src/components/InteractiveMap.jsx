@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import { AlertTriangle, MapPin, Phone, ShieldAlert, HeartHandshake } from 'lucide-react';
 import { pdfService } from '../services/pdfService';
+import { authService } from '../services/authService';
 
 export default function InteractiveMap({ victimRequests = [], ngos = [] }) {
   const mapRef = useRef(null);
@@ -57,6 +58,9 @@ export default function InteractiveMap({ victimRequests = [], ngos = [] }) {
       iconAnchor: [13, 13]
     });
 
+    const currentAuth = authService.getCurrentUser();
+    const isAuthorizedUser = currentAuth && (currentAuth.role === 'NGO' || currentAuth.role === 'VOLUNTEER' || currentAuth.role === 'ADMIN');
+
     // Add Victim Markers
     victimRequests.forEach((victim) => {
       if (!victim.latitude || !victim.longitude) return;
@@ -65,6 +69,11 @@ export default function InteractiveMap({ victimRequests = [], ngos = [] }) {
       bounds.push(latLng);
 
       const icon = victim.isUrgentRescue ? createRedPin() : createAmberPin();
+
+      const maskedPhone = victim.phone ? `+91 ******${victim.phone.slice(-4)}` : 'Protected';
+      const phoneButtonHtml = isAuthorizedUser
+        ? `<a href="tel:${victim.phone}" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded inline-flex items-center gap-1">📞 Call ${victim.phone}</a>`
+        : `<div class="bg-slate-900 border border-slate-700 text-amber-300 text-[11px] font-bold px-2.5 py-1.5 rounded-lg">🔒 Contact: ${maskedPhone} (Log in as NGO/Volunteer to view)</div>`;
 
       const popupContent = document.createElement('div');
       popupContent.className = "p-1 space-y-2 font-sans";
@@ -82,9 +91,7 @@ export default function InteractiveMap({ victimRequests = [], ngos = [] }) {
           <div class="text-[11px] text-slate-400 mt-1">Needs: ${(Array.isArray(victim.needs) ? victim.needs.join(', ') : victim.needs)}</div>
         </div>
         <div class="pt-2 flex items-center justify-between gap-2">
-          <a href="tel:${victim.phone}" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded inline-flex items-center gap-1">
-            📞 Call ${victim.phone}
-          </a>
+          ${phoneButtonHtml}
         </div>
       `;
 

@@ -55,7 +55,9 @@ const STORAGE_KEYS = {
   VICTIMS: "flood_portal_victims_prod_v9",
   NGOS: "flood_portal_ngos_prod_v9",
   VOLUNTEERS: "flood_portal_volunteers_prod_v9",
-  DELIVERY_LOGS: "flood_portal_delivery_logs_prod_v9"
+  DELIVERY_LOGS: "flood_portal_delivery_logs_prod_v9",
+  ACCOUNT_RECOVERY: "flood_portal_account_recovery_v1",
+  VOLUNTEER_COLLAB: "flood_portal_vol_collab_v1"
 };
 
 const notifyDataChanged = () => {
@@ -112,6 +114,9 @@ export const storageService = {
       landmark: securityService.limitLength(securityService.sanitizeText(requestData.landmark), 150),
       locationName: securityService.limitLength(securityService.sanitizeText(requestData.locationName), 250),
       details: securityService.limitLength(securityService.sanitizeText(requestData.details), 400),
+      requestedByRole: requestData.requestedByRole ? securityService.sanitizeText(requestData.requestedByRole) : 'CITIZEN',
+      requestedByName: requestData.requestedByName ? securityService.limitLength(securityService.sanitizeText(requestData.requestedByName), 80) : securityService.limitLength(securityService.sanitizeText(requestData.name), 60),
+      requestedByPhone: requestData.requestedByPhone ? securityService.limitLength(securityService.sanitizeText(requestData.requestedByPhone), 20) : securityService.limitLength(securityService.sanitizeText(requestData.phone), 20),
     };
 
     const requests = storageService.getVictimRequests(true);
@@ -465,6 +470,20 @@ export const storageService = {
     notifyDataChanged();
   },
 
+  updateNGOOperatingZones: (ngoId, zones) => {
+    const ngos = storageService.getNGOs(true);
+    const updated = ngos.map(n => n.id === ngoId ? { ...n, operatingZones: zones } : n);
+    localStorage.setItem(STORAGE_KEYS.NGOS, JSON.stringify(updated));
+
+    if (isSupabaseConfigured && supabase) {
+      supabase.from('ngos').update({ operating_zones: zones }).eq('id', ngoId).then(({ error }) => {
+        if (error) console.error("Supabase NGO zones update error:", error);
+      });
+    }
+
+    notifyDataChanged();
+  },
+
   rejectNGO: (ngoId) => {
     const ngos = storageService.getNGOs(true);
     const updated = ngos.filter(n => n.id !== ngoId);
@@ -577,11 +596,154 @@ export const storageService = {
     notifyDataChanged();
   },
 
+  // --- ACCOUNT RECOVERY REQUESTS (FORGOT PASSWORD / FORGOT EMAIL) ---
+  getAccountRecoveryRequests: (includeResolved = true) => {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.ACCOUNT_RECOVERY);
+      const list = data ? JSON.parse(data) : [];
+      if (!includeResolved) {
+        return list.filter(r => r.status !== 'RESOLVED');
+      }
+      return list;
+    } catch (e) {
+      console.error("Failed to load account recovery requests:", e);
+      return [];
+    }
+  },
+
+  getPendingAccountRecoveryRequests: () => {
+    return storageService.getAccountRecoveryRequests(false);
+  },
+
+  addAccountRecoveryRequest: (reqData) => {
+    const list = storageService.getAccountRecoveryRequests(true);
+    const newReq = {
+      id: `REC-${Math.floor(100000 + Math.random() * 900000)}`,
+      requestType: reqData.requestType, // 'FORGOT_PASSWORD' | 'FORGOT_EMAIL'
+      accountRole: reqData.accountRole || 'NGO', // 'NGO' | 'VOLUNTEER'
+      name: (reqData.name || '').trim(),
+      phone: (reqData.phone || '').trim(),
+      email: (reqData.email || '').trim(),
+      details: (reqData.details || '').trim(),
+      status: 'PENDING',
+      createdAt: new Date().toISOString(),
+      adminNotes: ''
+    };
+
+    list.unshift(newReq);
+    localStorage.setItem(STORAGE_KEYS.ACCOUNT_RECOVERY, JSON.stringify(list));
+    notifyDataChanged();
+    return newReq;
+  },
+
+  resolveAccountRecoveryRequest: (id, notes = '') => {
+    const list = storageService.getAccountRecoveryRequests(true);
+    const updated = list.map(r => r.id === id ? { ...r, status: 'RESOLVED', adminNotes: notes } : r);
+    localStorage.setItem(STORAGE_KEYS.ACCOUNT_RECOVERY, JSON.stringify(updated));
+    notifyDataChanged();
+  },
+
+  deleteAccountRecoveryRequest: (id) => {
+    const list = storageService.getAccountRecoveryRequests(true);
+    const updated = list.filter(r => r.id !== id);
+    localStorage.setItem(STORAGE_KEYS.ACCOUNT_RECOVERY, JSON.stringify(updated));
+    notifyDataChanged();
+  },
+
+  findMatchingAccount: (accountRole, identifier) => {
+    if (!identifier) return null;
+    const cleanId = identifier.trim().toLowerCase();
+    const cleanPhone = identifier.replace(/[^0-9]/g, '');
+
+    if (accountRole === 'NGO') {
+      const ngos = storageService.getNGOs(true);
+      return ngos.find(n => 
+        (n.email && n.email.toLowerCase() === cleanId) ||
+        (n.name && n.name.toLowerCase().includes(cleanId)) ||
+        (n.phone && cleanPhone && n.phone.replace(/[^0-9]/g, '').includes(cleanPhone))
+      ) || null;
+    } else {
+      const vols = storageService.getVolunteers(true);
+      return vols.find(v => 
+        (v.email && v.email.toLowerCase() === cleanId) ||
+        (v.name && v.name.toLowerCase().includes(cleanId)) ||
+        (v.phone && cleanPhone && v.phone.replace(/[^0-9]/g, '').includes(cleanPhone))
+      ) || null;
+    }
+  },
+
+  // --- VOLUNTEER & NGO LOGISTICS COLLABORATION REQUESTS ---
+  getVolunteerCollabRequests: (ngoId = null, volId = null) => {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.VOLUNTEER_COLLAB);
+      let list = data ? JSON.parse(data) : [];
+      if (ngoId) {
+        list = list.filter(r => r.ngoId === ngoId);
+      }
+      if (volId) {
+        list = list.filter(r => r.volId === volId);
+      }
+      return list;
+    } catch (e) {
+      console.error("Failed to load volunteer collaboration requests:", e);
+      return [];
+    }
+  },
+
+  addVolunteerCollabRequest: (reqData) => {
+    const list = storageService.getVolunteerCollabRequests();
+    const newReq = {
+      id: `VREQ-${Math.floor(100000 + Math.random() * 900000)}`,
+      ngoId: reqData.ngoId,
+      ngoName: reqData.ngoName,
+      ngoPhone: reqData.ngoPhone,
+      ngoEmail: reqData.ngoEmail,
+      volId: reqData.volId,
+      volName: reqData.volName,
+      volRole: reqData.volRole,
+      volPhone: reqData.volPhone,
+      volDistrict: reqData.volDistrict,
+      sosRequestId: reqData.sosRequestId || '',
+      sosLocation: reqData.sosLocation || '',
+      message: (reqData.message || '').trim(),
+      status: 'PENDING', // 'PENDING' | 'ACCEPTED' | 'DECLINED'
+      createdAt: new Date().toISOString()
+    };
+
+    list.unshift(newReq);
+    localStorage.setItem(STORAGE_KEYS.VOLUNTEER_COLLAB, JSON.stringify(list));
+    notifyDataChanged();
+    return newReq;
+  },
+
+  acceptVolunteerCollabRequest: (id) => {
+    const list = storageService.getVolunteerCollabRequests();
+    const updated = list.map(r => r.id === id ? { ...r, status: 'ACCEPTED' } : r);
+    localStorage.setItem(STORAGE_KEYS.VOLUNTEER_COLLAB, JSON.stringify(updated));
+    notifyDataChanged();
+  },
+
+  declineVolunteerCollabRequest: (id) => {
+    const list = storageService.getVolunteerCollabRequests();
+    const updated = list.map(r => r.id === id ? { ...r, status: 'DECLINED' } : r);
+    localStorage.setItem(STORAGE_KEYS.VOLUNTEER_COLLAB, JSON.stringify(updated));
+    notifyDataChanged();
+  },
+
+  deleteVolunteerCollabRequest: (id) => {
+    const list = storageService.getVolunteerCollabRequests();
+    const updated = list.filter(r => r.id !== id);
+    localStorage.setItem(STORAGE_KEYS.VOLUNTEER_COLLAB, JSON.stringify(updated));
+    notifyDataChanged();
+  },
+
   resetToDefaultSeed: () => {
     localStorage.removeItem(STORAGE_KEYS.VICTIMS);
     localStorage.removeItem(STORAGE_KEYS.DELIVERY_LOGS);
     localStorage.removeItem(STORAGE_KEYS.NGOS);
     localStorage.removeItem(STORAGE_KEYS.VOLUNTEERS);
+    localStorage.removeItem(STORAGE_KEYS.ACCOUNT_RECOVERY);
+    localStorage.removeItem(STORAGE_KEYS.VOLUNTEER_COLLAB);
     notifyDataChanged();
   }
 };

@@ -9,15 +9,36 @@ import { securityService } from './securityService';
 const AUTH_SESSION_KEY = "flood_portal_auth_session_v1";
 const OTP_STORAGE_KEY = "flood_portal_active_otps_v1";
 
+// Session Token Lifetimes:
+// Access Token: 15 minutes | Refresh Token: 7 days
+const ACCESS_TOKEN_LIFETIME = 15 * 60 * 1000;
+const REFRESH_TOKEN_LIFETIME = 7 * 24 * 60 * 60 * 1000;
+
 const notifyAuthChanged = () => {
   window.dispatchEvent(new Event("flood_auth_changed"));
+};
+
+/**
+ * Helper to generate cryptographic Access & Refresh tokens
+ */
+const generateAuthTokens = (userId, role) => {
+  const now = Date.now();
+  const salt = Math.random().toString(36).substring(2, 10);
+  
+  return {
+    accessToken: `at_${role.toLowerCase()}_${userId}_${now}_${salt}`,
+    refreshToken: `rt_${role.toLowerCase()}_${userId}_${now}_${salt}`,
+    expiresAt: now + ACCESS_TOKEN_LIFETIME,
+    refreshExpiresAt: now + REFRESH_TOKEN_LIFETIME
+  };
 };
 
 export const authService = {
   
   /**
-   * Get current active session
-   * @returns {Object} { role: 'GUEST'|'NGO'|'VOLUNTEER'|'ADMIN', user: Object|null }
+   * Get current active session. Automatically validates Access & Refresh tokens.
+   * If Access Token is expired but Refresh Token is valid, auto-refreshes session.
+   * @returns {Object} { role: 'GUEST'|'NGO'|'VOLUNTEER'|'ADMIN', user: Object|null, accessToken: string }
    */
   getCurrentUser: () => {
     try {
@@ -25,11 +46,95 @@ export const authService = {
       if (!data) {
         return { role: 'GUEST', user: null };
       }
-      return JSON.parse(data);
+      const session = JSON.parse(data);
+      if (!session || !session.role || session.role === 'GUEST') {
+        return { role: 'GUEST', user: null };
+      }
+
+      const now = Date.now();
+
+      // If refresh token has expired (after 7 days), force logout
+      if (session.refreshExpiresAt && now > session.refreshExpiresAt) {
+        console.warn("[AUTH] Refresh token expired (7 days inactivity). Logging out.");
+        authService.logout();
+        return { role: 'GUEST', user: null };
+      }
+
+      // If access token has expired (15 mins), auto-refresh session with Refresh Token
+      if (session.expiresAt && now > session.expiresAt) {
+        console.log("[AUTH] Access token expired. Auto-renewing session with Refresh Token...");
+        return authService.refreshAccessToken();
+      }
+
+      return session;
     } catch (e) {
       console.error("Auth session parse error:", e);
       return { role: 'GUEST', user: null };
     }
+  },
+
+  /**
+   * Refresh Access Token using Refresh Token
+   */
+  refreshAccessToken: () => {
+    try {
+      const data = localStorage.getItem(AUTH_SESSION_KEY);
+      if (!data) return { role: 'GUEST', user: null };
+
+      const session = JSON.parse(data);
+      if (!session || session.role === 'GUEST' || !session.user) {
+        return { role: 'GUEST', user: null };
+      }
+
+      const now = Date.now();
+      if (session.refreshExpiresAt && now > session.refreshExpiresAt) {
+        authService.logout();
+        return { role: 'GUEST', user: null };
+      }
+
+      const tokens = generateAuthTokens(session.user.id || 'usr', session.role);
+      const updatedSession = {
+        ...session,
+        ...tokens
+      };
+
+      localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(updatedSession));
+      notifyAuthChanged();
+      console.log(`[AUTH REFRESH TOKEN] Access Token renewed for ${session.role} (${session.user.email || session.user.id})`);
+      return updatedSession;
+    } catch (e) {
+      console.error("Error refreshing access token:", e);
+      return { role: 'GUEST', user: null };
+    }
+  },
+
+  /**
+   * Start background session auto-refresh timer & window focus listener
+   */
+  startSessionAutoRefresh: () => {
+    // Check and refresh token every 60 seconds if within 2 mins of expiry
+    const intervalId = setInterval(() => {
+      const session = authService.getCurrentUser();
+      if (session && session.role !== 'GUEST' && session.expiresAt) {
+        const timeRemaining = session.expiresAt - Date.now();
+        if (timeRemaining < 2 * 60 * 1000) {
+          authService.refreshAccessToken();
+        }
+      }
+    }, 60 * 1000);
+
+    const handleFocus = () => {
+      authService.getCurrentUser();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('visibilitychange', handleFocus);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('visibilitychange', handleFocus);
+    };
   },
 
   /**
@@ -53,6 +158,8 @@ export const authService = {
       throw new Error("⚠️ Your NGO account is pending Admin Verification. Our control room will contact you to verify details before activation.");
     }
 
+    const tokens = generateAuthTokens(foundNgo.id, 'NGO');
+
     const session = {
       role: 'NGO',
       user: {
@@ -63,7 +170,8 @@ export const authService = {
         email: foundNgo.email,
         operatingZones: foundNgo.operatingZones,
         verified: true
-      }
+      },
+      ...tokens
     };
 
     localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
@@ -92,6 +200,8 @@ export const authService = {
       throw new Error("⚠️ Your Volunteer account is pending Admin Verification.");
     }
 
+    const tokens = generateAuthTokens(foundVol.id, 'VOLUNTEER');
+
     const session = {
       role: 'VOLUNTEER',
       user: {
@@ -102,7 +212,8 @@ export const authService = {
         phone: foundVol.phone,
         email: foundVol.email,
         verified: true
-      }
+      },
+      ...tokens
     };
 
     localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
@@ -235,14 +346,16 @@ export const authService = {
     const cleanPass = (password || '').trim();
 
     if (cleanEmail === 'raphulali@gmail.com' && cleanPass === 'Raphul@9957422') {
+      const tokens = generateAuthTokens('admin-raphul', 'ADMIN');
       const session = {
         role: 'ADMIN',
         user: {
           id: 'admin-raphul',
           name: 'Raphul Ali (Super Admin)',
           email: 'raphulali@gmail.com',
-          title: 'Head Control Room Officer'
-        }
+          title: 'Head Platform Administrator'
+        },
+        ...tokens
       };
 
       localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
@@ -250,6 +363,24 @@ export const authService = {
       return session;
     } else {
       throw new Error("Invalid Admin Email or Password. Access denied.");
+    }
+  },
+
+  /**
+   * Update active user's operating zones in auth session
+   */
+  updateUserSessionZones: (zones) => {
+    try {
+      const data = localStorage.getItem(AUTH_SESSION_KEY);
+      if (!data) return;
+      const session = JSON.parse(data);
+      if (session && session.user) {
+        session.user.operatingZones = zones;
+        localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
+        notifyAuthChanged();
+      }
+    } catch (e) {
+      console.error("Error updating session zones:", e);
     }
   },
 

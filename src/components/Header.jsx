@@ -21,27 +21,24 @@ export default function Header({
   return (
     <header className="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-xl border-b border-red-900/40 shadow-2xl w-full max-w-full overflow-x-hidden">
       
-      {/* Top Community Ticker */}
-      <div className="bg-gradient-to-r from-red-900 via-rose-800 to-red-900 text-white text-[10px] sm:text-xs font-semibold px-3 py-1 flex items-center justify-between gap-2 border-b border-red-500/30">
+      {/* Top Disclaimer & Community Banner */}
+      <div className="bg-slate-900 text-slate-200 text-[10px] sm:text-xs font-semibold px-3 py-1 flex items-center justify-between gap-2 border-b border-slate-800">
         <div className="flex items-center gap-1.5 truncate">
-          <span className="flex h-2 w-2 relative shrink-0">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-90"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+          <span className="px-1.5 py-0.2 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded font-black text-[9px] sm:text-[10px] uppercase shrink-0">
+            Private Initiative
           </span>
-          <span className="uppercase tracking-wider font-extrabold text-amber-200 truncate">
-            ASSAM FLOOD RELIEF NETWORK
-          </span>
-          <span className="hidden md:inline text-red-100">
-            | Emergency Contacts: ASDMA 1070 | NDRF: 011-24363260
+          <span className="text-slate-300 truncate">
+            <strong>Notice:</strong> Independent community relief bridge. <span className="text-amber-300 font-bold">This is NOT an official government website.</span>
           </span>
         </div>
         
         <div className="flex items-center gap-2 shrink-0">
           <a 
             href="tel:1070" 
-            className="hover:underline flex items-center gap-1 font-black bg-red-950/90 px-2 py-0.5 rounded border border-red-400/40 text-amber-200 text-[10px] sm:text-[11px]"
+            className="hover:underline flex items-center gap-1 font-extrabold bg-slate-950 px-2 py-0.5 rounded border border-slate-700 text-amber-300 text-[10px] sm:text-[11px]"
+            title="Official Govt Emergency Helpline"
           >
-            <PhoneCall className="w-3 h-3 text-amber-400" /> ASDMA 1070
+            <PhoneCall className="w-3 h-3 text-amber-400" /> Govt Helpline: 1070
           </a>
         </div>
       </div>
@@ -103,21 +100,14 @@ export default function Header({
                 <span>🔐 Login</span>
               </button>
             ) : isNgo ? (
-              <div className="flex items-center gap-1 bg-emerald-950/80 border border-emerald-500/40 px-2 py-1 min-h-[36px] rounded-xl text-xs">
-                <div className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                  <span className="font-black text-emerald-300 truncate max-w-[80px] sm:max-w-[140px]" title={currentAuth.user.name}>
-                    {currentAuth.user.name}
-                  </span>
-                </div>
-                <button
-                  onClick={onLogout}
-                  className="text-[11px] font-bold text-slate-400 hover:text-red-400 p-0.5"
-                  title="Log out"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                </button>
-              </div>
+              <button
+                onClick={onLogout}
+                className="flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] sm:min-h-[42px] rounded-xl text-xs font-black bg-red-950/80 hover:bg-red-900 text-red-200 border border-red-500/40 shadow-md active:scale-95 transition-all cursor-pointer shrink-0"
+                title={`Logout ${currentAuth.user?.name || ''}`}
+              >
+                <LogOut className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                <span>Logout</span>
+              </button>
             ) : null}
 
             {/* Emergency SOS Button (Desktop/Tablet) */}
@@ -155,20 +145,22 @@ export default function Header({
               }`}
             >
               <Package className="w-3.5 h-3.5 shrink-0" />
-              <span className="truncate">RELIEF QUEUE</span>
+              <span className="truncate">{currentAuth.role !== 'GUEST' ? 'CONTROL ROOM DASHBOARD' : 'RELIEF QUEUE'}</span>
             </button>
 
-            <button
-              onClick={() => setActiveTab('ngos')}
-              className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all truncate text-center min-h-[38px] ${
-                activeTab === 'ngos'
-                  ? 'bg-slate-800 text-amber-400 border border-amber-500/40 shadow-md'
-                  : 'text-slate-300 bg-slate-900/80 hover:bg-slate-800 border border-slate-800'
-              }`}
-            >
-              <HeartHandshake className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span className="truncate">NGO & VOLUNTEERS</span>
-            </button>
+            {currentAuth.role === 'GUEST' && (
+              <button
+                onClick={() => setActiveTab('ngos')}
+                className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all truncate text-center min-h-[38px] ${
+                  activeTab === 'ngos'
+                    ? 'bg-slate-800 text-amber-400 border border-amber-500/40 shadow-md'
+                    : 'text-slate-300 bg-slate-900/80 hover:bg-slate-800 border border-slate-800'
+                }`}
+              >
+                <HeartHandshake className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span className="truncate">NGO & VOLUNTEERS</span>
+              </button>
+            )}
           </div>
 
           <button

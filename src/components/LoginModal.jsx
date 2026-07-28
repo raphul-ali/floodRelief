@@ -1,15 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { X, Lock, Key, ShieldCheck, HeartHandshake, Mail, UserCheck, AlertTriangle, ArrowRight, CheckCircle2, Building2, Send, Hash, Phone } from 'lucide-react';
+import { X, Lock, Key, ShieldCheck, HeartHandshake, Mail, UserCheck, AlertTriangle, ArrowRight, CheckCircle2, Building2, Send, Hash, Phone, Eye, EyeOff } from 'lucide-react';
 import { authService } from '../services/authService';
 import { securityService } from '../services/securityService';
+import { storageService } from '../services/storageService';
 
 export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOGIN', initialRegRole = 'NGO' }) {
-  const [activeMode, setActiveMode] = useState(initialMode); // 'NGO_LOGIN' | 'VOLUNTEER_LOGIN' | 'REGISTER'
+  const [activeMode, setActiveMode] = useState(initialMode); // 'NGO_LOGIN' | 'VOLUNTEER_LOGIN' | 'REGISTER' | 'FORGOT_PASSWORD' | 'FORGOT_EMAIL'
   
   // Login state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
+
+  // Account Recovery State (Forgot Password / Forgot Email)
+  const [recAccountRole, setRecAccountRole] = useState('NGO'); // 'NGO' | 'VOLUNTEER'
+  const [recName, setRecName] = useState('');
+  const [recPhone, setRecPhone] = useState('');
+  const [recEmail, setRecEmail] = useState('');
+  const [recDetails, setRecDetails] = useState('');
+  const [recSuccess, setRecSuccess] = useState(false);
+  const [recError, setRecError] = useState('');
 
   // Registration state
   const [regRole, setRegRole] = useState(initialRegRole); // 'NGO' | 'VOLUNTEER'
@@ -17,11 +28,28 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
   const [regPhone, setRegPhone] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
+  const [showRegPassword, setShowRegPassword] = useState(false);
   const [regAddress, setRegAddress] = useState('');
-  const [regRoleType, setRegRoleType] = useState('🚤 Free Motorboat / Rescue Boat Service');
+  const [regRoleType, setRegRoleType] = useState('');
   const [regLogoUrl, setRegLogoUrl] = useState('');
   const [logoError, setLogoError] = useState('');
+
+  // NGO Operating Zones State
+  const [regZoneMode, setRegZoneMode] = useState('WHOLE_ASSAM'); // 'WHOLE_ASSAM' | 'CUSTOM_DISTRICTS'
+  const [regSelectedDistricts, setRegSelectedDistricts] = useState([]);
   
+  useEffect(() => {
+    if (activeMode === 'REGISTER') {
+      setRegEmail('');
+      setRegPassword('');
+      setRegName('');
+      setRegPhone('');
+      setEmailTouched(false);
+      setPasswordTouched(false);
+      setPhoneTouched(false);
+    }
+  }, [activeMode]);
+
   // Live Inline Error States
   const [phoneError, setPhoneError] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -98,6 +126,66 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
     }
   };
 
+  // Submit Forgot Password Request to Admin
+  const handleForgotPasswordSubmit = (e) => {
+    e.preventDefault();
+    setRecError('');
+    setRecSuccess(false);
+
+    if (!recEmail || !recEmail.includes('@')) {
+      setRecError('Please enter a valid registered email address.');
+      return;
+    }
+    if (!recPhone || recPhone.length < 10) {
+      setRecError('Please enter a valid 10-digit mobile contact phone number.');
+      return;
+    }
+
+    try {
+      storageService.addAccountRecoveryRequest({
+        requestType: 'FORGOT_PASSWORD',
+        accountRole: recAccountRole,
+        name: recName,
+        email: recEmail,
+        phone: recPhone,
+        details: recDetails
+      });
+      setRecSuccess(true);
+    } catch (err) {
+      setRecError(err.message || 'Failed to submit recovery request.');
+    }
+  };
+
+  // Submit Forgot Email Request to Admin
+  const handleForgotEmailSubmit = (e) => {
+    e.preventDefault();
+    setRecError('');
+    setRecSuccess(false);
+
+    if (!recName || recName.trim().length < 2) {
+      setRecError('Please enter your Organization or Volunteer Name.');
+      return;
+    }
+    if (!recPhone || recPhone.length < 10) {
+      setRecError('Please enter your registered contact phone number.');
+      return;
+    }
+
+    try {
+      storageService.addAccountRecoveryRequest({
+        requestType: 'FORGOT_EMAIL',
+        accountRole: recAccountRole,
+        name: recName,
+        email: '',
+        phone: recPhone,
+        details: recDetails
+      });
+      setRecSuccess(true);
+    } catch (err) {
+      setRecError(err.message || 'Failed to submit recovery request.');
+    }
+  };
+
   // Registration Handler — Direct registration with pending admin approval state
   const handleDirectRegister = (e) => {
     e.preventDefault();
@@ -135,6 +223,10 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
       const fullPhone = `+91 ${regPhone}`;
 
       if (regRole === 'NGO') {
+        const finalZones = regZoneMode === 'WHOLE_ASSAM'
+          ? ['Whole Assam (All 35 Districts)']
+          : (regSelectedDistricts.length > 0 ? regSelectedDistricts : ['Whole Assam (All 35 Districts)']);
+
         authService.registerNgo({
           name: regName,
           contactPerson: regName,
@@ -142,7 +234,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
           email: regEmail,
           logoUrl: regLogoUrl,
           address: regAddress || 'Assam Operational Zone',
-          operatingZones: ['Jorhat', 'Sivasagar', 'Lakhimpur']
+          operatingZones: finalZones
         }, regPassword);
       } else {
         authService.registerVolunteer({
@@ -268,13 +360,50 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                 <div className="relative">
                   <Key className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter password"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-3 text-sm text-white focus:outline-none focus:border-amber-500 min-h-[44px]"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-10 py-3 text-sm text-white focus:outline-none focus:border-amber-500 min-h-[44px]"
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-slate-400 hover:text-white p-1 rounded-lg focus:outline-none"
+                    title={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                <div className="flex items-center justify-between text-[11px] sm:text-xs pt-1.5 px-0.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRecAccountRole('NGO');
+                      setRecEmail(email || '');
+                      setRecError('');
+                      setRecSuccess(false);
+                      setActiveMode('FORGOT_PASSWORD');
+                    }}
+                    className="text-amber-400 hover:text-amber-300 font-semibold underline underline-offset-2 flex items-center gap-1"
+                  >
+                    <Key className="w-3 h-3" />
+                    <span>Forgot Password?</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRecAccountRole('NGO');
+                      setRecError('');
+                      setRecSuccess(false);
+                      setActiveMode('FORGOT_EMAIL');
+                    }}
+                    className="text-cyan-400 hover:text-cyan-300 font-semibold underline underline-offset-2 flex items-center gap-1"
+                  >
+                    <Mail className="w-3 h-3" />
+                    <span>Forgot Email?</span>
+                  </button>
                 </div>
               </div>
 
@@ -334,13 +463,50 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                 <div className="relative">
                   <Key className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter password"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-3 text-sm text-white focus:outline-none focus:border-purple-500 min-h-[44px]"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-10 py-3 text-sm text-white focus:outline-none focus:border-purple-500 min-h-[44px]"
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-slate-400 hover:text-white p-1 rounded-lg focus:outline-none"
+                    title={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                <div className="flex items-center justify-between text-[11px] sm:text-xs pt-1.5 px-0.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRecAccountRole('VOLUNTEER');
+                      setRecEmail(email || '');
+                      setRecError('');
+                      setRecSuccess(false);
+                      setActiveMode('FORGOT_PASSWORD');
+                    }}
+                    className="text-amber-400 hover:text-amber-300 font-semibold underline underline-offset-2 flex items-center gap-1"
+                  >
+                    <Key className="w-3 h-3" />
+                    <span>Forgot Password?</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRecAccountRole('VOLUNTEER');
+                      setRecError('');
+                      setRecSuccess(false);
+                      setActiveMode('FORGOT_EMAIL');
+                    }}
+                    className="text-cyan-400 hover:text-cyan-300 font-semibold underline underline-offset-2 flex items-center gap-1"
+                  >
+                    <Mail className="w-3 h-3" />
+                    <span>Forgot Email?</span>
+                  </button>
                 </div>
               </div>
 
@@ -507,6 +673,85 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                   </div>
                 )}
 
+                {/* NGO Operating Zones Selector */}
+                {regRole === 'NGO' && (
+                  <div className="space-y-2 p-3 bg-slate-950/90 border border-slate-800 rounded-xl">
+                    <label className="block text-xs font-bold text-slate-300">
+                      NGO Operating Zones (Coverage Area) *
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setRegZoneMode('WHOLE_ASSAM')}
+                        className={`flex-1 py-2 px-2.5 rounded-lg text-xs transition-colors border ${
+                          regZoneMode === 'WHOLE_ASSAM'
+                            ? 'bg-amber-500 text-slate-950 border-amber-400 font-black'
+                            : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white font-bold'
+                        }`}
+                      >
+                        🌐 Whole Assam
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setRegZoneMode('CUSTOM_DISTRICTS')}
+                        className={`flex-1 py-2 px-2.5 rounded-lg text-xs transition-colors border ${
+                          regZoneMode === 'CUSTOM_DISTRICTS'
+                            ? 'bg-amber-500 text-slate-950 border-amber-400 font-black'
+                            : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white font-bold'
+                        }`}
+                      >
+                        📍 Specific Districts
+                      </button>
+                    </div>
+
+                    {regZoneMode === 'CUSTOM_DISTRICTS' && (
+                      <div className="space-y-2 pt-2 border-t border-slate-800">
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="text-amber-300 font-bold">Selected: {regSelectedDistricts.length} Districts</span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setRegSelectedDistricts(ASSAM_DISTRICTS)}
+                              className="text-emerald-400 font-bold hover:underline"
+                            >
+                              Select All
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setRegSelectedDistricts([])}
+                              className="text-red-400 font-bold hover:underline"
+                            >
+                              Clear
+                            </button>
+                          </div>
+                        </div>
+                        <div className="max-h-36 overflow-y-auto pr-1 grid grid-cols-2 gap-1.5 border border-slate-800 p-2 rounded-lg bg-slate-950 text-xs">
+                          {ASSAM_DISTRICTS.map(dist => {
+                            const isSelected = regSelectedDistricts.includes(dist);
+                            return (
+                              <label key={dist} className="flex items-center gap-1.5 text-[11px] text-slate-300 cursor-pointer select-none">
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setRegSelectedDistricts(prev => [...prev, dist]);
+                                    } else {
+                                      setRegSelectedDistricts(prev => prev.filter(d => d !== dist));
+                                    }
+                                  }}
+                                  className="rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-amber-500"
+                                />
+                                <span className={isSelected ? "text-amber-300 font-bold" : ""}>{dist}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {regRole === 'VOLUNTEER' && (
                   <div>
                     <label className="block text-xs font-bold text-slate-300 mb-1">
@@ -516,7 +761,9 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                       value={regRoleType}
                       onChange={(e) => setRegRoleType(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs font-bold text-amber-300 focus:outline-none min-h-[44px]"
+                      required
                     >
+                      <option value="" disabled>-- Select Volunteer Service Role * --</option>
                       <option value="🚤 Free Motorboat / Rescue Boat Service">🚤 Free Motorboat / Rescue Boat Service</option>
                       <option value="🚗 Free Car / SUV / 4x4 Transport Service">🚗 Free Car / SUV / 4x4 Transport Service</option>
                       <option value="🚚 Free Goods Truck / Pickup Van">🚚 Free Goods Truck / Pickup Van</option>
@@ -531,7 +778,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                 <div className="space-y-3">
                   <div>
                     <label className="block text-xs font-bold text-slate-300 mb-1">
-                      Mobile Phone (India +91) *
+                      {regRole === 'NGO' ? 'Official NGO Contact Phone (India +91) *' : 'Mobile Phone (India +91) *'}
                     </label>
                     <div className="flex items-center">
                       <span className="px-3 py-2.5 bg-slate-800 border border-r-0 border-slate-700 rounded-l-xl text-xs font-black text-amber-300 min-h-[44px] flex items-center justify-center shrink-0">
@@ -556,6 +803,11 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                         required
                       />
                     </div>
+                    {regRole === 'NGO' && (
+                      <p className="text-[11px] font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/30 p-2 rounded-lg mt-1.5 leading-normal">
+                        ℹ️ <strong>Notice:</strong> This official NGO phone number will be displayed publicly in the relief directory so victims & volunteers can contact your organization.
+                      </p>
+                    )}
                     {/* Live Inline Phone Error */}
                     {phoneError && (
                       <p className="text-[11px] font-bold text-red-400 mt-1 flex items-center gap-1 animate-fadeIn">
@@ -570,6 +822,9 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                     </label>
                     <input
                       type="email"
+                      autoComplete="off"
+                      name="reg_user_email_address"
+                      id="reg_user_email_address"
                       value={regEmail}
                       onChange={(e) => {
                         setRegEmail(e.target.value);
@@ -600,20 +855,33 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                       Min 8 chars (Letter + Number + Symbol @#$)
                     </span>
                   </div>
-                  <input
-                    type="password"
-                    value={regPassword}
-                    onChange={(e) => {
-                      setRegPassword(e.target.value);
-                      setPasswordTouched(true);
-                    }}
-                    onBlur={() => setPasswordTouched(true)}
-                    placeholder="e.g. Relief@2026"
-                    className={`w-full bg-slate-950 border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none min-h-[44px] ${
-                      passwordError ? 'border-red-500 focus:border-red-400' : 'border-slate-700 focus:border-emerald-500'
-                    }`}
-                    required
-                  />
+                  <div className="relative">
+                    <input
+                      type={showRegPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      name="reg_user_password_field"
+                      id="reg_user_password_field"
+                      value={regPassword}
+                      onChange={(e) => {
+                        setRegPassword(e.target.value);
+                        setPasswordTouched(true);
+                      }}
+                      onBlur={() => setPasswordTouched(true)}
+                      placeholder="e.g. Relief@2026"
+                      className={`w-full bg-slate-950 border rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-white focus:outline-none min-h-[44px] ${
+                        passwordError ? 'border-red-500 focus:border-red-400' : 'border-slate-700 focus:border-emerald-500'
+                      }`}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowRegPassword(!showRegPassword)}
+                      className="absolute right-3 top-2.5 text-slate-400 hover:text-white p-1 rounded-lg focus:outline-none"
+                      title={showRegPassword ? "Hide password" : "Show password"}
+                    >
+                      {showRegPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                   {/* Live Inline Password Error */}
                   {passwordError && (
                     <p className="text-[11px] font-bold text-red-400 mt-1 flex items-center gap-1 animate-fadeIn">
@@ -632,6 +900,276 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
               </form>
             )}
 
+          </div>
+        )}
+
+        {/* MODE 4: FORGOT PASSWORD REQUEST */}
+        {activeMode === 'FORGOT_PASSWORD' && (
+          <div className="space-y-4 overflow-y-auto pr-1">
+            <div>
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-amber-500/20 text-amber-400 rounded-xl border border-amber-500/30">
+                  <Key className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-black text-white">Reset Account Password</h3>
+                  <p className="text-xs text-slate-400">Send password recovery request to Platform Administrator.</p>
+                </div>
+              </div>
+            </div>
+
+            {recSuccess ? (
+              <div className="p-5 bg-slate-900 border border-emerald-500/40 rounded-2xl text-center space-y-3">
+                <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
+                <h4 className="text-base font-black text-white">Request Sent to Admin Desk!</h4>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Your password recovery request has been dispatched. Platform Admin will review your details and contact you via Phone/WhatsApp to help recover your login password.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveMode(recAccountRole === 'NGO' ? 'NGO_LOGIN' : 'VOLUNTEER_LOGIN');
+                    setRecSuccess(false);
+                  }}
+                  className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs"
+                >
+                  Return to Login
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotPasswordSubmit} className="space-y-3">
+                {recError && (
+                  <div className="p-3 bg-red-950/80 border border-red-500/40 rounded-xl text-red-200 text-xs font-semibold flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+                    <span>{recError}</span>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">Account Role *</label>
+                  <div className="flex items-center gap-2 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-bold">
+                    <button
+                      type="button"
+                      onClick={() => setRecAccountRole('NGO')}
+                      className={`flex-1 py-2 rounded-lg text-center min-h-[36px] ${recAccountRole === 'NGO' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400'}`}
+                    >
+                      NGO Account
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRecAccountRole('VOLUNTEER')}
+                      className={`flex-1 py-2 rounded-lg text-center min-h-[36px] ${recAccountRole === 'VOLUNTEER' ? 'bg-purple-600 text-white font-black' : 'text-slate-400'}`}
+                    >
+                      Volunteer Account
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Registered Email Address *
+                  </label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
+                    <input
+                      type="email"
+                      value={recEmail}
+                      onChange={(e) => setRecEmail(e.target.value)}
+                      placeholder="e.g. ngo@organization.org"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 min-h-[44px]"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Contact Phone Number (For Admin to Call/WhatsApp) *
+                  </label>
+                  <div className="relative">
+                    <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
+                    <input
+                      type="tel"
+                      value={recPhone}
+                      onChange={(e) => setRecPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 10))}
+                      placeholder="10-digit mobile number"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500 min-h-[44px]"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Organization / Volunteer Name (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={recName}
+                    onChange={(e) => setRecName(e.target.value)}
+                    placeholder="e.g. Assam Flood Care Unit"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 min-h-[44px]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Additional Details / Verification Note
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={recDetails}
+                    onChange={(e) => setRecDetails(e.target.value)}
+                    placeholder="Any detail to help admin identify your account..."
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setActiveMode(recAccountRole === 'NGO' ? 'NGO_LOGIN' : 'VOLUNTEER_LOGIN')}
+                    className="py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs min-h-[44px]"
+                  >
+                    Back to Login
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black rounded-xl text-xs sm:text-sm shadow-lg flex items-center justify-center gap-2 min-h-[44px]"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span>Send Password Request to Admin</span>
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        )}
+
+        {/* MODE 5: FORGOT EMAIL REQUEST */}
+        {activeMode === 'FORGOT_EMAIL' && (
+          <div className="space-y-4 overflow-y-auto pr-1">
+            <div>
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-cyan-500/20 text-cyan-400 rounded-xl border border-cyan-500/30">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-black text-white">Forgot Email Recovery</h3>
+                  <p className="text-xs text-slate-400">Request Admin to find and send your registered account email.</p>
+                </div>
+              </div>
+            </div>
+
+            {recSuccess ? (
+              <div className="p-5 bg-slate-900 border border-emerald-500/40 rounded-2xl text-center space-y-3">
+                <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
+                <h4 className="text-base font-black text-white">Request Sent to Admin Desk!</h4>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Your email recovery request has been sent to Admin. Admin will search records and contact your phone number with your registered email address.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveMode(recAccountRole === 'NGO' ? 'NGO_LOGIN' : 'VOLUNTEER_LOGIN');
+                    setRecSuccess(false);
+                  }}
+                  className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs"
+                >
+                  Return to Login
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotEmailSubmit} className="space-y-3">
+                {recError && (
+                  <div className="p-3 bg-red-950/80 border border-red-500/40 rounded-xl text-red-200 text-xs font-semibold flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+                    <span>{recError}</span>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">Account Role *</label>
+                  <div className="flex items-center gap-2 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-bold">
+                    <button
+                      type="button"
+                      onClick={() => setRecAccountRole('NGO')}
+                      className={`flex-1 py-2 rounded-lg text-center min-h-[36px] ${recAccountRole === 'NGO' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400'}`}
+                    >
+                      NGO Account
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRecAccountRole('VOLUNTEER')}
+                      className={`flex-1 py-2 rounded-lg text-center min-h-[36px] ${recAccountRole === 'VOLUNTEER' ? 'bg-purple-600 text-white font-black' : 'text-slate-400'}`}
+                    >
+                      Volunteer Account
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Organization / Volunteer Registered Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={recName}
+                    onChange={(e) => setRecName(e.target.value)}
+                    placeholder="e.g. Assam Relief Network / Bishal Dutta"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 min-h-[44px]"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    Registered Mobile Phone Number *
+                  </label>
+                  <div className="relative">
+                    <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
+                    <input
+                      type="tel"
+                      value={recPhone}
+                      onChange={(e) => setRecPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 10))}
+                      placeholder="10-digit mobile number"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-cyan-500 min-h-[44px]"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                    District / Address or Verification Note
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={recDetails}
+                    onChange={(e) => setRecDetails(e.target.value)}
+                    placeholder="e.g. Registered in Jorhat district for boat rescue service..."
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-cyan-500"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setActiveMode(recAccountRole === 'NGO' ? 'NGO_LOGIN' : 'VOLUNTEER_LOGIN')}
+                    className="py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs min-h-[44px]"
+                  >
+                    Back to Login
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-black rounded-xl text-xs sm:text-sm shadow-lg flex items-center justify-center gap-2 min-h-[44px]"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span>Send Email Request to Admin</span>
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         )}
 

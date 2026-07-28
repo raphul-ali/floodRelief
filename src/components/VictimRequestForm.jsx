@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, MapPin, Package, Users, Phone, CheckCircle, Navigation, HeartHandshake, ShieldCheck, Hash, UserCheck, AlertOctagon, AlertTriangle, Siren, ShieldAlert } from 'lucide-react';
-import confetti from 'canvas-confetti';
 import { storageService } from '../services/storageService';
+import { authService } from '../services/authService';
 import DistrictSelect from './DistrictSelect';
 
 const SUPPLY_NEEDS = [
@@ -20,10 +20,10 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
     name: '',
     phone: '',
     altPhone: '',
-    malesCount: 1,
-    femalesCount: 1,
+    malesCount: 0,
+    femalesCount: 0,
     childrenCount: 0,
-    district: 'Jorhat',
+    district: '',
     villageName: '',
     pinCode: '',
     landmark: '',
@@ -40,6 +40,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
       isUrgentRescue: initialUrgent,
       needs: initialUrgent ? ['Emergency Motorboat Rescue & Life Evacuation'] : ['Cooked Meals & Food Packets', 'Clean Drinking Water Jars']
     }));
+    handleDetectLocation();
   }, [initialUrgent]);
 
   const [isLocating, setIsLocating] = useState(false);
@@ -95,27 +96,47 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
     e.preventDefault();
     setErrorMessage('');
 
-    if (!formData.phone || !formData.name || !formData.villageName) {
-      setErrorMessage("Please fill out Victim Name, Mobile Phone, and Village Name!");
+    if (!formData.phone || !formData.name || !formData.villageName || !formData.district) {
+      setErrorMessage("Please fill out Victim Name, Mobile Phone, Village Name, and select a District!");
+      return;
+    }
+
+    if (!formData.latitude || !formData.longitude) {
+      setErrorMessage("📍 GPS Location is MANDATORY! Please click 'Attach GPS Location *' button to auto-detect your location before submitting.");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const locationAddressFormatted = `${formData.villageName}${formData.pinCode ? `, PIN: ${formData.pinCode}` : ''}${formData.landmark ? ` (${formData.landmark})` : ''}`;
+      const landmarkText = (formData.isUrgentRescue && formData.landmark) ? ` (${formData.landmark})` : '';
+      const locationAddressFormatted = `${formData.villageName}${formData.pinCode ? `, PIN: ${formData.pinCode}` : ''}${landmarkText}`;
+
+      const currentUser = authService.getCurrentUser();
+      let requestedByRole = 'CITIZEN';
+      let requestedByName = formData.name;
+      let requestedByPhone = formData.phone;
+
+      if (currentUser && currentUser.user) {
+        if (currentUser.role === 'NGO') {
+          requestedByRole = 'NGO';
+          requestedByName = currentUser.user.name;
+          requestedByPhone = currentUser.user.phone || formData.phone;
+        } else if (currentUser.role === 'VOLUNTEER') {
+          requestedByRole = 'VOLUNTEER';
+          requestedByName = currentUser.user.name;
+          requestedByPhone = currentUser.user.phone || formData.phone;
+        }
+      }
 
       const savedRequest = storageService.addVictimRequest({
         ...formData,
+        requestedByRole,
+        requestedByName,
+        requestedByPhone,
         peopleCount: totalPeopleCount > 0 ? totalPeopleCount : 1,
         locationName: locationAddressFormatted,
         needs: formData.isUrgentRescue ? ['Emergency Motorboat Rescue & Life Evacuation'] : formData.needs
-      });
-
-      confetti({
-        particleCount: 100,
-        spread: 80,
-        origin: { y: 0.6 }
       });
 
       setIsSubmitting(false);
@@ -215,29 +236,29 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
           </div>
         )}
 
-        {/* Success View */}
+        {/* Dignified Reassuring Success View */}
         {submittedSuccess ? (
-          <div className="p-8 text-center space-y-6">
-            <div className="w-16 h-16 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 rounded-full flex items-center justify-center mx-auto animate-bounce">
-              <CheckCircle className="w-10 h-10" />
+          <div className="p-6 sm:p-8 text-center space-y-5">
+            <div className="w-14 h-14 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 rounded-full flex items-center justify-center mx-auto shadow-md">
+              <CheckCircle className="w-8 h-8" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-2xl font-black text-white">
-                {formData.isUrgentRescue ? '🚨 SOS TRANSMITTED TO VERIFICATION QUEUE!' : '📦 RELIEF REQUEST SENT TO VERIFICATION QUEUE!'}
+              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                Request Registered. Someone will help you soon.
               </h3>
-              <p className="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-                Your submission is currently held in the <span className="text-amber-300 font-bold">Admin Verification Queue</span>. Our Control Room officer will connect with your phone via <span className="text-emerald-400 font-bold">WhatsApp / Call</span> to verify your location before publishing to the live map.
+              <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
+                Your request has been published to nearby verified NGOs, rescue boat operators, and logistics volunteers in <strong className="text-amber-300">{formData.district}</strong>. Someone will contact your mobile phone soon.
               </p>
             </div>
 
-            <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl text-left text-xs space-y-2 text-slate-300">
+            <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl text-left text-xs space-y-2 text-slate-300">
               <div className="flex justify-between">
-                <span className="text-slate-400">Victim Contact Phone:</span>
-                <span className="font-bold text-amber-400">{formData.phone}</span>
+                <span className="text-slate-400">Registered Phone:</span>
+                <span className="font-mono font-bold text-amber-300">{formData.phone}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Village & District:</span>
-                <span className="font-bold text-slate-200">{formData.villageName}, {formData.district} ({formData.pinCode || 'No PIN'})</span>
+                <span className="text-slate-400">Location:</span>
+                <span className="font-bold text-slate-200">{formData.villageName}, {formData.district} {formData.pinCode ? `(PIN: ${formData.pinCode})` : ''}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400">Demographics:</span>
@@ -249,9 +270,9 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
 
             <button
               onClick={onClose}
-              className="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-colors"
+              className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs sm:text-sm transition-colors min-h-[44px]"
             >
-              Close & View Rescue Queue
+              Return to Portal
             </button>
           </div>
         ) : (
@@ -350,33 +371,46 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
               </div>
             </div>
 
-            {/* Landmark & GPS Detector Row */}
+            {/* Landmark (Emergency Rescue Only) & GPS Detector Row */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
-              <div className="sm:col-span-2">
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                  Exact Spot / Rooftop / Dike Landmark
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Near Primary School Dike, House No 12"
-                  value={formData.landmark}
-                  onChange={(e) => setFormData(prev => ({ ...prev, landmark: e.target.value }))}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm"
-                />
-              </div>
+              {formData.isUrgentRescue && (
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+                    Exact Spot / Rooftop / Dike Landmark
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Near Primary School Dike, House No 12"
+                    value={formData.landmark}
+                    onChange={(e) => setFormData(prev => ({ ...prev, landmark: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm"
+                  />
+                </div>
+              )}
 
-              <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                  GPS Location
+              <div className={formData.isUrgentRescue ? "sm:col-span-1" : "sm:col-span-3"}>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                  <span>GPS Location *</span>
+                  {!formData.latitude && <span className="text-[10px] text-red-400 font-extrabold animate-pulse">REQUIRED</span>}
                 </label>
                 <button
                   type="button"
                   onClick={handleDetectLocation}
                   disabled={isLocating}
-                  className="w-full py-2.5 px-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all"
+                  className={`w-full py-2.5 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all min-h-[44px] ${
+                    formData.latitude
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50'
+                      : 'bg-red-500/20 text-red-300 border border-red-500/60 shadow-lg shadow-red-950/80 animate-pulse'
+                  }`}
                 >
                   <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
-                  <span>{isLocating ? 'Acquiring...' : formData.latitude ? '✅ GPS Pinned' : 'Attach GPS'}</span>
+                  <span>
+                    {isLocating 
+                      ? 'Acquiring GPS...' 
+                      : formData.latitude 
+                        ? `✅ GPS Pinned (${formData.latitude.toFixed(4)}, ${formData.longitude.toFixed(4)})` 
+                        : '📍 Attach Mandatory GPS Location *'}
+                  </span>
                 </button>
               </div>
             </div>
