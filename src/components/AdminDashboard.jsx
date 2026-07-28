@@ -7,11 +7,19 @@ import { storageService, ASSAM_DISTRICTS } from '../services/storageService';
 
 export default function AdminDashboard({ onDataUpdated }) {
   const [activeQueueTab, setActiveQueueTab] = useState('sos'); // 'sos' | 'deliveries' | 'ngos' | 'volunteers' | 'recovery'
+  const [viewMode, setViewMode] = useState('PENDING'); // 'PENDING' | 'ALL_LIVE'
+  
   const [pendingRequests, setPendingRequests] = useState([]);
   const [pendingDeliveries, setPendingDeliveries] = useState([]);
   const [pendingNgos, setPendingNgos] = useState([]);
   const [pendingVolunteers, setPendingVolunteers] = useState([]);
   const [pendingRecovery, setPendingRecovery] = useState([]);
+
+  // All live network records state
+  const [allRequests, setAllRequests] = useState([]);
+  const [allDeliveries, setAllDeliveries] = useState([]);
+  const [allNgos, setAllNgos] = useState([]);
+  const [allVolunteers, setAllVolunteers] = useState([]);
   
   const [selectedDistrict, setSelectedDistrict] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -22,6 +30,11 @@ export default function AdminDashboard({ onDataUpdated }) {
     setPendingNgos(storageService.getPendingNGOs());
     setPendingVolunteers(storageService.getPendingVolunteers());
     setPendingRecovery(storageService.getAccountRecoveryRequests(true));
+
+    setAllRequests(storageService.getVictimRequests(true));
+    setAllDeliveries(storageService.getDeliveryLogs(true));
+    setAllNgos(storageService.getNGOs(true));
+    setAllVolunteers(storageService.getVolunteers(true));
   };
 
   useEffect(() => {
@@ -143,11 +156,47 @@ export default function AdminDashboard({ onDataUpdated }) {
   const pendingRecoveryCount = pendingRecovery.filter(r => r.status === 'PENDING').length;
   const totalPendingCount = pendingRequests.length + pendingDeliveries.length + pendingNgos.length + pendingVolunteers.length + pendingRecoveryCount;
 
-  // Filter pending SOS
-  const filteredSos = pendingRequests.filter(req => {
+  // Active dataset depending on viewMode
+  const targetRequests = viewMode === 'ALL_LIVE' ? allRequests : pendingRequests;
+  const targetDeliveries = viewMode === 'ALL_LIVE' ? allDeliveries : pendingDeliveries;
+  const targetNgos = viewMode === 'ALL_LIVE' ? allNgos : pendingNgos;
+  const targetVolunteers = viewMode === 'ALL_LIVE' ? allVolunteers : pendingVolunteers;
+
+  // Filter SOS Requests
+  const filteredSos = targetRequests.filter(req => {
     const matchesDistrict = selectedDistrict === 'ALL' || req.district === selectedDistrict;
-    const matchesQuery = !searchQuery || req.name.toLowerCase().includes(searchQuery.toLowerCase()) || req.id.toLowerCase().includes(searchQuery.toLowerCase()) || req.phone.includes(searchQuery);
+    const matchesQuery = !searchQuery || 
+      (req.name && req.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
+      (req.id && req.id.toLowerCase().includes(searchQuery.toLowerCase())) || 
+      (req.phone && req.phone.includes(searchQuery));
     return matchesDistrict && matchesQuery;
+  });
+
+  // Filter Deliveries
+  const filteredDeliveries = targetDeliveries.filter(log => {
+    const matchesQuery = !searchQuery || 
+      (log.deliveredBy && log.deliveredBy.toLowerCase().includes(searchQuery.toLowerCase())) || 
+      (log.itemsDelivered && log.itemsDelivered.toLowerCase().includes(searchQuery.toLowerCase())) || 
+      (log.logId && log.logId.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesQuery;
+  });
+
+  // Filter NGOs
+  const filteredNgos = targetNgos.filter(ngo => {
+    const matchesQuery = !searchQuery || 
+      (ngo.name && ngo.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
+      (ngo.phone && ngo.phone.includes(searchQuery)) || 
+      (ngo.contactPerson && ngo.contactPerson.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesQuery;
+  });
+
+  // Filter Volunteers
+  const filteredVolunteers = targetVolunteers.filter(vol => {
+    const matchesQuery = !searchQuery || 
+      (vol.name && vol.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
+      (vol.phone && vol.phone.includes(searchQuery)) || 
+      (vol.roleType && vol.roleType.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesQuery;
   });
 
   return (
@@ -170,12 +219,31 @@ export default function AdminDashboard({ onDataUpdated }) {
             </div>
           </div>
 
-          {/* Pending Notification Pill */}
+          {/* View Mode Toggle Pill Bar */}
           <div className="flex items-center gap-2 shrink-0">
-            <div className="px-3 py-1.5 bg-red-950/90 border border-red-500/50 rounded-xl text-red-200 text-xs font-black flex items-center gap-1.5 animate-pulse">
-              <Bell className="w-3.5 h-3.5 text-red-400" />
-              <span>{totalPendingCount} PENDING VERIFICATIONS</span>
-            </div>
+            <button
+              onClick={() => setViewMode('PENDING')}
+              className={`px-3 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 min-h-[40px] ${
+                viewMode === 'PENDING'
+                  ? 'bg-red-600 text-white shadow-lg border border-red-400 animate-pulse'
+                  : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+              }`}
+            >
+              <Bell className="w-3.5 h-3.5" />
+              <span>⏳ PENDING QUEUE ({totalPendingCount})</span>
+            </button>
+
+            <button
+              onClick={() => setViewMode('ALL_LIVE')}
+              className={`px-3 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 min-h-[40px] ${
+                viewMode === 'ALL_LIVE'
+                  ? 'bg-emerald-600 text-white shadow-lg border border-emerald-400'
+                  : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>🌐 ALL LIVE RECORDS ({allRequests.length} Requests | {allNgos.length} NGOs)</span>
+            </button>
           </div>
         </div>
       </div>
@@ -183,7 +251,7 @@ export default function AdminDashboard({ onDataUpdated }) {
       {/* Notification Queue Tabs */}
       <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap pb-2 border-b border-slate-800 text-xs font-black">
         
-        {/* Tab 1: Pending SOS */}
+        {/* Tab 1: SOS Requests */}
         <button
           onClick={() => setActiveQueueTab('sos')}
           className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
@@ -193,11 +261,11 @@ export default function AdminDashboard({ onDataUpdated }) {
           }`}
         >
           <ShieldAlert className="w-4 h-4 text-red-300 shrink-0" />
-          <span>Pending SOS Requests</span>
+          <span>{viewMode === 'ALL_LIVE' ? 'All SOS Requests' : 'Pending SOS Requests'}</span>
           <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-            pendingRequests.length > 0 ? 'bg-white text-red-600 animate-pulse' : 'bg-slate-800 text-slate-400'
+            targetRequests.length > 0 ? (viewMode === 'PENDING' ? 'bg-white text-red-600 animate-pulse' : 'bg-red-950 text-red-300 border border-red-800') : 'bg-slate-800 text-slate-400'
           }`}>
-            {pendingRequests.length}
+            {targetRequests.length}
           </span>
         </button>
 
@@ -211,11 +279,11 @@ export default function AdminDashboard({ onDataUpdated }) {
           }`}
         >
           <Package className="w-4 h-4 text-amber-400 shrink-0" />
-          <span>Delivery Logs</span>
+          <span>{viewMode === 'ALL_LIVE' ? 'All Delivery Logs' : 'Pending Delivery Logs'}</span>
           <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-            pendingDeliveries.length > 0 ? 'bg-amber-400 text-slate-950 animate-pulse' : 'bg-slate-800 text-slate-400'
+            targetDeliveries.length > 0 ? 'bg-amber-400 text-slate-950 font-black' : 'bg-slate-800 text-slate-400'
           }`}>
-            {pendingDeliveries.length}
+            {targetDeliveries.length}
           </span>
         </button>
 
@@ -229,11 +297,11 @@ export default function AdminDashboard({ onDataUpdated }) {
           }`}
         >
           <HeartHandshake className="w-4 h-4 text-blue-400 shrink-0" />
-          <span>Pending NGOs</span>
+          <span>{viewMode === 'ALL_LIVE' ? 'Registered NGOs' : 'Pending NGOs'}</span>
           <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-            pendingNgos.length > 0 ? 'bg-blue-400 text-slate-950 animate-pulse' : 'bg-slate-800 text-slate-400'
+            targetNgos.length > 0 ? 'bg-blue-400 text-slate-950 font-black' : 'bg-slate-800 text-slate-400'
           }`}>
-            {pendingNgos.length}
+            {targetNgos.length}
           </span>
         </button>
 
@@ -247,11 +315,11 @@ export default function AdminDashboard({ onDataUpdated }) {
           }`}
         >
           <UserCheck className="w-4 h-4 text-purple-400 shrink-0" />
-          <span>Volunteers</span>
+          <span>{viewMode === 'ALL_LIVE' ? 'All Volunteers' : 'Pending Volunteers'}</span>
           <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-            pendingVolunteers.length > 0 ? 'bg-purple-400 text-slate-950 animate-pulse' : 'bg-slate-800 text-slate-400'
+            targetVolunteers.length > 0 ? 'bg-purple-400 text-slate-950 font-black' : 'bg-slate-800 text-slate-400'
           }`}>
-            {pendingVolunteers.length}
+            {targetVolunteers.length}
           </span>
         </button>
 
@@ -307,19 +375,34 @@ export default function AdminDashboard({ onDataUpdated }) {
           {filteredSos.length === 0 ? (
             <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center space-y-2">
               <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-bold text-white">No Pending SOS Requests</h3>
-              <p className="text-xs text-slate-400">All incoming distress signals have been verified & published live.</p>
+              <h3 className="text-base font-bold text-white">
+                {viewMode === 'ALL_LIVE' ? 'No SOS Requests Match Search' : 'No Pending SOS Requests'}
+              </h3>
+              <p className="text-xs text-slate-400">
+                {viewMode === 'ALL_LIVE' 
+                  ? 'Try adjusting district or search query filters.' 
+                  : 'All incoming distress signals have been verified & published live.'}
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredSos.map(req => (
-                <div key={req.id} className="bg-slate-900 border border-red-500/40 rounded-2xl p-4 shadow-xl space-y-3">
+                <div key={req.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="px-2 py-0.5 text-[10px] font-black bg-red-600/30 text-red-300 border border-red-500/40 rounded-md">
                           {req.isUrgentRescue ? '🚨 BOAT RESCUE' : '📦 RELIEF SUPPLY'}
                         </span>
+                        {req.verified ? (
+                          <span className="px-2 py-0.5 text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-md">
+                            ✅ PUBLISHED LIVE
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md animate-pulse">
+                            ⏳ PENDING VERIFICATION
+                          </span>
+                        )}
                         <span className="text-xs font-mono text-slate-400">{req.id}</span>
                       </div>
                       <h3 className="text-base font-black text-white mt-1">{req.name}</h3>
@@ -371,20 +454,22 @@ export default function AdminDashboard({ onDataUpdated }) {
                       <span>Call Victim</span>
                     </a>
 
-                    <button
-                      onClick={() => handleApproveSos(req.id)}
-                      className="col-span-2 py-2.5 px-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 shadow-md min-h-[44px]"
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>✓ APPROVE & PUBLISH LIVE</span>
-                    </button>
+                    {!req.verified && (
+                      <button
+                        onClick={() => handleApproveSos(req.id)}
+                        className="col-span-2 py-2.5 px-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 shadow-md min-h-[44px]"
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>✓ APPROVE & PUBLISH LIVE</span>
+                      </button>
+                    )}
 
                     <button
                       onClick={() => handleRejectSos(req.id)}
                       className="col-span-2 py-2 px-3 bg-red-950 hover:bg-red-900 text-red-300 border border-red-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 min-h-[38px]"
                     >
                       <XCircle className="w-3.5 h-3.5" />
-                      <span>Reject & Delete</span>
+                      <span>{req.verified ? "Delete Record" : "Reject & Delete"}</span>
                     </button>
                   </div>
                 </div>
@@ -394,24 +479,39 @@ export default function AdminDashboard({ onDataUpdated }) {
         </div>
       )}
 
-      {/* QUEUE 2: PENDING DELIVERY LOGS */}
+      {/* QUEUE 2: DELIVERY LOGS */}
       {activeQueueTab === 'deliveries' && (
         <div className="space-y-4">
-          {pendingDeliveries.length === 0 ? (
+          {filteredDeliveries.length === 0 ? (
             <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center space-y-2">
               <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-bold text-white">No Pending Delivery Logs</h3>
-              <p className="text-xs text-slate-400">All relief dispatches have been audited and verified.</p>
+              <h3 className="text-base font-bold text-white">
+                {viewMode === 'ALL_LIVE' ? 'No Delivery Logs Match Search' : 'No Pending Delivery Logs'}
+              </h3>
+              <p className="text-xs text-slate-400">
+                {viewMode === 'ALL_LIVE' ? 'Try adjusting your search terms.' : 'All relief dispatches have been audited and verified.'}
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {pendingDeliveries.map(log => (
+              {filteredDeliveries.map(log => (
                 <div key={log.logId} className="bg-slate-900 border border-amber-500/40 rounded-2xl p-4 shadow-xl space-y-3">
                   <div className="flex items-start justify-between">
                     <div>
-                      <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md">
-                        DISPATCH LOG #{log.logId}
-                      </span>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md">
+                          DISPATCH LOG #{log.logId}
+                        </span>
+                        {log.verified ? (
+                          <span className="px-2 py-0.5 text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-md">
+                            ✅ VERIFIED DISPATCH
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md animate-pulse">
+                            ⏳ PENDING AUDIT
+                          </span>
+                        )}
+                      </div>
                       <h3 className="text-base font-black text-white mt-1">Delivered by: {log.deliveredBy}</h3>
                       <p className="text-xs text-slate-300">Items: <strong className="text-amber-300">{log.itemsDelivered}</strong></p>
                     </div>
@@ -419,6 +519,7 @@ export default function AdminDashboard({ onDataUpdated }) {
 
                   <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1">
                     <p className="text-slate-300"><strong className="text-white">Volunteer Phone:</strong> {log.volunteerPhone}</p>
+                    {log.peopleImpacted && <p className="text-slate-300"><strong className="text-white">People Impacted:</strong> {log.peopleImpacted}</p>}
                     {log.deliveryNotes && <p className="text-slate-400 italic">"{log.deliveryNotes}"</p>}
                   </div>
 
@@ -433,13 +534,23 @@ export default function AdminDashboard({ onDataUpdated }) {
                       <span>Request Photo Proof</span>
                     </a>
 
-                    <button
-                      onClick={() => handleApproveDelivery(log.logId)}
-                      className="py-2.5 px-3 bg-emerald-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 shadow-md min-h-[44px]"
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Approve Log</span>
-                    </button>
+                    {!log.verified ? (
+                      <button
+                        onClick={() => handleApproveDelivery(log.logId)}
+                        className="py-2.5 px-3 bg-emerald-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 shadow-md min-h-[44px]"
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>Approve Log</span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleRejectDelivery(log.logId)}
+                        className="py-2.5 px-3 bg-red-950 text-red-300 border border-red-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 min-h-[44px]"
+                      >
+                        <XCircle className="w-4 h-4" />
+                        <span>Remove Log</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -448,38 +559,65 @@ export default function AdminDashboard({ onDataUpdated }) {
         </div>
       )}
 
-      {/* QUEUE 3: PENDING NGOS */}
+      {/* QUEUE 3: NGOS DIRECTORY */}
       {activeQueueTab === 'ngos' && (
         <div className="space-y-4">
-          {pendingNgos.length === 0 ? (
+          {filteredNgos.length === 0 ? (
             <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center space-y-2">
               <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-bold text-white">No Pending NGO Registrations</h3>
+              <h3 className="text-base font-bold text-white">
+                {viewMode === 'ALL_LIVE' ? 'No Registered NGOs Match Search' : 'No Pending NGO Registrations'}
+              </h3>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {pendingNgos.map(ngo => (
+              {filteredNgos.map(ngo => (
                 <div key={ngo.id} className="bg-slate-900 border border-blue-500/40 rounded-2xl p-4 shadow-xl space-y-3">
-                  <div>
-                    <h3 className="text-base font-black text-white">{ngo.name}</h3>
-                    <p className="text-xs text-slate-300">Contact: <strong>{ngo.contactPerson}</strong> ({ngo.phone})</p>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {ngo.verified ? (
+                          <span className="px-2 py-0.5 text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-md">
+                            ✅ VERIFIED NGO
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md animate-pulse">
+                            ⏳ PENDING VERIFICATION
+                          </span>
+                        )}
+                        <span className="text-xs font-mono text-slate-400">{ngo.id}</span>
+                      </div>
+                      <h3 className="text-base font-black text-white mt-1">{ngo.name}</h3>
+                      <p className="text-xs text-slate-300">Contact: <strong>{ngo.contactPerson || 'Official NGO'}</strong> ({ngo.phone})</p>
+                      {ngo.email && <p className="text-xs text-amber-300 font-mono mt-0.5">📧 {ngo.email}</p>}
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={() => handleApproveNgo(ngo.id)}
-                      className="py-2.5 px-3 bg-emerald-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 min-h-[44px]"
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Approve NGO</span>
-                    </button>
+                    {!ngo.verified ? (
+                      <button
+                        onClick={() => handleApproveNgo(ngo.id)}
+                        className="py-2.5 px-3 bg-emerald-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 min-h-[44px]"
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>Approve NGO</span>
+                      </button>
+                    ) : (
+                      <a
+                        href={`tel:${ngo.phone.replace(/[^0-9]/g, '')}`}
+                        className="py-2.5 px-3 bg-slate-800 text-emerald-300 border border-slate-700 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
+                      >
+                        <Phone className="w-3.5 h-3.5" />
+                        <span>Call NGO</span>
+                      </a>
+                    )}
 
                     <button
                       onClick={() => handleRejectNgo(ngo.id)}
                       className="py-2.5 px-3 bg-red-950 text-red-300 border border-red-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 min-h-[44px]"
                     >
                       <XCircle className="w-4 h-4" />
-                      <span>Reject</span>
+                      <span>{ngo.verified ? "Revoke / Delete" : "Reject"}</span>
                     </button>
                   </div>
                 </div>
@@ -489,39 +627,63 @@ export default function AdminDashboard({ onDataUpdated }) {
         </div>
       )}
 
-      {/* QUEUE 4: PENDING VOLUNTEERS */}
+      {/* QUEUE 4: VOLUNTEERS DIRECTORY */}
       {activeQueueTab === 'volunteers' && (
         <div className="space-y-4">
-          {pendingVolunteers.length === 0 ? (
+          {filteredVolunteers.length === 0 ? (
             <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center space-y-2">
               <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-bold text-white">No Pending Volunteer Profiles</h3>
+              <h3 className="text-base font-bold text-white">
+                {viewMode === 'ALL_LIVE' ? 'No Volunteer Profiles Match Search' : 'No Pending Volunteer Profiles'}
+              </h3>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {pendingVolunteers.map(vol => (
+              {filteredVolunteers.map(vol => (
                 <div key={vol.id} className="bg-slate-900 border border-purple-500/40 rounded-2xl p-4 shadow-xl space-y-3">
                   <div>
-                    <h3 className="text-base font-black text-white">{vol.name}</h3>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {vol.verified ? (
+                        <span className="px-2 py-0.5 text-[10px] font-black bg-purple-500/20 text-purple-300 border border-purple-500/40 rounded-md">
+                          ✅ ACTIVE VOLUNTEER
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md animate-pulse">
+                          ⏳ PENDING VERIFICATION
+                        </span>
+                      )}
+                      <span className="text-xs font-mono text-slate-400">{vol.id}</span>
+                    </div>
+                    <h3 className="text-base font-black text-white mt-1">{vol.name}</h3>
                     <p className="text-xs text-purple-300 font-bold">{vol.roleType} - {vol.phone}</p>
                     {vol.offerings && <p className="text-xs text-slate-300 mt-1">"{vol.offerings}"</p>}
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={() => handleApproveVol(vol.id)}
-                      className="py-2.5 px-3 bg-emerald-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 min-h-[44px]"
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Approve Volunteer</span>
-                    </button>
+                    {!vol.verified ? (
+                      <button
+                        onClick={() => handleApproveVol(vol.id)}
+                        className="py-2.5 px-3 bg-emerald-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 min-h-[44px]"
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>Approve Volunteer</span>
+                      </button>
+                    ) : (
+                      <a
+                        href={`tel:${vol.phone.replace(/[^0-9]/g, '')}`}
+                        className="py-2.5 px-3 bg-slate-800 text-purple-300 border border-slate-700 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
+                      >
+                        <Phone className="w-3.5 h-3.5" />
+                        <span>Call Volunteer</span>
+                      </a>
+                    )}
 
                     <button
                       onClick={() => handleRejectVol(vol.id)}
                       className="py-2.5 px-3 bg-red-950 text-red-300 border border-red-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 min-h-[44px]"
                     >
                       <XCircle className="w-4 h-4" />
-                      <span>Reject</span>
+                      <span>{vol.verified ? "Remove Volunteer" : "Reject"}</span>
                     </button>
                   </div>
                 </div>
