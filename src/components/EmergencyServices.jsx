@@ -435,38 +435,38 @@ export default function EmergencyServices() {
       {/* Results grid */}
       {!isLocating && !isFetching && filtered.length > 0 && (
         <>
-          <p className="text-xs text-slate-500 font-bold px-1">
+          <p className="text-xs text-slate-400 font-bold px-1">
             Showing {filtered.length} emergency service{filtered.length !== 1 ? 's' : ''} within {radiusKm} km
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map((item) => (
               <div
                 key={item.id}
-                className="bg-slate-900/80 border border-slate-800 hover:border-red-500/50 rounded-2xl p-5 space-y-3 shadow-lg transition-all flex flex-col justify-between group"
+                className="bg-slate-900/95 sm:bg-slate-900/80 border border-slate-800/90 hover:border-red-500/50 rounded-[22px] sm:rounded-2xl p-4 sm:p-5 space-y-3 shadow-app-card transition-all flex flex-col justify-between group active:scale-[0.99] sm:active:scale-100"
               >
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-2">
                     {badge(item.category)}
                     {item.distanceKm != null && (
-                      <span className="text-[11px] font-black px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30 shrink-0">
+                      <span className="text-[11px] font-black px-2.5 py-0.5 bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30 shrink-0">
                         {item.distanceKm} km
                       </span>
                     )}
                   </div>
 
-                  <h3 className="text-sm font-black text-white group-hover:text-amber-400 transition-colors leading-snug">
+                  <h3 className="text-sm sm:text-base font-black text-white group-hover:text-amber-400 transition-colors leading-snug">
                     {item.name}
                   </h3>
 
-                  <div className="space-y-0.5 text-xs text-slate-400 font-medium">
+                  <div className="space-y-1 text-xs text-slate-400 font-medium">
                     {item.district && (
                       <div className="flex items-center gap-1.5 text-amber-400 font-bold">
-                        <MapPin className="w-3 h-3 shrink-0" />
-                        {item.district}
+                        <MapPin className="w-3.5 h-3.5 shrink-0" />
+                        <span>{item.district}</span>
                       </div>
                     )}
                     {item.address && (
-                      <p className="pl-4 text-[11px] leading-relaxed">{item.address}</p>
+                      <p className="pl-5 text-xs text-slate-300 leading-relaxed bg-slate-950/80 p-2 rounded-xl border border-slate-800">{item.address}</p>
                     )}
                   </div>
                 </div>
@@ -474,20 +474,20 @@ export default function EmergencyServices() {
                 <div className="pt-3 border-t border-slate-800 flex items-center gap-2">
                   <a
                     href={`tel:${item.phone.replace(/[^0-9+]/g, '')}`}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-xs shadow-md transition-colors"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 sm:py-2 px-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-xs shadow-md active:scale-95 transition-all min-h-[44px] sm:min-h-[38px]"
                   >
-                    <Phone className="w-3.5 h-3.5" />
-                    {item.phone}
+                    <Phone className="w-4 h-4" />
+                    <span>{item.phone}</span>
                   </a>
 
                   <a
                     href={`https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 transition-colors"
+                    className="flex items-center justify-center p-2.5 sm:p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 active:scale-95 transition-all min-h-[44px] min-w-[44px] sm:min-h-[38px] sm:min-w-[38px]"
                     title="Open in Google Maps"
                   >
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <ExternalLink className="w-4 h-4" />
                   </a>
                 </div>
               </div>

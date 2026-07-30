@@ -229,91 +229,6 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
           </div>
         </div>
 
-        {/* PhonePe-Style Native Mobile App Category Grid (Mobile Only) */}
-        <div className="sm:hidden grid grid-cols-2 gap-2.5 pt-3 border-t border-slate-700/60">
-          
-          {/* Tile 1: ALL */}
-          <button
-            onClick={() => setActiveCategory('ALL')}
-            className={`p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer text-center min-h-[68px] ${
-              activeCategory === 'ALL'
-                ? 'bg-slate-900 text-amber-300 border border-amber-400 shadow-lg ring-1 ring-amber-400/40 scale-[1.02]'
-                : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-0 font-bold shadow-md'
-            }`}
-          >
-            <div className="flex items-center gap-1.5">
-              <Sparkles className={`w-4 h-4 ${activeCategory === 'ALL' ? 'text-amber-400' : 'text-slate-400'}`} />
-              <span className="text-xs font-black">{i18nService.t('allCategories', 'ALL')}</span>
-            </div>
-            <span className={`text-[10px] font-extrabold px-2 py-0.2 rounded-full ${
-              activeCategory === 'ALL' ? 'bg-amber-400/10 text-amber-300 border border-amber-400/40' : 'bg-slate-950 text-slate-400'
-            }`}>
-              {ngos.length + volunteers.length} Partners
-            </span>
-          </button>
-
-          {/* Tile 2: NGOs */}
-          <button
-            onClick={() => setActiveCategory('NGOS')}
-            className={`p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer text-center min-h-[68px] ${
-              activeCategory === 'NGOS'
-                ? 'bg-slate-900 text-amber-300 border border-amber-400 shadow-lg ring-1 ring-amber-400/40 scale-[1.02]'
-                : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-0 font-bold shadow-md'
-            }`}
-          >
-            <div className="flex items-center gap-1.5">
-              <Building2 className={`w-4 h-4 ${activeCategory === 'NGOS' ? 'text-amber-400' : 'text-slate-400'}`} />
-              <span className="text-xs font-black">{i18nService.t('ngosCategory', 'NGOs & Helpers')}</span>
-            </div>
-            <span className={`text-[10px] font-extrabold px-2 py-0.2 rounded-full ${
-              activeCategory === 'NGOS' ? 'bg-amber-400/10 text-amber-300 border border-amber-400/40' : 'bg-slate-950 text-slate-400'
-            }`}>
-              {ngos.length} Registered
-            </span>
-          </button>
-
-          {/* Tile 3: BOATS & CARS */}
-          <button
-            onClick={() => setActiveCategory('BOATS_CARS')}
-            className={`p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer text-center min-h-[68px] ${
-              activeCategory === 'BOATS_CARS'
-                ? 'bg-slate-900 text-amber-300 border border-amber-400 shadow-lg ring-1 ring-amber-400/40 scale-[1.02]'
-                : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-0 font-bold shadow-md'
-            }`}
-          >
-            <div className="flex items-center gap-1.5">
-              <Anchor className={`w-4 h-4 ${activeCategory === 'BOATS_CARS' ? 'text-amber-400' : 'text-slate-400'}`} />
-              <span className="text-xs font-black">{i18nService.t('boatsCarsCategory', 'Boats & 4x4')}</span>
-            </div>
-            <span className={`text-[10px] font-extrabold px-2 py-0.2 rounded-full ${
-              activeCategory === 'BOATS_CARS' ? 'bg-amber-400/10 text-amber-300 border border-amber-400/40' : 'bg-slate-950 text-slate-400'
-            }`}>
-              Rescue Vehicles
-            </span>
-          </button>
-
-          {/* Tile 4: LOGISTICS & SERVICES */}
-          <button
-            onClick={() => setActiveCategory('VOLUNTEERS')}
-            className={`p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer text-center min-h-[68px] ${
-              activeCategory === 'VOLUNTEERS'
-                ? 'bg-slate-900 text-amber-300 border border-amber-400 shadow-lg ring-1 ring-amber-400/40 scale-[1.02]'
-                : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-0 font-bold shadow-md'
-            }`}
-          >
-            <div className="flex items-center gap-1.5">
-              <Truck className={`w-4 h-4 ${activeCategory === 'VOLUNTEERS' ? 'text-amber-400' : 'text-slate-400'}`} />
-              <span className="text-xs font-black">{i18nService.t('logisticsCategory', 'Logistics')}</span>
-            </div>
-            <span className={`text-[10px] font-extrabold px-2 py-0.2 rounded-full ${
-              activeCategory === 'VOLUNTEERS' ? 'bg-amber-400/10 text-amber-300 border border-amber-400/40' : 'bg-slate-950 text-slate-400'
-            }`}>
-              {volunteers.length} Services
-            </span>
-          </button>
-
-        </div>
-
         {/* Native Search Bar Input */}
         <div className="relative w-full pt-1">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-[58%] -translate-y-1/2" />
@@ -340,7 +255,7 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
         
         {/* NGO CARDS */}
         {(activeCategory === 'ALL' || activeCategory === 'NGOS') && filteredNgos.map((ngo) => (
-          <div key={ngo.id} className="bg-slate-900/90 border border-amber-500/30 hover:border-amber-400 rounded-2xl p-4 shadow-lg space-y-3 flex flex-col justify-between transition-all">
+          <div key={ngo.id} className="bg-slate-900/95 sm:bg-slate-900/90 border border-amber-500/30 hover:border-amber-400 rounded-[22px] sm:rounded-2xl p-3.5 sm:p-4 shadow-app-card space-y-3 flex flex-col justify-between active:scale-[0.99] sm:active:scale-100 transition-all">
             <div className="space-y-2.5">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-start gap-2.5">
@@ -392,9 +307,9 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
                 <>
                   <a
                     href={`tel:${ngo.phone?.replace(/[^0-9]/g, '')}`}
-                    className="flex-1 py-2 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all min-h-[40px]"
+                    className="flex-1 py-2.5 sm:py-2 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 active:scale-95 transition-all min-h-[44px] sm:min-h-[40px]"
                   >
-                    <Phone className="w-3.5 h-3.5" />
+                    <Phone className="w-4 h-4" />
                     <span>Call NGO</span>
                   </a>
 
@@ -402,15 +317,15 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
                     href={getWhatsAppLink(ngo.whatsapp || ngo.phone, `Hello ${ngo.name}, we need flood relief support.`)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 py-2 px-3 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all min-h-[40px]"
+                    className="flex-1 py-2.5 sm:py-2 px-3 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition-all min-h-[44px] sm:min-h-[40px]"
                   >
-                    <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
+                    <MessageSquare className="w-4 h-4 text-emerald-400" />
                     <span>WhatsApp</span>
                   </a>
                 </>
               ) : (
-                <div className="flex-1 py-2 px-3 bg-slate-900/50 border border-slate-800 text-slate-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all min-h-[40px] italic" title="Number hidden from public guests. Log in as a registered NGO to view.">
-                  <Phone className="w-3.5 h-3.5 opacity-50" />
+                <div className="flex-1 py-2.5 sm:py-2 px-3 bg-slate-900/50 border border-slate-800 text-slate-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all min-h-[44px] sm:min-h-[40px] italic" title="Number hidden from public guests. Log in as a registered NGO to view.">
+                  <Phone className="w-4 h-4 opacity-50" />
                   <span>Number Protected (NGO Partners Only)</span>
                 </div>
               )}
@@ -420,7 +335,7 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
 
         {/* VOLUNTEER CARDS (BOATS, CARS, DOCTORS) */}
         {(activeCategory === 'ALL' || activeCategory === 'VOLUNTEERS' || activeCategory === 'BOATS_CARS') && filteredVolunteers.map((vol) => (
-          <div key={vol.id} className="bg-slate-900/90 border border-purple-500/30 hover:border-purple-400 rounded-2xl p-4 shadow-lg space-y-3 flex flex-col justify-between transition-all">
+          <div key={vol.id} className="bg-slate-900/95 sm:bg-slate-900/90 border border-purple-500/30 hover:border-purple-400 rounded-[22px] sm:rounded-2xl p-3.5 sm:p-4 shadow-app-card space-y-3 flex flex-col justify-between active:scale-[0.99] sm:active:scale-100 transition-all">
             <div className="space-y-2.5">
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -451,9 +366,9 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
                 <>
                   <a
                     href={`tel:${vol.phone?.replace(/[^0-9]/g, '')}`}
-                    className="flex-1 py-2 px-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all min-h-[40px]"
+                    className="flex-1 py-2.5 sm:py-2 px-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 active:scale-95 transition-all min-h-[44px] sm:min-h-[40px]"
                   >
-                    <Phone className="w-3.5 h-3.5" />
+                    <Phone className="w-4 h-4" />
                     <span>Call Volunteer</span>
                   </a>
 
@@ -461,15 +376,15 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
                     href={getWhatsAppLink(vol.whatsapp || vol.phone, `Hello ${vol.name}, we need flood relief boat/car support.`)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 py-2 px-3 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all min-h-[40px]"
+                    className="flex-1 py-2.5 sm:py-2 px-3 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition-all min-h-[44px] sm:min-h-[40px]"
                   >
-                    <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
+                    <MessageSquare className="w-4 h-4 text-emerald-400" />
                     <span>WhatsApp</span>
                   </a>
                 </>
               ) : (
-                <div className="flex-1 py-2 px-3 bg-slate-900/50 border border-slate-800 text-slate-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all min-h-[40px] italic">
-                  <Phone className="w-3.5 h-3.5 opacity-50" />
+                <div className="flex-1 py-2.5 sm:py-2 px-3 bg-slate-900/50 border border-slate-800 text-slate-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all min-h-[44px] sm:min-h-[40px] italic">
+                  <Phone className="w-4 h-4 opacity-50" />
                   <span>Number Hidden</span>
                 </div>
               )}
@@ -477,30 +392,43 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
           </div>
         ))}
 
-        {/* Empty State Message when no partners match category/search */}
+        {/* Empty State Mobile Result Card when no partners match category/search */}
         {((activeCategory === 'ALL' && filteredNgos.length === 0 && filteredVolunteers.length === 0) ||
           (activeCategory === 'NGOS' && filteredNgos.length === 0) ||
           ((activeCategory === 'BOATS_CARS' || activeCategory === 'VOLUNTEERS') && filteredVolunteers.length === 0)) && (
-          <div className="col-span-1 sm:col-span-2 lg:col-span-3 bg-slate-900/90 border border-slate-800 rounded-2xl p-8 text-center space-y-4 my-2">
-            <div className="w-12 h-12 rounded-2xl bg-slate-800/80 border border-slate-700 flex items-center justify-center mx-auto text-slate-400">
-              <ShieldCheck className="w-6 h-6 text-slate-400" />
+          <div className="col-span-1 sm:col-span-2 lg:col-span-3 bg-slate-900/95 border border-slate-800 rounded-[22px] sm:rounded-2xl p-6 sm:p-8 text-center space-y-4 my-2 shadow-xl animate-fadeIn">
+            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400 shadow-md">
+              <ShieldCheck className="w-7 h-7 text-amber-400" />
             </div>
-            <div className="space-y-1">
-              <h3 className="text-base font-black text-white">No Partners Found in This Category</h3>
+            <div className="space-y-1.5">
+              <h3 className="text-base sm:text-lg font-black text-white">
+                Empty Result for {activeCategory === 'NGOS' ? 'NGOs & Helpers' : activeCategory === 'BOATS_CARS' ? 'Boats & 4x4' : activeCategory === 'VOLUNTEERS' ? 'Logistics & Services' : 'All Categories'}
+              </h3>
               <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
-                We currently have no registered partners matching your search or selected filter. Are you an NGO or rescue volunteer in this area?
+                {searchQuery ? `No partners found matching search "${searchQuery}".` : `No registered partners available in this tapped category.`} Are you an NGO or rescue volunteer in this area?
               </p>
             </div>
             <div className="pt-2 flex flex-wrap items-center justify-center gap-2">
+              {(activeCategory !== 'ALL' || searchQuery) && (
+                <button
+                  onClick={() => {
+                    setActiveCategory('ALL');
+                    setSearchQuery('');
+                  }}
+                  className="px-4 py-2.5 rounded-xl text-xs font-black bg-amber-500 hover:bg-amber-400 text-slate-950 border border-amber-400 shadow-md active:scale-95 transition-all cursor-pointer min-h-[44px]"
+                >
+                  Show All Categories
+                </button>
+              )}
               <button
                 onClick={() => openLoginModal?.('REGISTER', 'NGO')}
-                className="px-4 py-2.5 rounded-xl text-xs font-black bg-slate-100 hover:bg-white text-slate-950 border-2 border-white shadow-lg transition-all cursor-pointer"
+                className="px-4 py-2.5 rounded-xl text-xs font-black bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 shadow-md active:scale-95 transition-all cursor-pointer min-h-[44px]"
               >
-                + Register Your NGO
+                + Register NGO
               </button>
               <button
                 onClick={() => openLoginModal?.('REGISTER', 'VOLUNTEER')}
-                className="px-4 py-2.5 rounded-xl text-xs font-black bg-slate-100 hover:bg-white text-slate-950 border-2 border-white shadow-lg transition-all cursor-pointer"
+                className="px-4 py-2.5 rounded-xl text-xs font-black bg-red-600 hover:bg-red-500 text-white border border-red-500 shadow-md active:scale-95 transition-all cursor-pointer min-h-[44px]"
               >
                 + Offer Rescue / Transport
               </button>

@@ -36,15 +36,15 @@ export default function PublicRequestsList({ victimRequests = [] }) {
               const totalPeopleCount = req.peopleCount || ((req.malesCount || 0) + (req.femalesCount || 0) + (req.childrenCount || 0));
               
               return (
-                <div key={req.id} className={`bg-slate-800 border rounded-2xl overflow-hidden shadow-lg flex flex-col justify-between transition-all ${
+                <div key={req.id} className={`bg-slate-900/95 sm:bg-slate-800 border rounded-[22px] sm:rounded-2xl overflow-hidden shadow-app-card flex flex-col justify-between active:scale-[0.99] sm:active:scale-100 transition-all ${
                   isUrgent ? 'border-red-500/40 hover:border-red-400' : 'border-amber-500/30 hover:border-amber-400'
                 }`}>
-                  <div className={`px-4 py-2.5 flex items-center justify-between text-xs font-bold border-b ${
+                  <div className={`px-3.5 sm:px-4 py-2.5 flex items-center justify-between text-xs font-bold border-b ${
                     isUrgent ? 'bg-red-950/40 border-red-900/40 text-red-300' : 'bg-amber-950/30 border-amber-900/40 text-amber-300'
                   }`}>
                     <div className="flex items-center gap-1.5">
                       {isUrgent ? <AlertTriangle className="w-4 h-4 text-red-500 animate-pulse" /> : <Package className="w-4 h-4 text-amber-500" />}
-                      <span className="uppercase">{isUrgent ? 'EMERGENCY BOAT RESCUE' : 'RELIEF SUPPLY REQUEST'}</span>
+                      <span className="uppercase text-[11px] sm:text-xs font-black">{isUrgent ? 'EMERGENCY BOAT RESCUE' : 'RELIEF SUPPLY REQUEST'}</span>
                     </div>
                     <span className={`px-2 py-0.5 rounded-full border text-[10px] uppercase font-black ${
                       req.status === 'Rescued'
@@ -57,22 +57,22 @@ export default function PublicRequestsList({ victimRequests = [] }) {
                     </span>
                   </div>
                   
-                  <div className="p-4 space-y-3">
+                  <div className="p-3.5 sm:p-4 space-y-3">
                     <div className="flex justify-between items-start gap-2">
                       <div>
-                        <h3 className="font-black text-white">{req.name}</h3>
-                        <p className="text-[10px] text-slate-400 mt-1 font-bold">
+                        <h3 className="font-black text-white text-base">{req.name}</h3>
+                        <p className="text-[10px] text-slate-400 mt-0.5 font-bold">
                           Requested by: {req.requestedByRole === 'CITIZEN' ? 'Citizen' : req.requestedByRole === 'NGO' ? 'NGO' : 'Volunteer'}
                         </p>
                       </div>
-                      <span className="text-[10px] font-mono text-slate-500 shrink-0 bg-slate-950 px-2 py-1 rounded border border-slate-800">
-                        {new Date(req.createdAt).toLocaleString()}
+                      <span className="text-[10px] font-mono text-slate-400 shrink-0 bg-slate-950 px-2 py-1 rounded-lg border border-slate-800">
+                        {new Date(req.createdAt).toLocaleDateString()}
                       </span>
                     </div>
 
                     {(totalPeopleCount > 0 || req.familiesCount > 0) && (
-                      <div className="flex items-center gap-1 text-xs text-amber-400 font-bold bg-amber-950/20 p-2 rounded-lg border border-amber-900/30 w-fit">
-                        <Users className="w-3.5 h-3.5" />
+                      <div className="flex items-center gap-1.5 text-xs text-amber-300 font-bold bg-amber-950/40 px-2.5 py-1.5 rounded-xl border border-amber-900/40 w-fit">
+                        <Users className="w-4 h-4 text-amber-400" />
                         <span>
                           {totalPeopleCount > 0 ? `${totalPeopleCount} People` : ''} 
                           {totalPeopleCount > 0 && req.familiesCount > 0 ? ' & ' : ''}
@@ -95,7 +95,7 @@ export default function PublicRequestsList({ victimRequests = [] }) {
                     {Array.isArray(req.needs) && req.needs.length > 0 && (
                       <div className="flex flex-wrap gap-1">
                         {req.needs.map((item, idx) => (
-                          <span key={idx} className="px-2 py-0.5 text-[10px] font-semibold bg-slate-800 text-slate-300 rounded border border-slate-700">
+                          <span key={idx} className="px-2 py-0.5 text-[10px] font-bold bg-slate-950 text-slate-300 rounded-lg border border-slate-800">
                             {item}
                           </span>
                         ))}
@@ -103,18 +103,18 @@ export default function PublicRequestsList({ victimRequests = [] }) {
                     )}
                     
                     {req.details && (
-                      <div className="text-xs text-slate-400 italic bg-slate-950/40 p-2.5 rounded-lg border border-slate-800/80 leading-relaxed">
+                      <div className="text-xs text-slate-400 italic bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80 leading-relaxed">
                         "{req.details}"
                       </div>
                     )}
                   </div>
                   
                   <div className="p-3 bg-slate-950 border-t border-slate-800 flex justify-between items-center text-xs">
-                    <div className="flex items-center gap-1.5 text-slate-500 font-mono font-bold bg-slate-900 px-2 py-1 rounded-md border border-slate-800">
+                    <div className="flex items-center gap-1.5 text-slate-400 font-mono font-bold bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
                       <span>Phone: +91 ******{req.phone ? req.phone.slice(-4) : 'XXXX'}</span>
                     </div>
                     {req.verified && (
-                      <span className="flex items-center gap-1 text-emerald-400 font-black bg-emerald-950/50 px-2 py-1 rounded-md border border-emerald-900">
+                      <span className="flex items-center gap-1 text-emerald-400 font-black bg-emerald-950/50 px-2 py-1 rounded-lg border border-emerald-900/60">
                         <ShieldCheck className="w-3.5 h-3.5" /> Verified
                       </span>
                     )}
