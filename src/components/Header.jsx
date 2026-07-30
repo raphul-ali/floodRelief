@@ -100,6 +100,26 @@ export default function Header({
           {/* Top Right Action Buttons */}
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             
+            {/* Desktop-Visible Rescue & Relief Buttons */}
+            <div className="hidden sm:flex items-center gap-2 mr-1">
+              <button
+                onClick={openRescueModal}
+                className="flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] sm:min-h-[42px] rounded-xl text-xs font-extrabold bg-red-600 hover:bg-red-700 active:bg-red-800 text-white border border-red-500 shadow-sm active:scale-95 transition-all uppercase tracking-wider cursor-pointer"
+                title="Request Emergency Rescue"
+              >
+                <ShieldAlert className="w-4 h-4 text-white shrink-0" />
+                <span>{i18nService.t('requestRescue', 'REQUEST RESCUE')}</span>
+              </button>
+              <button
+                onClick={openSupplyModal}
+                className="flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] sm:min-h-[42px] rounded-xl text-xs font-extrabold bg-slate-800 hover:bg-slate-700 active:bg-slate-900 text-white border border-slate-700 shadow-sm active:scale-95 transition-all uppercase tracking-wider cursor-pointer"
+                title="Submit Relief Support Form"
+              >
+                <Package className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>{i18nService.t('reliefForm', 'RELIEF FORM')}</span>
+              </button>
+            </div>
+
             {/* Home Button in Top Header */}
             <button
               onClick={() => setActiveTab(currentAuth.role === 'GUEST' ? 'ngos' : 'dashboard')}

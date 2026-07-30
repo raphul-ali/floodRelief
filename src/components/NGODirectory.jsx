@@ -132,43 +132,121 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
           </div>
 
           {/* Native Action Pills */}
+          {/* Native Action Pills */}
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => openLoginModal?.('REGISTER', 'NGO')}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black bg-slate-700 hover:bg-slate-600 active:scale-95 text-white shadow-md border border-slate-600 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 shadow-lg border border-amber-300 transition-all cursor-pointer"
             >
-              <Building2 className="w-4 h-4 text-blue-300" />
+              <Building2 className="w-4 h-4 text-slate-950" />
               <span>+ REGISTER NGO</span>
             </button>
 
             <button
               onClick={() => openLoginModal?.('REGISTER', 'VOLUNTEER')}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black bg-slate-900 hover:bg-slate-800 active:scale-95 text-slate-200 shadow-md border border-slate-700 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black bg-red-600 hover:bg-red-500 active:scale-95 text-white shadow-lg border border-red-400 transition-all cursor-pointer"
             >
-              <Anchor className="w-4 h-4 text-cyan-300" />
+              <Anchor className="w-4 h-4 text-white" />
               <span>+ OFFER BOAT / CAR</span>
             </button>
           </div>
         </div>
 
-        {/* PhonePe-Style Native Mobile App Category Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t border-slate-700/60">
+        {/* Desktop Website: Sleek Horizontal Filter Bar */}
+        <div className="hidden sm:flex items-center justify-between gap-3 pt-3 border-t border-slate-700/60">
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Horizontal Pill 1: ALL */}
+            <button
+              onClick={() => setActiveCategory('ALL')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
+                activeCategory === 'ALL'
+                  ? 'bg-slate-900 text-amber-300 border border-amber-400 shadow-lg ring-1 ring-amber-400/40 scale-[1.02]'
+                  : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-0 shadow-md font-bold'
+              }`}
+            >
+              <Sparkles className={`w-3.5 h-3.5 ${activeCategory === 'ALL' ? 'text-amber-400' : 'text-slate-400'}`} />
+              <span>{i18nService.t('allCategories', 'ALL')}</span>
+              <span className={`px-1.5 py-0.2 text-[10px] rounded-full font-extrabold ml-1 ${
+                activeCategory === 'ALL' ? 'bg-amber-400/10 text-amber-300 border border-amber-400/40' : 'bg-slate-950 text-slate-400'
+              }`}>
+                {ngos.length + volunteers.length} Partners
+              </span>
+            </button>
+
+            {/* Horizontal Pill 2: NGOs */}
+            <button
+              onClick={() => setActiveCategory('NGOS')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
+                activeCategory === 'NGOS'
+                  ? 'bg-slate-900 text-amber-300 border border-amber-400 shadow-lg ring-1 ring-amber-400/40 scale-[1.02]'
+                  : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-0 shadow-md font-bold'
+              }`}
+            >
+              <Building2 className={`w-3.5 h-3.5 ${activeCategory === 'NGOS' ? 'text-amber-400' : 'text-slate-400'}`} />
+              <span>{i18nService.t('ngosCategory', 'NGOs & Helpers')}</span>
+              <span className={`px-1.5 py-0.2 text-[10px] rounded-full font-extrabold ml-1 ${
+                activeCategory === 'NGOS' ? 'bg-amber-400/10 text-amber-300 border border-amber-400/40' : 'bg-slate-950 text-slate-400'
+              }`}>
+                {ngos.length} Registered
+              </span>
+            </button>
+
+            {/* Horizontal Pill 3: BOATS & CARS */}
+            <button
+              onClick={() => setActiveCategory('BOATS_CARS')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
+                activeCategory === 'BOATS_CARS'
+                  ? 'bg-slate-900 text-amber-300 border border-amber-400 shadow-lg ring-1 ring-amber-400/40 scale-[1.02]'
+                  : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-0 shadow-md font-bold'
+              }`}
+            >
+              <Anchor className={`w-3.5 h-3.5 ${activeCategory === 'BOATS_CARS' ? 'text-amber-400' : 'text-slate-400'}`} />
+              <span>{i18nService.t('boatsCarsCategory', 'Boats & 4x4')}</span>
+              <span className={`px-1.5 py-0.2 text-[10px] rounded-full font-extrabold ml-1 ${
+                activeCategory === 'BOATS_CARS' ? 'bg-amber-400/10 text-amber-300 border border-amber-400/40' : 'bg-slate-950 text-slate-400'
+              }`}>
+                Rescue
+              </span>
+            </button>
+
+            {/* Horizontal Pill 4: LOGISTICS & SERVICES */}
+            <button
+              onClick={() => setActiveCategory('VOLUNTEERS')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer ${
+                activeCategory === 'VOLUNTEERS'
+                  ? 'bg-slate-900 text-amber-300 border border-amber-400 shadow-lg ring-1 ring-amber-400/40 scale-[1.02]'
+                  : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-0 shadow-md font-bold'
+              }`}
+            >
+              <Truck className={`w-3.5 h-3.5 ${activeCategory === 'VOLUNTEERS' ? 'text-amber-400' : 'text-slate-400'}`} />
+              <span>{i18nService.t('logisticsCategory', 'Logistics')}</span>
+              <span className={`px-1.5 py-0.2 text-[10px] rounded-full font-extrabold ml-1 ${
+                activeCategory === 'VOLUNTEERS' ? 'bg-amber-400/10 text-amber-300 border border-amber-400/40' : 'bg-slate-950 text-slate-400'
+              }`}>
+                {volunteers.length} Services
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* PhonePe-Style Native Mobile App Category Grid (Mobile Only) */}
+        <div className="sm:hidden grid grid-cols-2 gap-2.5 pt-3 border-t border-slate-700/60">
           
           {/* Tile 1: ALL */}
           <button
             onClick={() => setActiveCategory('ALL')}
-            className={`p-2.5 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer text-center min-h-[64px] ${
+            className={`p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer text-center min-h-[68px] ${
               activeCategory === 'ALL'
-                ? 'bg-slate-700 text-white font-black shadow-md border border-slate-500 ring-1 ring-slate-400 scale-[1.02]'
-                : 'bg-slate-950/80 border border-slate-800 text-slate-400 hover:text-slate-200 font-semibold hover:border-slate-700'
+                ? 'bg-slate-900 text-amber-300 border border-amber-400 shadow-lg ring-1 ring-amber-400/40 scale-[1.02]'
+                : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-0 font-bold shadow-md'
             }`}
           >
             <div className="flex items-center gap-1.5">
-              <Sparkles className={`w-4 h-4 ${activeCategory === 'ALL' ? 'text-blue-300' : 'text-slate-400'}`} />
+              <Sparkles className={`w-4 h-4 ${activeCategory === 'ALL' ? 'text-amber-400' : 'text-slate-400'}`} />
               <span className="text-xs font-black">{i18nService.t('allCategories', 'ALL')}</span>
             </div>
             <span className={`text-[10px] font-extrabold px-2 py-0.2 rounded-full ${
-              activeCategory === 'ALL' ? 'bg-slate-800 text-slate-200 border border-slate-600' : 'bg-slate-900 text-slate-500 border border-slate-800'
+              activeCategory === 'ALL' ? 'bg-amber-400/10 text-amber-300 border border-amber-400/40' : 'bg-slate-950 text-slate-400'
             }`}>
               {ngos.length + volunteers.length} Partners
             </span>
@@ -177,18 +255,18 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
           {/* Tile 2: NGOs */}
           <button
             onClick={() => setActiveCategory('NGOS')}
-            className={`p-2.5 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer text-center min-h-[64px] ${
+            className={`p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer text-center min-h-[68px] ${
               activeCategory === 'NGOS'
-                ? 'bg-slate-700 text-white font-black shadow-md border border-slate-500 ring-1 ring-slate-400 scale-[1.02]'
-                : 'bg-slate-950/80 border border-slate-800 text-slate-400 hover:text-slate-200 font-semibold hover:border-slate-700'
+                ? 'bg-slate-900 text-amber-300 border border-amber-400 shadow-lg ring-1 ring-amber-400/40 scale-[1.02]'
+                : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-0 font-bold shadow-md'
             }`}
           >
             <div className="flex items-center gap-1.5">
-              <Building2 className={`w-4 h-4 ${activeCategory === 'NGOS' ? 'text-amber-300' : 'text-slate-400'}`} />
+              <Building2 className={`w-4 h-4 ${activeCategory === 'NGOS' ? 'text-amber-400' : 'text-slate-400'}`} />
               <span className="text-xs font-black">{i18nService.t('ngosCategory', 'NGOs & Helpers')}</span>
             </div>
             <span className={`text-[10px] font-extrabold px-2 py-0.2 rounded-full ${
-              activeCategory === 'NGOS' ? 'bg-slate-800 text-slate-200 border border-slate-600' : 'bg-slate-900 text-slate-500 border border-slate-800'
+              activeCategory === 'NGOS' ? 'bg-amber-400/10 text-amber-300 border border-amber-400/40' : 'bg-slate-950 text-slate-400'
             }`}>
               {ngos.length} Registered
             </span>
@@ -197,18 +275,18 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
           {/* Tile 3: BOATS & CARS */}
           <button
             onClick={() => setActiveCategory('BOATS_CARS')}
-            className={`p-2.5 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer text-center min-h-[64px] ${
+            className={`p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer text-center min-h-[68px] ${
               activeCategory === 'BOATS_CARS'
-                ? 'bg-slate-700 text-white font-black shadow-md border border-slate-500 ring-1 ring-slate-400 scale-[1.02]'
-                : 'bg-slate-950/80 border border-slate-800 text-slate-400 hover:text-slate-200 font-semibold hover:border-slate-700'
+                ? 'bg-slate-900 text-amber-300 border border-amber-400 shadow-lg ring-1 ring-amber-400/40 scale-[1.02]'
+                : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-0 font-bold shadow-md'
             }`}
           >
             <div className="flex items-center gap-1.5">
-              <Anchor className={`w-4 h-4 ${activeCategory === 'BOATS_CARS' ? 'text-cyan-300' : 'text-slate-400'}`} />
+              <Anchor className={`w-4 h-4 ${activeCategory === 'BOATS_CARS' ? 'text-amber-400' : 'text-slate-400'}`} />
               <span className="text-xs font-black">{i18nService.t('boatsCarsCategory', 'Boats & 4x4')}</span>
             </div>
             <span className={`text-[10px] font-extrabold px-2 py-0.2 rounded-full ${
-              activeCategory === 'BOATS_CARS' ? 'bg-slate-800 text-slate-200 border border-slate-600' : 'bg-slate-900 text-slate-500 border border-slate-800'
+              activeCategory === 'BOATS_CARS' ? 'bg-amber-400/10 text-amber-300 border border-amber-400/40' : 'bg-slate-950 text-slate-400'
             }`}>
               Rescue Vehicles
             </span>
@@ -217,18 +295,18 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
           {/* Tile 4: LOGISTICS & SERVICES */}
           <button
             onClick={() => setActiveCategory('VOLUNTEERS')}
-            className={`p-2.5 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer text-center min-h-[64px] ${
+            className={`p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer text-center min-h-[68px] ${
               activeCategory === 'VOLUNTEERS'
-                ? 'bg-slate-700 text-white font-black shadow-md border border-slate-500 ring-1 ring-slate-400 scale-[1.02]'
-                : 'bg-slate-950/80 border border-slate-800 text-slate-400 hover:text-slate-200 font-semibold hover:border-slate-700'
+                ? 'bg-slate-900 text-amber-300 border border-amber-400 shadow-lg ring-1 ring-amber-400/40 scale-[1.02]'
+                : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-0 font-bold shadow-md'
             }`}
           >
             <div className="flex items-center gap-1.5">
-              <Truck className={`w-4 h-4 ${activeCategory === 'VOLUNTEERS' ? 'text-emerald-300' : 'text-slate-400'}`} />
+              <Truck className={`w-4 h-4 ${activeCategory === 'VOLUNTEERS' ? 'text-amber-400' : 'text-slate-400'}`} />
               <span className="text-xs font-black">{i18nService.t('logisticsCategory', 'Logistics')}</span>
             </div>
             <span className={`text-[10px] font-extrabold px-2 py-0.2 rounded-full ${
-              activeCategory === 'VOLUNTEERS' ? 'bg-slate-800 text-slate-200 border border-slate-600' : 'bg-slate-900 text-slate-500 border border-slate-800'
+              activeCategory === 'VOLUNTEERS' ? 'bg-amber-400/10 text-amber-300 border border-amber-400/40' : 'bg-slate-950 text-slate-400'
             }`}>
               {volunteers.length} Services
             </span>
@@ -398,6 +476,37 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
             </div>
           </div>
         ))}
+
+        {/* Empty State Message when no partners match category/search */}
+        {((activeCategory === 'ALL' && filteredNgos.length === 0 && filteredVolunteers.length === 0) ||
+          (activeCategory === 'NGOS' && filteredNgos.length === 0) ||
+          ((activeCategory === 'BOATS_CARS' || activeCategory === 'VOLUNTEERS') && filteredVolunteers.length === 0)) && (
+          <div className="col-span-1 sm:col-span-2 lg:col-span-3 bg-slate-900/90 border border-slate-800 rounded-2xl p-8 text-center space-y-4 my-2">
+            <div className="w-12 h-12 rounded-2xl bg-slate-800/80 border border-slate-700 flex items-center justify-center mx-auto text-slate-400">
+              <ShieldCheck className="w-6 h-6 text-slate-400" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-base font-black text-white">No Partners Found in This Category</h3>
+              <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                We currently have no registered partners matching your search or selected filter. Are you an NGO or rescue volunteer in this area?
+              </p>
+            </div>
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-2">
+              <button
+                onClick={() => openLoginModal?.('REGISTER', 'NGO')}
+                className="px-4 py-2.5 rounded-xl text-xs font-black bg-slate-100 hover:bg-white text-slate-950 border-2 border-white shadow-lg transition-all cursor-pointer"
+              >
+                + Register Your NGO
+              </button>
+              <button
+                onClick={() => openLoginModal?.('REGISTER', 'VOLUNTEER')}
+                className="px-4 py-2.5 rounded-xl text-xs font-black bg-slate-100 hover:bg-white text-slate-950 border-2 border-white shadow-lg transition-all cursor-pointer"
+              >
+                + Offer Rescue / Transport
+              </button>
+            </div>
+          </div>
+        )}
 
       </div>
 
