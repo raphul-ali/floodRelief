@@ -197,7 +197,7 @@ export const authService = {
     }
 
     if (!foundNgo.verified) {
-      throw new Error("⚠️ Your NGO account is pending Admin Verification. Our control room will contact you to verify details before activation.");
+      throw new Error("Your NGO account is pending Admin Verification. Our control room will contact you to verify details before activation.");
     }
 
     const tokens = generateAuthTokens(foundNgo.id, 'NGO');
@@ -260,7 +260,7 @@ export const authService = {
     }
 
     if (!foundVol.verified) {
-      throw new Error("⚠️ Your Volunteer account is pending Admin Verification.");
+      throw new Error("Your Volunteer account is pending Admin Verification.");
     }
 
     const tokens = generateAuthTokens(foundVol.id, 'VOLUNTEER');
@@ -355,7 +355,7 @@ export const authService = {
   },
 
   /**
-   * 📧 Free Email OTP Verification Service
+   * Free Email OTP Verification Service
    * Generates a 6-digit OTP code for verifying email address during account creation
    */
   generateEmailOtp: (email) => {

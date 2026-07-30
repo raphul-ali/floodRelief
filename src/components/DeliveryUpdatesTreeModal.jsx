@@ -25,7 +25,7 @@ export default function DeliveryUpdatesTreeModal({ request, deliveryLogs = [], o
                 {isRescue ? "Emergency Rescue & Impact Tree" : "Relief Delivery & Impact Tree"}
               </h3>
               <p className="text-xs text-amber-300 font-semibold">
-                📍 {request.district}: {request.villageName || request.locationName}
+                {request.district}: {request.villageName || request.locationName}
               </p>
             </div>
           </div>
@@ -41,11 +41,11 @@ export default function DeliveryUpdatesTreeModal({ request, deliveryLogs = [], o
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 shrink-0">
           <div className="p-3 bg-slate-950 border border-slate-800 rounded-2xl space-y-1">
             <span className="text-[10px] font-extrabold text-slate-400 uppercase">Target Beneficiaries</span>
-            <p className="text-xs sm:text-sm font-black text-amber-300">👥 {request.peopleCount || 1} People</p>
+            <p className="text-xs sm:text-sm font-black text-amber-300">{request.peopleCount || 1} People</p>
           </div>
           <div className="p-3 bg-slate-950 border border-slate-800 rounded-2xl space-y-1">
             <span className="text-[10px] font-extrabold text-slate-400 uppercase">{isRescue ? 'Rescue Operations Logged' : 'Dispatches Logged'}</span>
-            <p className="text-xs sm:text-sm font-black text-emerald-400">{isRescue ? '🛟' : '📦'} {totalDeliveries} {isRescue ? 'Operations' : 'Deliveries'}</p>
+            <p className="text-xs sm:text-sm font-black text-emerald-400">{totalDeliveries} {isRescue ? 'Operations' : 'Deliveries'}</p>
           </div>
           <div className="col-span-2 sm:col-span-1 p-3 bg-slate-950 border border-slate-800 rounded-2xl space-y-1">
             <span className="text-[10px] font-extrabold text-slate-400 uppercase">{isRescue ? 'Rescue Status' : 'Delivery Status'}</span>
@@ -65,7 +65,7 @@ export default function DeliveryUpdatesTreeModal({ request, deliveryLogs = [], o
             <div className="p-3.5 bg-slate-950 border border-amber-500/30 rounded-2xl space-y-1 text-xs shadow-md">
               <div className="flex items-center justify-between">
                 <span className="font-extrabold text-amber-300 uppercase tracking-wider text-[10px]">
-                  📌 Distress Relief Demand Registered
+                  Distress Relief Demand Registered
                 </span>
                 <span className="flex items-center gap-1 text-[10px] text-slate-400 font-mono">
                   <Clock className="w-3 h-3 text-emerald-400 shrink-0" />
@@ -103,14 +103,12 @@ export default function DeliveryUpdatesTreeModal({ request, deliveryLogs = [], o
                     {log.rescuedCount !== undefined && log.rescuedCount !== null ? (
                       <div className="space-y-1.5">
                         <div className="flex items-start gap-2">
-                          <span className="text-xl">🛟</span>
                           <div>
                             <strong className="text-white">People Rescued:</strong>
                             <p className="text-emerald-400 font-bold mt-0.5 text-sm">{log.rescuedCount}</p>
                           </div>
                         </div>
                         <div className="flex items-start gap-2 pt-1">
-                          <span className="text-lg">⚠️</span>
                           <div>
                             <strong className="text-white">People Remaining:</strong>
                             <p className="text-amber-400 font-bold mt-0.5 text-sm">{log.remainingCount}</p>

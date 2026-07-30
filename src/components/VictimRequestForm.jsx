@@ -3,10 +3,18 @@ import { X, MapPin, Package, Users, Phone, CheckCircle, Navigation, HeartHandsha
 import { storageService } from '../services/storageService';
 import { authService } from '../services/authService';
 import DistrictSelect from './DistrictSelect';
+import { i18nService } from '../services/i18nService';
 
 // Removed SUPPLY_NEEDS array
 
 export default function VictimRequestForm({ onClose, onRequestSubmitted, initialUrgent = true }) {
+  const [, setLangState] = useState(i18nService.getLanguage());
+
+  useEffect(() => {
+    const handleLangChange = () => setLangState(i18nService.getLanguage());
+    window.addEventListener('flood_lang_changed', handleLangChange);
+    return () => window.removeEventListener('flood_lang_changed', handleLangChange);
+  }, []);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -60,12 +68,12 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
           longitude
         }));
         setIsLocating(false);
-        setLocationStatus(`✅ GPS Pinned: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+        setLocationStatus(`GPS Pinned: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
       },
       (error) => {
         setIsLocating(false);
         console.warn("GPS error:", error);
-        setLocationStatus('⚠️ Could not acquire GPS automatically. Please type village & PIN code below.');
+        setLocationStatus('Could not acquire GPS automatically. Please type village & PIN code below.');
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
@@ -85,7 +93,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
     }
 
     if (attachGps && (!formData.latitude || !formData.longitude)) {
-      setErrorMessage("📍 GPS Location is required when 'Attach GPS' is checked. Please click 'Attach Mandatory GPS Location *' button to auto-detect your location before submitting, or uncheck the 'Attach GPS' option if you don't have internet/GPS.");
+      setErrorMessage("GPS Location is required when 'Attach GPS' is checked. Please click 'Attach Mandatory GPS Location *' button to auto-detect your location before submitting, or uncheck the 'Attach GPS' option if you don't have internet/GPS.");
       return;
     }
 
@@ -117,7 +125,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
         requestedByRole,
         requestedByName,
         requestedByPhone,
-        peopleCount: totalPeopleCount > 0 ? totalPeopleCount : 1,
+        peopleCount: totalPeopleCount,
         locationName: locationAddressFormatted,
         needs: formData.isUrgentRescue ? ['Emergency Motorboat Rescue & Life Evacuation'] : [formData.customNeeds],
         latitude: attachGps ? formData.latitude : null,
@@ -138,8 +146,8 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-slate-950/85 backdrop-blur-lg overflow-y-auto">
-      <div className={`relative w-full max-w-2xl bg-slate-900 border-2 rounded-2xl shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col ${
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-6 bg-slate-950/85 backdrop-blur-lg overflow-y-auto">
+      <div className={`relative w-full max-w-2xl bg-slate-900 border-2 rounded-2xl max-sm:rounded-b-none max-sm:rounded-t-3xl shadow-2xl overflow-hidden my-auto max-sm:mb-0 max-sm:mt-auto max-h-[92vh] max-sm:max-h-[90vh] flex flex-col animate-slide-up ${
         formData.isUrgentRescue ? 'border-red-500 shadow-red-950/80' : 'border-amber-500/40 shadow-amber-950/50'
       }`}>
         
@@ -159,12 +167,12 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
             </div>
             <div>
               <h3 className="text-sm sm:text-lg font-black text-white uppercase tracking-tight leading-tight">
-                {formData.isUrgentRescue ? '🚨 EMERGENCY RESCUE SOS' : '📦 FLOOD RELIEF & SUPPLY REQUEST'}
+                {formData.isUrgentRescue ? i18nService.t('emergencyRescueSos', 'EMERGENCY RESCUE SOS') : i18nService.t('floodReliefRequest', 'FLOOD RELIEF & SUPPLY REQUEST')}
               </h3>
               <p className="text-[10px] sm:text-xs font-semibold text-amber-300">
                 {formData.isUrgentRescue 
-                  ? 'Transmitting victim location directly to rescue boats' 
-                  : 'Published to NGOs & Volunteers to supply food & materials'}
+                  ? i18nService.t('sosSubtitle', 'Transmitting victim location directly to rescue boats') 
+                  : i18nService.t('requestRegisteredSub', 'Published to NGOs & Volunteers to supply food & materials')}
               </p>
             </div>
           </div>
@@ -192,7 +200,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
             }`}
           >
             <Siren className="w-4 h-4" />
-            <span>🚨 EMERGENCY BOAT RESCUE</span>
+            <span>{i18nService.t('emergencyBoatRescue', 'EMERGENCY BOAT RESCUE')}</span>
           </button>
 
           <button
@@ -204,12 +212,12 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
             }))}
             className={`flex-1 py-2 px-3 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
               !formData.isUrgentRescue
-                ? 'bg-amber-500 text-slate-950 shadow-md'
+                ? 'bg-amber-600 text-white shadow-md shadow-amber-950/50'
                 : 'bg-slate-900 text-slate-400 hover:text-white'
             }`}
           >
             <Package className="w-4 h-4" />
-            <span>📦 FOOD & MATERIAL RELIEF</span>
+            <span>{i18nService.t('foodMaterialRelief', 'FOOD & MATERIAL RELIEF')}</span>
           </button>
         </div>
 
@@ -269,7 +277,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                  Victim / Contact Person Name *
+                  {i18nService.t('victimName', 'Victim / Contact Person Name *')}
                 </label>
                 <input
                   type="text"
@@ -283,7 +291,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
 
               <div>
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                  Mobile Phone Number *
+                  {i18nService.t('phoneContact', 'Mobile Phone Number *')}
                 </label>
                 <div className="relative">
                   <Phone className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
@@ -302,7 +310,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
             {/* Alternate Phone */}
             <div>
               <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                Alternate Phone Number (Optional)
+                {i18nService.t('alternatePhone', 'Alternate Phone Number (Optional)')}
               </label>
               <input
                 type="tel"
@@ -317,7 +325,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="sm:col-span-1">
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                  Village / Panchayat *
+                  {i18nService.t('villageName', 'Village / Panchayat *')}
                 </label>
                 <input
                   type="text"
@@ -331,7 +339,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
 
               <div className="sm:col-span-1">
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                  District *
+                  {i18nService.t('selectDistrict', 'District *')}
                 </label>
                 <DistrictSelect
                   value={formData.district}
@@ -341,7 +349,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
 
               <div className="sm:col-span-1">
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                  PIN Code (6-digit)
+                  {i18nService.t('pinCodeLabel', 'PIN Code (6-digit)')}
                 </label>
                 <div className="relative">
                   <Hash className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
@@ -362,7 +370,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
               {formData.isUrgentRescue && (
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                    Exact Spot / Rooftop / Dike Landmark
+                    {i18nService.t('exactSpotLandmark', 'Exact Spot / Rooftop / Dike Landmark')}
                   </label>
                   <input
                     type="text"
@@ -427,8 +435,8 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                         {isLocating 
                           ? 'Acquiring GPS...' 
                           : formData.latitude 
-                            ? '✅ GPS Pinned (Click to Refetch)' 
-                            : '📍 Fetch Auto Geolocation'}
+                            ? 'GPS Pinned (Click to Refetch)' 
+                            : 'Fetch Auto Geolocation'}
                       </span>
                     </button>
                   </div>
@@ -454,7 +462,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-300 mb-1">👨 Males</label>
+                  <label className="block text-[10px] sm:text-xs font-bold text-slate-300 mb-1">Males</label>
                   <input
                     type="number"
                     min="0"
@@ -465,7 +473,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                 </div>
 
                 <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-300 mb-1">👩 Females</label>
+                  <label className="block text-[10px] sm:text-xs font-bold text-slate-300 mb-1">Females</label>
                   <input
                     type="number"
                     min="0"
@@ -476,7 +484,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                 </div>
 
                 <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-300 mb-1">👶 Children</label>
+                  <label className="block text-[10px] sm:text-xs font-bold text-slate-300 mb-1">Children</label>
                   <input
                     type="number"
                     min="0"
@@ -487,7 +495,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                 </div>
 
                 <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-300 mb-1">🏠 Families</label>
+                  <label className="block text-[10px] sm:text-xs font-bold text-slate-300 mb-1">Families</label>
                   <input
                     type="number"
                     min="0"
@@ -535,18 +543,18 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-2xl ${
+                className={`w-full py-4 rounded-xl font-bold text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg ${
                   formData.isUrgentRescue
-                    ? 'bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 hover:from-red-500 hover:to-amber-400 text-white shadow-red-950/80 border border-red-400/40 animate-urgent-pulse'
-                    : 'bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 shadow-amber-950/50'
+                    ? 'bg-red-600 hover:bg-red-700 text-white border border-red-500'
+                    : 'bg-slate-700 hover:bg-slate-600 text-white border border-slate-600'
                 }`}
               >
                 {isSubmitting ? (
-                  <span>TRANSMITTING SOS SIGNAL...</span>
+                  <span>{i18nService.t('transmitting', 'TRANSMITTING SOS SIGNAL...')}</span>
                 ) : (
                   <>
                     {formData.isUrgentRescue ? <ShieldAlert className="w-5 h-5" /> : <HeartHandshake className="w-5 h-5" />}
-                    <span>{formData.isUrgentRescue ? '⚡ TRANSMIT EMERGENCY RESCUE SOS NOW' : 'PUBLISH RELIEF SUPPLY REQUEST'}</span>
+                    <span>{formData.isUrgentRescue ? i18nService.t('transmitSos', 'TRANSMIT EMERGENCY RESCUE SOS NOW') : i18nService.t('publishRequest', 'PUBLISH RELIEF SUPPLY REQUEST')}</span>
                   </>
                 )}
               </button>

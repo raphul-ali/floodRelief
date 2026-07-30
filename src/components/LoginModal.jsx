@@ -3,8 +3,16 @@ import { X, Lock, Key, ShieldCheck, HeartHandshake, Mail, UserCheck, AlertTriang
 import { authService } from '../services/authService';
 import { securityService } from '../services/securityService';
 import { storageService, VOLUNTEER_ROLES, NGO_TYPES, ASSAM_DISTRICTS } from '../services/storageService';
+import { i18nService } from '../services/i18nService';
 
 export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOGIN', initialRegRole = 'NGO' }) {
+  const [, setLangState] = useState(i18nService.getLanguage());
+
+  useEffect(() => {
+    const handleLangChange = () => setLangState(i18nService.getLanguage());
+    window.addEventListener('flood_lang_changed', handleLangChange);
+    return () => window.removeEventListener('flood_lang_changed', handleLangChange);
+  }, []);
   const [activeMode, setActiveMode] = useState(initialMode); // 'NGO_LOGIN' | 'VOLUNTEER_LOGIN' | 'REGISTER' | 'FORGOT_PASSWORD' | 'FORGOT_EMAIL'
   
   // Login state
@@ -34,7 +42,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
   const [regNgoType, setRegNgoType] = useState('');
   const [regLogoUrl, setRegLogoUrl] = useState('');
   const [logoError, setLogoError] = useState('');
-  const [regShowPhone, setRegShowPhone] = useState(initialRegRole === 'NGO');
+  const [regShowPhone, setRegShowPhone] = useState(false);
 
   // NGO Operating Zones State
   const [regZoneMode, setRegZoneMode] = useState('WHOLE_ASSAM'); // 'WHOLE_ASSAM' | 'CUSTOM_DISTRICTS'
@@ -64,19 +72,52 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
   const [regSuccess, setRegSuccess] = useState(false);
   const [regError, setRegError] = useState('');
 
+  const validateRegPhone = (val) => {
+    const clean = val.replace(/[^0-9]/g, '');
+    if (!clean) {
+      setPhoneError('Phone number is required.');
+      return false;
+    } else if (clean.length !== 10) {
+      setPhoneError(`Phone number must be exactly 10 digits (${clean.length}/10).`);
+      return false;
+    } else if (!/^[6-9]\d{9}$/.test(clean)) {
+      setPhoneError('Must be a valid Indian mobile number starting with 6, 7, 8, or 9.');
+      return false;
+    }
+    setPhoneError('');
+    return true;
+  };
+
+  const validateRegEmail = (val) => {
+    const clean = val.trim();
+    if (!clean) {
+      setEmailError('Email address is required.');
+      return false;
+    } else if (!securityService.validateEmail(clean)) {
+      setEmailError('Please enter a valid email format (e.g. name@domain.com).');
+      return false;
+    }
+    setEmailError('');
+    return true;
+  };
+
+  const validateRegPassword = (val) => {
+    if (!val) {
+      setPasswordError('Password is required.');
+      return false;
+    } else if (!securityService.validatePassword(val)) {
+      setPasswordError('Must be min 8 chars with 1 letter, 1 number, & 1 symbol (@#$%).');
+      return false;
+    }
+    setPasswordError('');
+    return true;
+  };
+
   // Debounced Phone Validation (400ms pause)
   useEffect(() => {
     if (!phoneTouched) return;
     const timer = setTimeout(() => {
-      if (!regPhone) {
-        setPhoneError('⚠️ Phone number is required.');
-      } else if (regPhone.length !== 10) {
-        setPhoneError(`⚠️ Phone number must be exactly 10 digits (${regPhone.length}/10).`);
-      } else if (!/^[6-9]\d{9}$/.test(regPhone)) {
-        setPhoneError('⚠️ Must be a valid Indian mobile number starting with 6, 7, 8, or 9.');
-      } else {
-        setPhoneError('');
-      }
+      validateRegPhone(regPhone);
     }, 400);
     return () => clearTimeout(timer);
   }, [regPhone, phoneTouched]);
@@ -85,13 +126,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
   useEffect(() => {
     if (!emailTouched) return;
     const timer = setTimeout(() => {
-      if (!regEmail) {
-        setEmailError('⚠️ Email address is required.');
-      } else if (!securityService.validateEmail(regEmail)) {
-        setEmailError('⚠️ Please enter a valid email format (e.g. name@domain.com).');
-      } else {
-        setEmailError('');
-      }
+      validateRegEmail(regEmail);
     }, 400);
     return () => clearTimeout(timer);
   }, [regEmail, emailTouched]);
@@ -100,13 +135,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
   useEffect(() => {
     if (!passwordTouched) return;
     const timer = setTimeout(() => {
-      if (!regPassword) {
-        setPasswordError('⚠️ Password is required.');
-      } else if (!securityService.validatePassword(regPassword)) {
-        setPasswordError('⚠️ Must be min 8 chars with 1 letter, 1 number, & 1 symbol (@#$%).');
-      } else {
-        setPasswordError('');
-      }
+      validateRegPassword(regPassword);
     }, 400);
     return () => clearTimeout(timer);
   }, [regPassword, passwordTouched]);
@@ -203,20 +232,17 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
       return;
     }
 
-    if (regPhone.length !== 10 || !/^[6-9]\d{9}$/.test(regPhone)) {
-      setPhoneError('⚠️ Must be a valid 10-digit Indian mobile number starting with 6-9.');
-      setRegError('Invalid Phone Number. Must be exactly 10 digits (+91).');
+    if (!validateRegPhone(regPhone)) {
+      setRegError('Invalid Phone Number. Please check the format.');
       return;
     }
 
-    if (!securityService.validateEmail(regEmail)) {
-      setEmailError('⚠️ Please enter a valid email address (e.g. name@domain.com).');
+    if (!validateRegEmail(regEmail)) {
       setRegError('Invalid Email format. Please enter a valid email address.');
       return;
     }
 
-    if (!securityService.validatePassword(regPassword)) {
-      setPasswordError('⚠️ Must be min 8 chars with 1 letter, 1 number, & 1 symbol (@#$%).');
+    if (!validateRegPassword(regPassword)) {
       setRegError('Password too weak! Must be min 8 characters with 1 letter, 1 number, & 1 special symbol.');
       return;
     }
@@ -257,14 +283,14 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-md w-full p-4 sm:p-6 shadow-2xl space-y-4 text-slate-100 relative max-h-[92vh] flex flex-col justify-between my-auto">
+    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-0 sm:p-4 overflow-y-auto">
+      <div className="bg-slate-900 border border-slate-700/80 rounded-3xl max-sm:rounded-b-none max-sm:rounded-t-3xl max-w-md w-full p-4 sm:p-6 shadow-2xl space-y-4 text-slate-100 relative max-h-[92vh] max-sm:max-h-[90vh] flex flex-col justify-between my-auto max-sm:mb-0 max-sm:mt-auto animate-slide-up">
         
         {/* Modal Header Row — Title + Close Button */}
         <div className="flex items-center justify-between gap-2 shrink-0">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-xl bg-gradient-to-br from-red-600 to-amber-500 border border-red-400/40">
-              <ShieldCheck className="w-4 h-4 text-white" />
+            <div className="p-1.5 rounded-xl bg-slate-800 border border-slate-700 text-indigo-400">
+              <ShieldCheck className="w-4 h-4 text-indigo-400" />
             </div>
             <span className="text-sm font-black text-white tracking-tight uppercase">Partner Portal Login</span>
           </div>
@@ -284,12 +310,12 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
             onClick={() => { setActiveMode('NGO_LOGIN'); setLoginError(''); }}
             className={`flex-1 py-2.5 px-2 rounded-xl min-h-[40px] transition-all flex items-center justify-center gap-1 text-[11px] sm:text-xs truncate ${
               activeMode === 'NGO_LOGIN'
-                ? 'bg-amber-500 text-slate-950 font-black shadow-md'
+                ? 'bg-amber-600 text-white font-black shadow-md shadow-amber-950/50'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
             <HeartHandshake className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">NGO Login</span>
+            <span className="truncate">{i18nService.t('ngoLoginTab', 'NGO Login')}</span>
           </button>
 
           <button
@@ -297,12 +323,12 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
             onClick={() => { setActiveMode('VOLUNTEER_LOGIN'); setLoginError(''); }}
             className={`flex-1 py-2.5 px-2 rounded-xl min-h-[40px] transition-all flex items-center justify-center gap-1 text-[11px] sm:text-xs truncate ${
               activeMode === 'VOLUNTEER_LOGIN'
-                ? 'bg-purple-600 text-white font-black shadow-md'
+                ? 'bg-indigo-600 text-white font-black shadow-md shadow-indigo-950/50'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
             <UserCheck className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">Volunteer</span>
+            <span className="truncate">{i18nService.t('volunteerLoginTab', 'Volunteer Login')}</span>
           </button>
 
           <button
@@ -310,12 +336,12 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
             onClick={() => { setActiveMode('REGISTER'); setRegError(''); setOtpStep(false); }}
             className={`flex-1 py-2.5 px-2 rounded-xl min-h-[40px] transition-all flex items-center justify-center gap-1 text-[11px] sm:text-xs truncate ${
               activeMode === 'REGISTER'
-                ? 'bg-emerald-600 text-white font-black shadow-md'
+                ? 'bg-emerald-600 text-white font-black shadow-md shadow-emerald-950/50'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
             <Building2 className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">Register</span>
+            <span className="truncate">{i18nService.t('createAccountTab', 'Create Account')}</span>
           </button>
         </div>
 
@@ -538,15 +564,18 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
             <div className="flex items-center gap-2 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-bold">
               <button
                 type="button"
-                onClick={() => { setRegRole('NGO'); setRegShowPhone(true); }}
-                className={`flex-1 py-2 rounded-lg text-center min-h-[36px] ${regRole === 'NGO' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400'}`}
+                onClick={() => { 
+                  setRegRole('NGO'); 
+                  setRegShowPhone(regNgoType.includes('Registered NGO')); 
+                }}
+                className={`flex-1 py-2 rounded-lg text-center min-h-[36px] transition-all ${regRole === 'NGO' ? 'bg-amber-600 text-white font-black shadow-md' : 'text-slate-400'}`}
               >
                 NGO Account
               </button>
               <button
                 type="button"
                 onClick={() => { setRegRole('VOLUNTEER'); setRegShowPhone(false); }}
-                className={`flex-1 py-2 rounded-lg text-center min-h-[36px] ${regRole === 'VOLUNTEER' ? 'bg-purple-600 text-white font-black' : 'text-slate-400'}`}
+                className={`flex-1 py-2 rounded-lg text-center min-h-[36px] transition-all ${regRole === 'VOLUNTEER' ? 'bg-indigo-600 text-white font-black shadow-md' : 'text-slate-400'}`}
               >
                 Individual Volunteer
               </button>
@@ -568,7 +597,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                   </div>
                   <div>
                     <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black uppercase tracking-wider mb-1">
-                      ⏳ Status: Pending Verification
+                      Status: Pending Verification
                     </div>
                     <h4 className="text-base font-black text-white leading-tight">
                       Awaiting Admin Approval
@@ -649,7 +678,16 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                     </label>
                     <select
                       value={regNgoType}
-                      onChange={(e) => setRegNgoType(e.target.value)}
+                      onChange={(e) => {
+                        const selectedType = e.target.value;
+                        setRegNgoType(selectedType);
+                        // Only enable showPhone publicly for Registered NGOs; keep OFF for Donors, Influencers, and Individual Helpers
+                        if (selectedType.includes('Registered NGO')) {
+                          setRegShowPhone(true);
+                        } else {
+                          setRegShowPhone(false);
+                        }
+                      }}
                       className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs font-bold text-amber-300 focus:outline-none min-h-[44px]"
                       required
                     >
@@ -758,23 +796,28 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                       />
                     </div>
                     {regRole === 'NGO' && (
-                      <p className="text-[11px] font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/30 p-2 rounded-lg mt-1.5 leading-normal">
-                        ℹ️ <strong>Notice:</strong> This official NGO phone number will be displayed publicly in the relief directory so victims & volunteers can contact your organization.
-                      </p>
+                      <div className="space-y-1.5 mt-2">
+                        <div className="flex items-center gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                          <input
+                            type="checkbox"
+                            checked={regShowPhone}
+                            onChange={(e) => setRegShowPhone(e.target.checked)}
+                            className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-amber-500 cursor-pointer"
+                            id="regShowPhoneToggle"
+                          />
+                          <label htmlFor="regShowPhoneToggle" className="text-[11px] font-bold text-slate-200 cursor-pointer">
+                            Show phone number publicly in public relief directory
+                          </label>
+                        </div>
+                        <p className="text-[11px] font-semibold leading-normal px-1">
+                          {regShowPhone ? (
+                            <span className="text-amber-300">Public: Victims & volunteers can view and call your NGO directly.</span>
+                          ) : (
+                            <span className="text-emerald-300">Protected: Phone number will be hidden from public guests and only visible to verified NGO partners & Control Room.</span>
+                          )}
+                        </p>
+                      </div>
                     )}
-                    
-                    <div className="mt-2 flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={regShowPhone}
-                        onChange={(e) => setRegShowPhone(e.target.checked)}
-                        className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-amber-500"
-                        id="regShowPhoneToggle"
-                      />
-                      <label htmlFor="regShowPhoneToggle" className="text-[11px] font-semibold text-slate-300 cursor-pointer">
-                        Show phone number publicly
-                      </label>
-                    </div>
                     {/* Live Inline Phone Error */}
                     {phoneError && (
                       <p className="text-[11px] font-bold text-red-400 mt-1 flex items-center gap-1 animate-fadeIn">

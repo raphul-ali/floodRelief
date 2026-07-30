@@ -286,12 +286,12 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                   {Array.isArray(ngoUserDetail.operatingZones) ? (
                     ngoUserDetail.operatingZones.map(zone => (
                       <span key={zone} className="px-2.5 py-0.5 bg-slate-900 text-amber-300 border border-slate-800 rounded-md font-bold text-[11px]">
-                        📍 {zone}
+                        {zone}
                       </span>
                     ))
                   ) : (
                     <span className="px-2.5 py-0.5 bg-slate-900 text-amber-300 border border-slate-800 rounded-md font-bold text-[11px]">
-                      📍 Assam State Relief Corridor
+                      Assam State Relief Corridor
                     </span>
                   )}
                 </div>
@@ -306,7 +306,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                   }}
                   className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs flex items-center gap-1 shadow-md transition-all active:scale-95 shrink-0"
                 >
-                  <span>✏️ Configure Zones</span>
+                  <span>Configure Zones</span>
                 </button>
               </div>
 
@@ -416,7 +416,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                   }`}
                 >
                   <Siren className="w-4 h-4 animate-pulse text-amber-300 shrink-0" />
-                  <span>🚨 EMERGENCY RESCUES ({criticalRequests.length})</span>
+                  <span>EMERGENCY RESCUES ({criticalRequests.length})</span>
                 </button>
 
                 {/* Tab 3: Food & Relief Requests */}
@@ -429,7 +429,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                   }`}
                 >
                   <Package className="w-4 h-4 text-slate-950 fill-amber-300 shrink-0" />
-                  <span>📦 FOOD & RELIEF DEMAND ({supplyRequests.length})</span>
+                  <span>FOOD & RELIEF DEMAND ({supplyRequests.length})</span>
                 </button>
 
                 {/* Tab 4: Transport & Logistics Volunteers */}
@@ -442,7 +442,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                   }`}
                 >
                   <Truck className="w-4 h-4 text-purple-300 shrink-0" />
-                  <span>🚤 LOGISTICS VOLUNTEERS ({volunteers.length})</span>
+                  <span>LOGISTICS VOLUNTEERS ({volunteers.length})</span>
                 </button>
               </>
             )}
@@ -457,7 +457,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
               }`}
             >
               <UserCheck className="w-4 h-4 text-cyan-300 shrink-0" />
-              <span>🤝 MUTUAL CONTACT EXCHANGE ({collabRequests.length})</span>
+              <span>MUTUAL CONTACT EXCHANGE ({collabRequests.length})</span>
             </button>
           </div>
 
@@ -494,11 +494,11 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                 className="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-400 min-h-[40px]"
               >
                 <option value="ALL">All Volunteer Capability Types</option>
-                <option value="Rescue Boat">🚤 Rescue Motorboat</option>
-                <option value="Transport Service">🚗 4x4 Transport Car / SUV</option>
-                <option value="Truck">🚚 Goods Truck / Pickup</option>
-                <option value="Medical">🩺 Medical Doctor / Paramedic</option>
-                <option value="Supply Donor">📦 Food & Water Donor</option>
+                <option value="Rescue Boat">Rescue Motorboat</option>
+                <option value="Transport Service">4x4 Transport Car / SUV</option>
+                <option value="Truck">Goods Truck / Pickup</option>
+                <option value="Medical">Medical Doctor / Paramedic</option>
+                <option value="Supply Donor">Food & Water Donor</option>
               </select>
             ) : (
               <select
@@ -507,9 +507,9 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                 className="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400 min-h-[40px]"
               >
                 <option value="ALL">All Statuses</option>
-                <option value="Pending">⏳ Pending Response</option>
-                <option value="In Progress">🚁 Team Dispatched</option>
-                <option value="Rescued">✅ Safely Rescued / Relieved</option>
+                <option value="Pending">Pending Response</option>
+                <option value="In Progress">Team Dispatched</option>
+                <option value="Rescued">Safely Rescued / Relieved</option>
               </select>
             )}
 
@@ -568,12 +568,12 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                           {isUrgent ? (
                             <>
                               <AlertTriangle className="w-4 h-4 text-red-500 animate-pulse" />
-                              <span className="font-black uppercase text-red-300">🚨 EMERGENCY BOAT RESCUE</span>
+                              <span className="font-black uppercase text-red-300">EMERGENCY BOAT RESCUE</span>
                             </>
                           ) : (
                             <>
                               <Package className="w-4 h-4 text-amber-400" />
-                              <span className="font-bold text-amber-300">📦 FOOD & RELIEF DEMAND</span>
+                              <span className="font-bold text-amber-300">FOOD & RELIEF DEMAND</span>
                             </>
                           )}
                         </div>
@@ -616,7 +616,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
 
                                   return (
                                     <>
-                                      {showPeople && `${totalPeople} Total (👨 ${req.malesCount || 0} Males, 👩 ${req.femalesCount || 0} Females, 👶 ${req.childrenCount || 0} Children)`}
+                                      {showPeople && `${totalPeople} Total (${req.malesCount || 0} Males, ${req.femalesCount || 0} Females, ${req.childrenCount || 0} Children)`}
                                       {showPeople && showFamilies && ' & '}
                                       {showFamilies && `${req.familiesCount} Families`}
                                       {' Need Help'}
@@ -636,15 +636,15 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                           <span className="text-slate-400 font-semibold">Requested by:</span>
                           {req.requestedByRole === 'NGO' ? (
                             <span className="px-2 py-0.5 rounded-md font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
-                              🏛️ NGO: {req.requestedByName}
+                              NGO: {req.requestedByName}
                             </span>
                           ) : req.requestedByRole === 'VOLUNTEER' ? (
                             <span className="px-2 py-0.5 rounded-md font-black bg-purple-500/20 text-purple-300 border border-purple-500/40 flex items-center gap-1">
-                              🚚 Volunteer: {req.requestedByName}
+                              Volunteer: {req.requestedByName}
                             </span>
                           ) : (
                             <span className="px-2 py-0.5 rounded-md font-extrabold bg-slate-900 text-amber-300 border border-slate-700 flex items-center gap-1">
-                              👤 Individual Citizen: {req.requestedByName || req.name}
+                              Individual Citizen: {req.requestedByName || req.name}
                             </span>
                           )}
                         </div>
@@ -744,7 +744,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                                 className="flex-1 w-full py-2 px-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 rounded-xl text-xs font-black shadow-md flex items-center justify-center gap-1.5 active:scale-95 transition-all"
                               >
                                 <Plus className="w-4 h-4" />
-                                <span>📦 LOG RELIEF DELIVERY</span>
+                                <span>LOG RELIEF DELIVERY</span>
                               </button>
                             )}
 
@@ -753,7 +753,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                               className="flex-1 w-full py-2 px-3 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 hover:border-emerald-500/50 rounded-xl text-xs font-black shadow-md flex items-center justify-center gap-1.5 active:scale-95 transition-all"
                             >
                               <Activity className="w-4 h-4 text-emerald-400" />
-                              <span>📜 SEE UPDATES & IMPACT TREE</span>
+                              <span>SEE UPDATES & IMPACT TREE</span>
                             </button>
                           </div>
                         </div>
@@ -846,7 +846,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                             )}
                           </div>
                           <h3 className="text-base font-black text-white mt-1.5">{vol.name}</h3>
-                          <p className="text-xs text-amber-300 font-bold">📍 {vol.district} District</p>
+                          <p className="text-xs text-amber-300 font-bold">{vol.district} District</p>
                         </div>
                       </div>
 
@@ -871,7 +871,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                         className="w-full py-2.5 px-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-xs font-black shadow-lg flex items-center justify-center gap-1.5 min-h-[44px] active:scale-95 transition-all"
                       >
                         <Send className="w-4 h-4" />
-                        <span>📩 REQUEST LOGISTICS ASSISTANCE</span>
+                        <span>REQUEST LOGISTICS ASSISTANCE</span>
                       </button>
                     </div>
                   </div>
@@ -907,7 +907,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
               <UserCheck className="w-12 h-12 text-slate-600 mx-auto" />
               <h3 className="text-lg font-bold text-white">No Logistics Requests Sent Yet</h3>
               <p className="text-xs text-slate-400">
-                Go to the "🚤 LOGISTICS VOLUNTEERS" tab to dispatch requests to Motorboats, 4x4 Cars, or Trucks.
+                Go to the "LOGISTICS VOLUNTEERS" tab to dispatch requests to Motorboats, 4x4 Cars, or Trucks.
               </p>
             </div>
           ) : (
@@ -929,9 +929,9 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                       <span className={`px-2.5 py-0.5 text-[10px] font-black rounded-full border ${
                         isAccepted 
                           ? 'bg-emerald-950 text-emerald-300 border-emerald-500/50' 
-                          : 'bg-amber-950 text-amber-300 border-amber-500/40 animate-pulse'
+                          : 'bg-amber-950 text-amber-300 border-amber-500/40'
                       }`}>
-                        {isAccepted ? '✅ ACCEPTED & UNLOCKED' : '⏳ PENDING VOLUNTEER RESPONSE'}
+                        {isAccepted ? 'ACCEPTED & UNLOCKED' : 'PENDING VOLUNTEER RESPONSE'}
                       </span>
                     </div>
 
@@ -993,17 +993,8 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                     ) : (
                       <div className="space-y-2">
                         <div className="p-3 bg-slate-950 border border-dashed border-amber-500/30 rounded-xl text-xs text-slate-400 text-center">
-                          ⏳ Waiting for volunteer to accept on their device. Contact details will unlock automatically upon acceptance.
+                          Waiting for volunteer to accept on their device. Contact details will unlock automatically upon acceptance.
                         </div>
-
-                        {/* Demo Acceptance Simulator for Testing */}
-                        <button
-                          onClick={() => handleSimulateAccept(req.id)}
-                          className="w-full py-2 bg-slate-800 hover:bg-emerald-950 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5"
-                        >
-                          <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                          <span>Simulate Volunteer Accepting Request (Demo Test)</span>
-                        </button>
                       </div>
                     )}
 
@@ -1060,7 +1051,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                     <option value="">Select an active distress signal location...</option>
                     {victimRequests.map(r => (
                       <option key={r.id} value={r.id}>
-                        {r.isUrgentRescue ? '🚨 BOAT' : '📦 FOOD'} - {r.district}: {r.name} ({r.locationName || r.villageName})
+                        {r.isUrgentRescue ? 'BOAT' : 'FOOD'} - {r.district}: {r.name} ({r.locationName || r.villageName})
                       </option>
                     ))}
                   </select>
@@ -1081,7 +1072,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                 </div>
 
                 <div className="p-3 bg-purple-950/40 border border-purple-500/30 rounded-xl text-[11px] text-purple-200">
-                  🔒 <strong>Privacy Note:</strong> Contact numbers are kept private until the volunteer accepts your request.
+                  <strong>Privacy Note:</strong> Contact numbers are kept private until the volunteer accepts your request.
                 </div>
 
                 <div className="flex items-center gap-2 pt-2">
@@ -1141,7 +1132,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                       : 'text-slate-400 hover:text-white font-bold'
                   }`}
                 >
-                  🌐 Whole Assam (All 35 Districts)
+                  Whole Assam (All 35 Districts)
                 </button>
                 <button
                   type="button"
@@ -1152,7 +1143,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                       : 'text-slate-400 hover:text-white font-bold'
                   }`}
                 >
-                  📍 Specific Districts
+                  Specific Districts
                 </button>
               </div>
 

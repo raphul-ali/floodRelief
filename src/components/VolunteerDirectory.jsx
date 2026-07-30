@@ -147,7 +147,7 @@ export default function VolunteerDirectory({ volunteers = [] }) {
                   <h3 className="text-lg font-black text-white mt-2">{vol.name}</h3>
                   {vol.followersCount && (
                     <span className="text-xs font-bold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30 inline-block mt-1">
-                      ⭐ {vol.followersCount}
+                      {vol.followersCount}
                     </span>
                   )}
                 </div>

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, ShieldAlert, MessageSquare, Phone, CheckCircle2, XCircle, 
-  Search, RefreshCw, Lock, Key, Clock, Package, HeartHandshake, UserCheck, AlertTriangle, ExternalLink, Bell, Edit2, Save, X
+  Search, RefreshCw, Lock, Key, Clock, Package, HeartHandshake, UserCheck, AlertTriangle, ExternalLink, Bell, Edit2, Save, X,
+  Users, ChevronLeft, ChevronRight, Eye, EyeOff
 } from 'lucide-react';
 import { storageService, ASSAM_DISTRICTS } from '../services/storageService';
 import { isSupabaseConfigured } from '../services/supabaseClient';
 
 export default function AdminDashboard({ onDataUpdated }) {
-  const [activeQueueTab, setActiveQueueTab] = useState('sos'); // 'sos' | 'deliveries' | 'ngos' | 'volunteers' | 'recovery'
+  const [activeQueueTab, setActiveQueueTab] = useState('sos'); // 'sos' | 'deliveries' | 'ngos' | 'volunteers' | 'recovery' | 'users'
   const [viewMode, setViewMode] = useState('PENDING'); // 'PENDING' | 'ALL_LIVE'
   
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -21,6 +22,21 @@ export default function AdminDashboard({ onDataUpdated }) {
   const [allDeliveries, setAllDeliveries] = useState([]);
   const [allNgos, setAllNgos] = useState([]);
   const [allVolunteers, setAllVolunteers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
+
+  // User Directory Pagination & Filter State
+  const [userCurrentPage, setUserCurrentPage] = useState(1);
+  const [userItemsPerPage, setUserItemsPerPage] = useState(5);
+  const [userRoleFilter, setUserRoleFilter] = useState('ALL'); // 'ALL' | 'NGO' | 'VOLUNTEER'
+  const [userStatusFilter, setUserStatusFilter] = useState('ALL'); // 'ALL' | 'VERIFIED' | 'PENDING'
+  const [visiblePasswords, setVisiblePasswords] = useState({});
+
+  const togglePasswordVisibility = (userId) => {
+    setVisiblePasswords(prev => ({
+      ...prev,
+      [userId]: !prev[userId]
+    }));
+  };
   
   const [selectedDistrict, setSelectedDistrict] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,6 +55,7 @@ export default function AdminDashboard({ onDataUpdated }) {
     setAllDeliveries(storageService.getDeliveryLogs(true));
     setAllNgos(storageService.getNGOs(true));
     setAllVolunteers(storageService.getVolunteers(true));
+    setAllUsers(storageService.getAllUsers());
   };
 
   useEffect(() => {
@@ -83,7 +100,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                        
     const payload = {
       ...editSosData,
-      peopleCount: totalPeople > 0 ? totalPeople : (parseInt(editSosData.familiesCount) > 0 ? 0 : 1)
+      peopleCount: totalPeople,
     };
     
     storageService.editVictimRequest(editingSosId, payload);
@@ -156,7 +173,7 @@ export default function AdminDashboard({ onDataUpdated }) {
 
     let text = `Hello ${name || 'User'}, this is Super Admin from Assam Flood Relief Portal. Regarding your ${reqType === 'FORGOT_PASSWORD' ? 'Forgot Password' : 'Forgot Email'} request for your ${role} account:`;
     if (matchedAccount) {
-      text += `\n\n📌 Registered Account Details:\n• Name: ${matchedAccount.name}\n• Email: ${matchedAccount.email}\n• Password: ${matchedAccount.password || '(Demo Standard Password)'}\n• Status: ${matchedAccount.verified ? 'Verified ✅' : 'Pending Admin Verification ⚠️'}`;
+      text += `\n\nRegistered Account Details:\n• Name: ${matchedAccount.name}\n• Email: ${matchedAccount.email}\n• Password: ${matchedAccount.password || 'Standard Password'}\n• Status: ${matchedAccount.verified ? 'Verified' : 'Pending Admin Verification'}`;
     } else {
       text += `\n\nPlease confirm your registered name and contact details so we can assist you.`;
     }
@@ -234,6 +251,27 @@ export default function AdminDashboard({ onDataUpdated }) {
     return matchesQuery;
   });
 
+  // Filter All Users
+  const filteredUsers = allUsers.filter(u => {
+    const matchesRole = userRoleFilter === 'ALL' || u.userType === userRoleFilter;
+    const matchesStatus = userStatusFilter === 'ALL' || 
+      (userStatusFilter === 'VERIFIED' && u.verified) || 
+      (userStatusFilter === 'PENDING' && !u.verified);
+    const matchesDistrict = selectedDistrict === 'ALL' || u.district === selectedDistrict;
+    const matchesQuery = !searchQuery || 
+      (u.name && u.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
+      (u.email && u.email.toLowerCase().includes(searchQuery.toLowerCase())) || 
+      (u.phone && u.phone.includes(searchQuery)) || 
+      (u.id && u.id.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesRole && matchesStatus && matchesDistrict && matchesQuery;
+  });
+
+  // User Pagination calculation
+  const totalUserPages = Math.ceil(filteredUsers.length / userItemsPerPage) || 1;
+  const safeUserCurrentPage = Math.min(Math.max(1, userCurrentPage), totalUserPages);
+  const userStartIndex = (safeUserCurrentPage - 1) * userItemsPerPage;
+  const paginatedUsers = filteredUsers.slice(userStartIndex, userStartIndex + userItemsPerPage);
+
   return (
     <div className="space-y-4 sm:space-y-6">
       
@@ -265,7 +303,7 @@ export default function AdminDashboard({ onDataUpdated }) {
               }`}
             >
               <Bell className="w-3.5 h-3.5" />
-              <span>⏳ PENDING QUEUE ({totalPendingCount})</span>
+              <span>PENDING QUEUE ({totalPendingCount})</span>
             </button>
 
             <button
@@ -277,7 +315,7 @@ export default function AdminDashboard({ onDataUpdated }) {
               }`}
             >
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>🌐 ALL LIVE RECORDS ({allRequests.length} Requests | {allNgos.length} NGOs)</span>
+              <span>ALL LIVE RECORDS ({allRequests.length} Requests | {allNgos.length} NGOs)</span>
             </button>
           </div>
         </div>
@@ -287,13 +325,13 @@ export default function AdminDashboard({ onDataUpdated }) {
           {isSupabaseConfigured ? (
             <div className="flex items-center gap-2 text-emerald-300 font-bold bg-emerald-950/80 border border-emerald-500/40 px-3 py-2 rounded-xl w-full">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping shrink-0"></span>
-              <span>⚡ Supabase Cloud Database: <strong className="text-emerald-300">CONNECTED & LIVE</strong> (Global real-time sync active across all IPs & devices)</span>
+              <span>Supabase Cloud Database: <strong className="text-emerald-300">CONNECTED & LIVE</strong> (Global real-time sync active across all IPs & devices)</span>
             </div>
           ) : (
             <div className="flex items-center justify-between gap-2 text-amber-300 font-bold bg-amber-500/10 border border-amber-500/30 px-3 py-2 rounded-xl w-full">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0"></span>
-                <span>💻 Offline Local Storage Mode: Supabase Database Not Connected.</span>
+                <span>Offline Local Storage Mode: Supabase Database Not Connected.</span>
               </div>
               <span className="text-[11px] font-semibold text-slate-300 hidden sm:inline">Add VITE_SUPABASE_URL & VITE_SUPABASE_ANON_KEY to hosting platform</span>
             </div>
@@ -394,6 +432,22 @@ export default function AdminDashboard({ onDataUpdated }) {
           </span>
         </button>
 
+        {/* Tab 6: User Directory with Pagination */}
+        <button
+          onClick={() => setActiveQueueTab('users')}
+          className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
+            activeQueueTab === 'users'
+              ? 'bg-emerald-600 text-white font-black shadow-lg border border-emerald-400'
+              : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+          }`}
+        >
+          <Users className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>User Directory</span>
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+            {allUsers.length}
+          </span>
+        </button>
+
       </div>
 
       {/* Global Filters */}
@@ -457,21 +511,21 @@ export default function AdminDashboard({ onDataUpdated }) {
                     <div>
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="px-2 py-0.5 text-[10px] font-black bg-red-600/30 text-red-300 border border-red-500/40 rounded-md">
-                          {req.isUrgentRescue ? '🚨 BOAT RESCUE' : '📦 RELIEF SUPPLY'}
+                          {req.isUrgentRescue ? 'BOAT RESCUE' : 'RELIEF SUPPLY'}
                         </span>
                         {req.verified ? (
                           <span className="px-2 py-0.5 text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-md">
-                            ✅ PUBLISHED LIVE
+                            PUBLISHED LIVE
                           </span>
                         ) : (
                           <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md animate-pulse">
-                            ⏳ PENDING VERIFICATION
+                            PENDING VERIFICATION
                           </span>
                         )}
                         <span className="text-xs font-mono text-slate-400">{req.id}</span>
                       </div>
                       <h3 className="text-base font-black text-white mt-1">{req.name}</h3>
-                      <p className="text-xs text-amber-300 font-bold">📍 {req.district}: {req.locationName || req.villageName}</p>
+                      <p className="text-xs text-amber-300 font-bold">{req.district}: {req.locationName || req.villageName}</p>
                     </div>
                   </div>
 
@@ -480,21 +534,26 @@ export default function AdminDashboard({ onDataUpdated }) {
                     <span className="text-slate-400 font-semibold">Requested by:</span>
                     {req.requestedByRole === 'NGO' ? (
                       <span className="px-2 py-0.5 rounded-md font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
-                        🏛️ NGO: {req.requestedByName}
+                        NGO: {req.requestedByName}
                       </span>
                     ) : req.requestedByRole === 'VOLUNTEER' ? (
                       <span className="px-2 py-0.5 rounded-md font-black bg-purple-500/20 text-purple-300 border border-purple-500/40 flex items-center gap-1">
-                        🚚 Volunteer: {req.requestedByName}
+                        Volunteer: {req.requestedByName}
                       </span>
                     ) : (
                       <span className="px-2 py-0.5 rounded-md font-extrabold bg-slate-900 text-amber-300 border border-slate-700 flex items-center gap-1">
-                        👤 Individual Citizen: {req.requestedByName || req.name}
+                        Individual Citizen: {req.requestedByName || req.name}
                       </span>
                     )}
                   </div>
 
                   <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1">
-                    <p className="text-slate-300"><strong className="text-white">Affected:</strong> {(req.peopleCount || 0) > 0 ? req.peopleCount : ((req.malesCount || 0) + (req.femalesCount || 0) + (req.childrenCount || 0))} People {req.familiesCount > 0 ? `& ${req.familiesCount} Families` : ''}</p>
+                    <p className="text-slate-300"><strong className="text-white">Affected:</strong> {(() => {
+                      const tp = (req.peopleCount || 0) > 0 ? req.peopleCount : ((req.malesCount || 0) + (req.femalesCount || 0) + (req.childrenCount || 0));
+                      if (tp === 0 && req.familiesCount > 0) return `${req.familiesCount} Families`;
+                      if (tp === 0) return '0 People';
+                      return `${tp} People ${req.familiesCount > 0 ? `& ${req.familiesCount} Families` : ''}`;
+                    })()}</p>
                     <p className="text-slate-300"><strong className="text-white">Phone:</strong> {req.phone}</p>
                     {req.details && <p className="text-slate-400 italic">"{req.details}"</p>}
                   </div>
@@ -576,11 +635,11 @@ export default function AdminDashboard({ onDataUpdated }) {
                         </span>
                         {log.verified ? (
                           <span className="px-2 py-0.5 text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-md">
-                            ✅ VERIFIED DISPATCH
+                            VERIFIED DISPATCH
                           </span>
                         ) : (
                           <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md animate-pulse">
-                            ⏳ PENDING AUDIT
+                            PENDING AUDIT
                           </span>
                         )}
                       </div>
@@ -650,18 +709,18 @@ export default function AdminDashboard({ onDataUpdated }) {
                       <div className="flex items-center gap-1.5 flex-wrap">
                         {ngo.verified ? (
                           <span className="px-2 py-0.5 text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-md">
-                            ✅ VERIFIED NGO
+                            VERIFIED NGO
                           </span>
                         ) : (
                           <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md animate-pulse">
-                            ⏳ PENDING VERIFICATION
+                            PENDING VERIFICATION
                           </span>
                         )}
                         <span className="text-xs font-mono text-slate-400">{ngo.id}</span>
                       </div>
                       <h3 className="text-base font-black text-white mt-1">{ngo.name}</h3>
                       <p className="text-xs text-slate-300">Contact: <strong>{ngo.contactPerson || 'Official NGO'}</strong> ({ngo.phone})</p>
-                      {ngo.email && <p className="text-xs text-amber-300 font-mono mt-0.5">📧 {ngo.email}</p>}
+                      {ngo.email && <p className="text-xs text-amber-300 font-mono mt-0.5">{ngo.email}</p>}
                     </div>
                   </div>
 
@@ -717,11 +776,11 @@ export default function AdminDashboard({ onDataUpdated }) {
                     <div className="flex items-center gap-1.5 flex-wrap">
                       {vol.verified ? (
                         <span className="px-2 py-0.5 text-[10px] font-black bg-purple-500/20 text-purple-300 border border-purple-500/40 rounded-md">
-                          ✅ ACTIVE VOLUNTEER
+                          ACTIVE VOLUNTEER
                         </span>
                       ) : (
                         <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md animate-pulse">
-                          ⏳ PENDING VERIFICATION
+                          PENDING VERIFICATION
                         </span>
                       )}
                       <span className="text-xs font-mono text-slate-400">{vol.id}</span>
@@ -808,7 +867,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                           <span className={`px-2.5 py-0.5 text-[10px] font-black rounded-md border ${
                             isPasswordReq ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
                           }`}>
-                            {isPasswordReq ? '🔑 FORGOT PASSWORD' : '📧 FORGOT EMAIL'}
+                            {isPasswordReq ? 'FORGOT PASSWORD' : 'FORGOT EMAIL'}
                           </span>
                           <span className="px-2 py-0.5 text-[10px] font-bold bg-slate-800 text-slate-300 rounded-md border border-slate-700">
                             {req.accountRole}
@@ -859,12 +918,12 @@ export default function AdminDashboard({ onDataUpdated }) {
                               <span>System Record Matched!</span>
                             </span>
                             <span className="text-[10px] font-bold text-slate-400">
-                              {matchedAccount.verified ? 'Verified ✅' : 'Unverified ⚠️'}
+                              {matchedAccount.verified ? 'Verified' : 'Unverified'}
                             </span>
                           </div>
                           <div className="text-xs space-y-1 text-slate-200 bg-slate-950/80 p-2 rounded-lg font-mono">
                             <p><strong>Registered Email:</strong> <span className="text-cyan-300">{matchedAccount.email}</span></p>
-                            <p><strong>Password:</strong> <span className="text-amber-300">{matchedAccount.password || '(Standard Demo Pass)'}</span></p>
+                            <p><strong>Password:</strong> <span className="text-amber-300">{matchedAccount.password || 'Standard Pass'}</span></p>
                             <p><strong>Registered Name:</strong> {matchedAccount.name}</p>
                           </div>
                           <button
@@ -880,7 +939,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                         </div>
                       ) : (
                         <div className="p-2.5 bg-slate-950 border border-dashed border-slate-800 rounded-xl text-center text-xs text-slate-400">
-                          ⚠️ No exact matching registered record found automatically. Use phone/email to verify with user.
+                          No exact matching registered record found automatically. Use phone/email to verify with user.
                         </div>
                       )}
 
@@ -920,6 +979,232 @@ export default function AdminDashboard({ onDataUpdated }) {
                 })}
             </div>
           )}
+        </div>
+      )}
+
+      {/* QUEUE 6: USER DIRECTORY WITH PAGINATION */}
+      {activeQueueTab === 'users' && (
+        <div className="space-y-4">
+          
+          {/* Header & Controls Bar */}
+          <div className="bg-slate-900 p-4 rounded-2xl border border-emerald-500/40 space-y-3 shadow-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-emerald-400 shrink-0" />
+                <div>
+                  <h3 className="text-sm font-black text-white uppercase tracking-tight">ALL REGISTERED USER ACCOUNTS</h3>
+                  <p className="text-[11px] text-slate-400">Total {filteredUsers.length} users matching filters (Page {safeUserCurrentPage} of {totalUserPages})</p>
+                </div>
+              </div>
+
+              {/* Filters for User Table */}
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Role Filter */}
+                <select
+                  value={userRoleFilter}
+                  onChange={(e) => { setUserRoleFilter(e.target.value); setUserCurrentPage(1); }}
+                  className="bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none min-h-[38px]"
+                >
+                  <option value="ALL">All Roles ({allUsers.length})</option>
+                  <option value="NGO">NGOs ({allUsers.filter(u=>u.userType==='NGO').length})</option>
+                  <option value="VOLUNTEER">Volunteers ({allUsers.filter(u=>u.userType==='VOLUNTEER').length})</option>
+                </select>
+
+                {/* Status Filter */}
+                <select
+                  value={userStatusFilter}
+                  onChange={(e) => { setUserStatusFilter(e.target.value); setUserCurrentPage(1); }}
+                  className="bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none min-h-[38px]"
+                >
+                  <option value="ALL">All Statuses</option>
+                  <option value="VERIFIED">Verified Only</option>
+                  <option value="PENDING">Pending Only</option>
+                </select>
+
+                {/* Items Per Page Selector */}
+                <div className="flex items-center gap-1 text-xs text-slate-400 bg-slate-950 px-2.5 py-1.5 rounded-xl border border-slate-800">
+                  <span className="font-semibold">Show:</span>
+                  <select
+                    value={userItemsPerPage}
+                    onChange={(e) => { setUserItemsPerPage(Number(e.target.value)); setUserCurrentPage(1); }}
+                    className="bg-transparent text-emerald-300 font-bold focus:outline-none cursor-pointer"
+                  >
+                    <option value={5} className="bg-slate-900 text-white">5 per page</option>
+                    <option value={10} className="bg-slate-900 text-white">10 per page</option>
+                    <option value={20} className="bg-slate-900 text-white">20 per page</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* User Cards / List */}
+          {filteredUsers.length === 0 ? (
+            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center space-y-2">
+              <Users className="w-10 h-10 text-emerald-400 mx-auto" />
+              <h3 className="text-base font-bold text-white">No Registered Users Found</h3>
+              <p className="text-xs text-slate-400">No user accounts match your current filters or search term.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {paginatedUsers.map(usr => (
+                <div key={usr.id} className="bg-slate-900 border border-slate-800 hover:border-emerald-500/50 rounded-2xl p-4 shadow-xl space-y-3 transition-all">
+                  
+                  {/* Top Badge & Type */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <div className={`p-2 rounded-xl shrink-0 ${usr.userType === 'NGO' ? 'bg-blue-600/20 text-blue-400 border border-blue-500/40' : 'bg-purple-600/20 text-purple-400 border border-purple-500/40'}`}>
+                        <User className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className={`px-2 py-0.5 text-[10px] font-black rounded-md ${usr.userType === 'NGO' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40' : 'bg-purple-500/20 text-purple-300 border border-purple-500/40'}`}>
+                            {usr.userType}
+                          </span>
+                          {usr.verified ? (
+                            <span className="px-2 py-0.5 text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-md">
+                              VERIFIED
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md animate-pulse">
+                              PENDING VERIFICATION
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="text-base font-black text-white mt-1">{usr.name}</h4>
+                        <p className="text-xs font-mono text-slate-400">ID: {usr.id}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Account Details Box */}
+                  <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1.5">
+                    <div className="flex items-center justify-between text-slate-300">
+                      <span className="font-semibold text-slate-400">Email Address:</span>
+                      <span className="font-mono text-emerald-300 font-bold">{usr.email}</span>
+                    </div>
+
+                    {/* Password Credential Row (Viewable by Admin with Toggle) */}
+                    <div className="flex items-center justify-between text-slate-300 pt-1 border-t border-slate-900">
+                      <span className="font-semibold text-slate-400 flex items-center gap-1">
+                        <Lock className="w-3 h-3 text-amber-400" /> Password Credential:
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className={`px-2 py-0.5 rounded font-mono text-[11px] font-bold border transition-all ${
+                          visiblePasswords[usr.id] 
+                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' 
+                            : 'bg-slate-900 text-slate-400 border-slate-800 tracking-widest'
+                        }`}>
+                          {visiblePasswords[usr.id] ? (usr.password || '••••••••') : '••••••••'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => togglePasswordVisibility(usr.id)}
+                          className="p-1 text-slate-400 hover:text-amber-300 hover:bg-slate-900 rounded transition-colors"
+                          title={visiblePasswords[usr.id] ? "Hide Password" : "View Password"}
+                        >
+                          {visiblePasswords[usr.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5 text-amber-400" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-300 pt-1 border-t border-slate-900">
+                      <span className="font-semibold text-slate-400">Phone Contact:</span>
+                      <span className="font-semibold text-white">{usr.phone}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-300 pt-1 border-t border-slate-900">
+                      <span className="font-semibold text-slate-400">District Zone:</span>
+                      <span className="font-semibold text-amber-300">{usr.district}</span>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    {!usr.verified ? (
+                      <button
+                        onClick={() => {
+                          if (usr.userType === 'NGO') handleApproveNgo(usr.id);
+                          else handleApproveVol(usr.id);
+                        }}
+                        className="py-2.5 px-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 min-h-[42px]"
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>Approve Account</span>
+                      </button>
+                    ) : (
+                      <a
+                        href={`tel:${(usr.phone || '').replace(/[^0-9]/g, '')}`}
+                        className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[42px]"
+                      >
+                        <Phone className="w-3.5 h-3.5" />
+                        <span>Call User</span>
+                      </a>
+                    )}
+
+                    <button
+                      onClick={() => {
+                        if (usr.userType === 'NGO') handleRejectNgo(usr.id);
+                        else handleRejectVol(usr.id);
+                      }}
+                      className="py-2.5 px-3 bg-red-950 hover:bg-red-900 text-red-300 border border-red-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 min-h-[42px]"
+                    >
+                      <XCircle className="w-4 h-4" />
+                      <span>{usr.verified ? "Delete Account" : "Reject"}</span>
+                    </button>
+                  </div>
+
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Pagination Controls Bar */}
+          {filteredUsers.length > 0 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-900 p-3.5 rounded-2xl border border-slate-800 text-xs font-bold">
+              <div className="text-slate-400">
+                Showing <strong className="text-white">{userStartIndex + 1}</strong> to <strong className="text-white">{Math.min(userStartIndex + userItemsPerPage, filteredUsers.length)}</strong> of <strong className="text-emerald-400">{filteredUsers.length}</strong> registered users
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  disabled={safeUserCurrentPage <= 1}
+                  onClick={() => setUserCurrentPage(prev => Math.max(1, prev - 1))}
+                  className="px-3 py-2 bg-slate-950 hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-slate-950 text-white border border-slate-800 rounded-xl flex items-center gap-1 transition-all min-h-[38px]"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  <span>Previous</span>
+                </button>
+
+                {/* Page Number Buttons */}
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalUserPages }, (_, i) => i + 1).map(page => (
+                    <button
+                      key={page}
+                      onClick={() => setUserCurrentPage(page)}
+                      className={`w-9 h-9 rounded-xl font-mono text-xs flex items-center justify-center transition-all ${
+                        safeUserCurrentPage === page
+                          ? 'bg-emerald-500 text-slate-950 font-black shadow-lg border border-emerald-400 scale-105'
+                          : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  disabled={safeUserCurrentPage >= totalUserPages}
+                  onClick={() => setUserCurrentPage(prev => Math.min(totalUserPages, prev + 1))}
+                  className="px-3 py-2 bg-slate-950 hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-slate-950 text-white border border-slate-800 rounded-xl flex items-center gap-1 transition-all min-h-[38px]"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
         </div>
       )}
 

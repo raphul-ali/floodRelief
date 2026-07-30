@@ -1,12 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Phone, PhoneCall, Building2, Globe, Info, ChevronDown, ChevronUp, Layers } from 'lucide-react';
+import { i18nService } from '../services/i18nService';
 
 export default function ASDMAHelplines() {
+  const [, setLangState] = useState(i18nService.getLanguage());
+
+  useEffect(() => {
+    const handleLangChange = () => setLangState(i18nService.getLanguage());
+    window.addEventListener('flood_lang_changed', handleLangChange);
+    return () => window.removeEventListener('flood_lang_changed', handleLangChange);
+  }, []);
+
   const [expanded, setExpanded] = useState(false);
 
   const districtHelplines = [
-    { district: "Sivasagar ⭐", phone: "8471864355", tollFree: "1077" },
-    { district: "Jorhat ⭐", phone: "0376-2300124", tollFree: "1077" },
+    { district: "Sivasagar", phone: "8471864355", tollFree: "1077" },
+    { district: "Jorhat", phone: "0376-2300124", tollFree: "1077" },
     { district: "Charaideo", phone: "9085412180", tollFree: "1077" },
     { district: "Golaghat", phone: "9394985421", tollFree: "1077" },
     { district: "Lakhimpur", phone: "03752-222217", tollFree: "1077" },
@@ -28,7 +37,7 @@ export default function ASDMAHelplines() {
   ];
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3 sm:p-5 shadow-xl space-y-3">
+    <div className="bg-slate-800 border border-slate-700/80 rounded-2xl p-3.5 sm:p-5 shadow-app-card space-y-3">
       
       {/* Compact Header Bar */}
       <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2">

@@ -32,7 +32,7 @@ export default function NearestMedicals() {
           const { latitude, longitude } = position.coords;
           setUserLocation({ lat: latitude, lng: longitude });
           setIsLocating(false);
-          setLocationStatus(`📍 Live GPS Active: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+          setLocationStatus(`Live GPS Active: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
           loadMedicals(latitude, longitude, selectedCategory);
         },
         async (error) => {
@@ -43,7 +43,7 @@ export default function NearestMedicals() {
               const ipData = await res.json();
               if (ipData.latitude && ipData.longitude) {
                 setUserLocation({ lat: ipData.latitude, lng: ipData.longitude });
-                setLocationStatus(`📍 Live Location (${ipData.city || 'Assam'}): ${ipData.latitude.toFixed(4)}, ${ipData.longitude.toFixed(4)}`);
+                setLocationStatus(`Live Location (${ipData.city || 'Assam'}): ${ipData.latitude.toFixed(4)}, ${ipData.longitude.toFixed(4)}`);
                 loadMedicals(ipData.latitude, ipData.longitude, selectedCategory);
                 setIsLocating(false);
                 return;
@@ -55,10 +55,10 @@ export default function NearestMedicals() {
 
           setIsLocating(false);
           if (fallbackLat && fallbackLng) {
-            setLocationStatus(`📍 Live GPS Retained: ${fallbackLat.toFixed(4)}, ${fallbackLng.toFixed(4)}`);
+            setLocationStatus(`Live GPS Retained: ${fallbackLat.toFixed(4)}, ${fallbackLng.toFixed(4)}`);
             loadMedicals(fallbackLat, fallbackLng, selectedCategory);
           } else {
-            setLocationStatus('⚠️ Click "Detect Live GPS" to pin your location or select your District.');
+            setLocationStatus('Click "Detect Live GPS" to pin your location or select your District.');
             loadMedicals(null, null, selectedCategory);
           }
         },
@@ -66,7 +66,7 @@ export default function NearestMedicals() {
       );
     } else {
       setIsLocating(false);
-      setLocationStatus('⚠️ Geolocation not supported by browser. Select your District below.');
+      setLocationStatus('Geolocation not supported by browser. Select your District below.');
       loadMedicals(fallbackLat, fallbackLng, selectedCategory);
     }
   };
@@ -267,11 +267,11 @@ export default function NearestMedicals() {
                 {/* Type Badge & Distance */}
                 <div className="flex items-start justify-between gap-2">
                   <span className="text-[11px] font-black px-2.5 py-0.5 bg-emerald-950/80 text-emerald-400 rounded-full border border-emerald-500/30">
-                    🏥 {med.type || med.category}
+                    {med.type || med.category}
                   </span>
                   {med.distanceKm !== null && (
                     <span className="text-[11px] font-black px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30 shrink-0">
-                      📍 {med.distanceKm} km away
+                      {med.distanceKm} km away
                     </span>
                   )}
                 </div>
@@ -303,7 +303,7 @@ export default function NearestMedicals() {
                     <div className="flex flex-wrap gap-1">
                       {med.services.map((svc, i) => (
                         <span key={i} className="text-[10px] font-bold text-slate-300 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
-                          ✓ {svc}
+                          {svc}
                         </span>
                       ))}
                     </div>

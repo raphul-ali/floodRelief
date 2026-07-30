@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { fetchNearestServices } from '../services/emergencyService';
 import { ASSAM_DISTRICTS } from '../services/storageService';
+import { i18nService } from '../services/i18nService';
 
 const RADIUS_OPTIONS = [50, 100, 200, 500];
 
@@ -62,6 +63,13 @@ export default function EmergencyServices() {
 
   const fetchAbortRef = useRef(null);
   const filtersRef = useRef(null);
+  const [, setLangState] = useState(i18nService.getLanguage());
+
+  useEffect(() => {
+    const handleLangChange = () => setLangState(i18nService.getLanguage());
+    window.addEventListener('flood_lang_changed', handleLangChange);
+    return () => window.removeEventListener('flood_lang_changed', handleLangChange);
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -231,11 +239,11 @@ export default function EmergencyServices() {
     <div className="space-y-6">
 
       {/* ── Header ── */}
-      <div className="bg-gradient-to-r from-red-950 via-slate-900 to-amber-950 border border-red-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4">
+      <div className="bg-slate-800 border border-slate-700/80 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-app-card space-y-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs font-black rounded-full border border-emerald-500/40">
-              ⚡ 231 Verified Emergency Stations (Offline Instant)
+              {i18nService.t('verifiedStations', '231 Verified Emergency Stations (Offline Instant)')}
             </span>
             {userLocation && !isLocating && (
               <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 text-xs font-bold rounded-full border border-amber-500/40">
@@ -244,10 +252,10 @@ export default function EmergencyServices() {
             )}
           </div>
           <h2 className="text-xl sm:text-3xl font-black text-white tracking-tight uppercase">
-            NEAREST EMERGENCY SERVICES
+            {i18nService.t('emergencyTitle', 'NEAREST EMERGENCY SERVICES')}
           </h2>
           <p className="text-xs sm:text-sm text-slate-300">
-            Fire stations, police thanas, hospitals &amp; rescue squads near you — anywhere in India.
+            {i18nService.t('emergencySubtitle', 'Fire stations, police thanas, hospitals & rescue squads near you — anywhere in India.')}
           </p>
         </div>
 
@@ -255,7 +263,7 @@ export default function EmergencyServices() {
         <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-950/80 border border-slate-800 rounded-2xl p-3">
           <div className="flex items-center gap-2 text-xs font-bold text-amber-300 truncate flex-1 min-w-[200px]">
             <MapPin className="w-4 h-4 text-red-400 shrink-0" />
-            <span className="truncate">📍 {userLocation?.label || 'Detecting Location…'}</span>
+            <span className="truncate">{userLocation?.label || 'Detecting Location…'}</span>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
@@ -265,7 +273,7 @@ export default function EmergencyServices() {
               onChange={(e) => handleDistrictChange(e.target.value)}
               className="bg-slate-900 border border-slate-700 text-amber-300 font-bold text-xs rounded-xl px-3 py-1.5 focus:outline-none focus:border-amber-400 cursor-pointer"
             >
-              <option value="ALL">📍 Change District / Region</option>
+              <option value="ALL">{i18nService.t('changeDistrict', 'Change District / Region')}</option>
               {ASSAM_DISTRICTS.map((dist) => (
                 <option key={dist} value={dist}>
                   {dist}
@@ -441,7 +449,7 @@ export default function EmergencyServices() {
                     {badge(item.category)}
                     {item.distanceKm != null && (
                       <span className="text-[11px] font-black px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30 shrink-0">
-                        📍 {item.distanceKm} km
+                        {item.distanceKm} km
                       </span>
                     )}
                   </div>

@@ -27,7 +27,7 @@ export const securityService = {
         return {
           allowed: false,
           cooldownSeconds: Math.max(1, cooldownSeconds),
-          message: `⚠️ Anti-Spam Rate Limit: Too many submissions. Please wait ${cooldownSeconds} seconds before submitting again.`
+          message: `Anti-Spam Rate Limit: Too many submissions. Please wait ${cooldownSeconds} seconds before submitting again.`
         };
       }
 
@@ -136,7 +136,7 @@ export const securityService = {
     const validMimes = ['image/jpeg', 'image/jpg', 'image/png'];
 
     if (!validExtensions.includes(ext) && !validMimes.includes(file.type)) {
-      return { valid: false, error: '⚠️ Invalid format! Only JPG, JPEG, and PNG files are allowed.' };
+      return { valid: false, error: 'Invalid format! Only JPG, JPEG, and PNG files are allowed.' };
     }
 
     const minBytes = 20 * 1024; // 20 KB
@@ -144,12 +144,12 @@ export const securityService = {
 
     if (file.size < minBytes) {
       const kb = (file.size / 1024).toFixed(1);
-      return { valid: false, error: `⚠️ Logo image too small (${kb} KB). Minimum file size is 20 KB.` };
+      return { valid: false, error: `Logo image too small (${kb} KB). Minimum file size is 20 KB.` };
     }
 
     if (file.size > maxBytes) {
       const kb = (file.size / 1024).toFixed(1);
-      return { valid: false, error: `⚠️ Logo image too large (${kb} KB). Maximum allowed size is 50 KB.` };
+      return { valid: false, error: `Logo image too large (${kb} KB). Maximum allowed size is 50 KB.` };
     }
 
     return { valid: true, error: null };

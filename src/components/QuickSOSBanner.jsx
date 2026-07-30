@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShieldAlert, Navigation, Phone, CheckCircle2, Zap, AlertTriangle, Users, Hash, MapPin, AlertOctagon } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { storageService } from '../services/storageService';
+import { i18nService } from '../services/i18nService';
 import DistrictSelect from './DistrictSelect';
 
 export default function QuickSOSBanner({ onRequestSubmitted }) {
+  const [, setLangState] = useState(i18nService.getLanguage());
+
+  useEffect(() => {
+    const handleLangChange = () => setLangState(i18nService.getLanguage());
+    window.addEventListener('flood_lang_changed', handleLangChange);
+    return () => window.removeEventListener('flood_lang_changed', handleLangChange);
+  }, []);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -47,11 +55,11 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
           longitude
         }));
         setIsLocating(false);
-        setLocationStatus(`✅ GPS: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+        setLocationStatus(`GPS: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
       },
       (error) => {
         setIsLocating(false);
-        setLocationStatus('⚠️ Type village name & PIN code below');
+        setLocationStatus('Type village name & PIN code below');
       },
       { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
     );
@@ -76,7 +84,7 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
       const saved = storageService.addVictimRequest({
         ...formData,
         name: formData.name || 'Emergency Victim',
-        peopleCount: totalPeopleCount > 0 ? totalPeopleCount : 1,
+        peopleCount: totalPeopleCount,
         locationName: locationAddressFormatted,
         needs: ['Emergency Motorboat Rescue & Life Evacuation']
       });
@@ -93,22 +101,22 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
   };
 
   return (
-    <div className="bg-gradient-to-r from-red-950 via-slate-900 to-red-950 border-2 border-red-500 rounded-3xl p-5 sm:p-8 shadow-2xl space-y-6">
+    <div className="bg-slate-800 border-2 border-red-500/80 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-app-card space-y-6">
       
       {/* Top Banner Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-red-800/50 pb-4">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-red-600 rounded-2xl text-white shadow-lg shadow-red-600/50 animate-pulse">
+          <div className="p-3 bg-red-600 rounded-2xl text-white shadow-md">
             <ShieldAlert className="w-7 h-7" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="bg-amber-400 text-slate-950 font-black text-[10px] uppercase px-2 py-0.5 rounded tracking-wider flex items-center gap-1">
-                <Zap className="w-3 h-3 fill-slate-950" /> LOW BATTERY OPTIMIZED (10-SEC SOS)
+              <span className="bg-indigo-600 text-white font-black text-[10px] uppercase px-2 py-0.5 rounded tracking-wider flex items-center gap-1 shadow-md">
+                <Zap className="w-3 h-3 fill-white" /> LOW BATTERY OPTIMIZED (10-SEC SOS)
               </span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-0.5">
-              NEED EMERGENCY MOTORBOAT RESCUE? SEND SOS NOW
+            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-0.5 uppercase">
+              {i18nService.t('sosTitle', 'NEED EMERGENCY MOTORBOAT RESCUE? SEND SOS NOW')}
             </h2>
           </div>
         </div>
@@ -118,7 +126,7 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
           className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs rounded-xl shadow-md transition-colors shrink-0"
         >
           <Phone className="w-4 h-4" />
-          <span>CALL ASDMA HELPLINE: 1070</span>
+          <span>{i18nService.t('govtHelpline', 'CALL ASDMA HELPLINE: 1070')}</span>
         </a>
       </div>
 
@@ -242,7 +250,7 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
                 className="w-full py-2.5 px-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition-all"
               >
                 <Navigation className={`w-4 h-4 ${isLocating ? 'animate-spin' : ''}`} />
-                <span>{isLocating ? 'Acquiring...' : formData.latitude ? '✅ GPS Pinned' : '1-Tap Detect GPS'}</span>
+                <span>{isLocating ? 'Acquiring...' : formData.latitude ? 'GPS Pinned' : '1-Tap Detect GPS'}</span>
               </button>
             </div>
           </div>
@@ -255,7 +263,7 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
             </div>
             <div className="grid grid-cols-3 gap-2">
               <div>
-                <label className="block text-[11px] font-bold text-slate-300 mb-1">👨 Males</label>
+                <label className="block text-[11px] font-bold text-slate-300 mb-1">Males</label>
                 <input
                   type="number"
                   min="0"
@@ -266,7 +274,7 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-bold text-slate-300 mb-1">👩 Females</label>
+                <label className="block text-[11px] font-bold text-slate-300 mb-1">Females</label>
                 <input
                   type="number"
                   min="0"
@@ -277,7 +285,7 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-bold text-slate-300 mb-1">👶 Children</label>
+                <label className="block text-[11px] font-bold text-slate-300 mb-1">Children</label>
                 <input
                   type="number"
                   min="0"
@@ -308,10 +316,10 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-4 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 hover:from-red-500 hover:to-amber-400 text-white font-black text-base uppercase tracking-wider shadow-2xl shadow-red-950/80 transition-all flex items-center justify-center gap-3 active:scale-98 animate-urgent-pulse"
+            className="w-full py-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-base uppercase tracking-wider shadow-lg border border-red-500 transition-all flex items-center justify-center gap-3 active:scale-98"
           >
             <ShieldAlert className="w-6 h-6" />
-            <span>{isSubmitting ? 'TRANSMITTING SOS...' : '⚡ TRANSMIT EMERGENCY RESCUE SOS NOW'}</span>
+            <span>{isSubmitting ? i18nService.t('transmitting', 'TRANSMITTING SOS...') : i18nService.t('transmitSos', 'TRANSMIT EMERGENCY RESCUE SOS NOW')}</span>
           </button>
 
         </form>

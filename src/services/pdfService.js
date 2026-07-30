@@ -30,7 +30,7 @@ export const pdfService = {
       doc.setTextColor(185, 28, 28);
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
-      doc.text('⚠️ CRITICAL RESCUE SIGNAL: STRANDED / IMMEDIATE EVACUATION NEEDED', 18, startY + 11);
+      doc.text('CRITICAL RESCUE SIGNAL: STRANDED / IMMEDIATE EVACUATION NEEDED', 18, startY + 11);
       startY += 24;
     }
 

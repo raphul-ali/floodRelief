@@ -1,13 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Building2, Phone, MapPin, Search, MessageSquare, HeartHandshake, 
   Anchor, Car, Truck, Stethoscope, Users, UserPlus, Sparkles, Activity, ShieldCheck, Package, Megaphone
 } from 'lucide-react';
 import { storageService, ASSAM_DISTRICTS, VOLUNTEER_ROLES } from '../services/storageService';
+import { i18nService } from '../services/i18nService';
 
-export default function NGODirectory({ ngos = [], volunteers = [], openLoginModal }) {
+export default function NGODirectory({ ngos = [], volunteers = [], openLoginModal, currentAuth = { role: 'GUEST' } }) {
+  const [, setLangState] = useState(i18nService.getLanguage());
+
+  useEffect(() => {
+    const handleLangChange = () => setLangState(i18nService.getLanguage());
+    window.addEventListener('flood_lang_changed', handleLangChange);
+    return () => window.removeEventListener('flood_lang_changed', handleLangChange);
+  }, []);
+
   const [activeCategory, setActiveCategory] = useState('ALL'); // 'ALL' | 'NGOS' | 'VOLUNTEERS' | 'BOATS_CARS'
   const [searchQuery, setSearchQuery] = useState('');
+
+  const isAuthorizedPartner = currentAuth.role === 'NGO' || currentAuth.role === 'VOLUNTEER' || currentAuth.role === 'ADMIN';
 
   // Filtering
   const cleanQuery = searchQuery.toLowerCase().trim();
@@ -100,103 +111,154 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
   };
 
   return (
-    <div className="space-y-5">
+    <div id="ngo-directory-container" className="space-y-5">
       
-      {/* Header Banner */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-7 shadow-xl space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-black uppercase tracking-wider mb-2">
-              <HeartHandshake className="w-3.5 h-3.5 text-amber-400" />
+      {/* Native Mobile App Header & Filter Shell */}
+      <div className="bg-slate-800 border border-slate-700/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-app-card space-y-4">
+        
+        {/* Top App Title & Action Buttons */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-900 border border-slate-700 text-[10px] font-black text-slate-300 uppercase tracking-wider">
+              <HeartHandshake className="w-3.5 h-3.5 text-blue-400" />
               <span>DIRECT RESCUE & RELIEF PARTNERS</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-white">
+            <h2 className="text-lg sm:text-xl font-black text-white tracking-tight">
               RELIEF COORDINATORS & SERVICE PROVIDERS DIRECTORY
             </h2>
-            <p className="text-xs text-slate-300 font-semibold mt-1">
-              Direct contact directory for NGOs, Coordinators, free rescue boat owners, 4x4 cars/trucks, and medical services across Assam.
+            <p className="text-xs text-slate-300 font-semibold">
+              Direct contact directory for NGOs, Coordinators, free rescue boat owners, 4x4 cars/trucks, and medical services.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 shrink-0">
+          {/* Native Action Pills */}
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => openLoginModal?.('REGISTER', 'NGO')}
-              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-black bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-lg active:scale-95 transition-all"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black bg-slate-700 hover:bg-slate-600 active:scale-95 text-white shadow-md border border-slate-600 transition-all cursor-pointer"
             >
-              <Building2 className="w-4 h-4" />
+              <Building2 className="w-4 h-4 text-blue-300" />
               <span>+ REGISTER NGO</span>
             </button>
 
             <button
               onClick={() => openLoginModal?.('REGISTER', 'VOLUNTEER')}
-              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg active:scale-95 transition-all"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black bg-slate-900 hover:bg-slate-800 active:scale-95 text-slate-200 shadow-md border border-slate-700 transition-all cursor-pointer"
             >
               <Anchor className="w-4 h-4 text-cyan-300" />
-              <span>+ OFFER BOAT / CAR / LOGISTICS</span>
+              <span>+ OFFER BOAT / CAR</span>
             </button>
           </div>
         </div>
 
-        {/* Category Switcher & Search Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-800">
-          <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-2xl border border-slate-800 w-full sm:w-auto overflow-x-auto">
-            <button
-              onClick={() => setActiveCategory('ALL')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-black whitespace-nowrap transition-all ${
-                activeCategory === 'ALL'
-                  ? 'bg-amber-500 text-slate-950 shadow-md'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              ALL ({ngos.length + volunteers.length})
-            </button>
+        {/* PhonePe-Style Native Mobile App Category Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t border-slate-700/60">
+          
+          {/* Tile 1: ALL */}
+          <button
+            onClick={() => setActiveCategory('ALL')}
+            className={`p-2.5 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer text-center min-h-[64px] ${
+              activeCategory === 'ALL'
+                ? 'bg-slate-700 text-white font-black shadow-md border border-slate-500 ring-1 ring-slate-400 scale-[1.02]'
+                : 'bg-slate-950/80 border border-slate-800 text-slate-400 hover:text-slate-200 font-semibold hover:border-slate-700'
+            }`}
+          >
+            <div className="flex items-center gap-1.5">
+              <Sparkles className={`w-4 h-4 ${activeCategory === 'ALL' ? 'text-blue-300' : 'text-slate-400'}`} />
+              <span className="text-xs font-black">{i18nService.t('allCategories', 'ALL')}</span>
+            </div>
+            <span className={`text-[10px] font-extrabold px-2 py-0.2 rounded-full ${
+              activeCategory === 'ALL' ? 'bg-slate-800 text-slate-200 border border-slate-600' : 'bg-slate-900 text-slate-500 border border-slate-800'
+            }`}>
+              {ngos.length + volunteers.length} Partners
+            </span>
+          </button>
 
-            <button
-              onClick={() => setActiveCategory('NGOS')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-black whitespace-nowrap transition-all ${
-                activeCategory === 'NGOS'
-                  ? 'bg-amber-500 text-slate-950 shadow-md'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              🏢 NGOs & INDIVIDUAL HELPERS ({ngos.length})
-            </button>
+          {/* Tile 2: NGOs */}
+          <button
+            onClick={() => setActiveCategory('NGOS')}
+            className={`p-2.5 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer text-center min-h-[64px] ${
+              activeCategory === 'NGOS'
+                ? 'bg-slate-700 text-white font-black shadow-md border border-slate-500 ring-1 ring-slate-400 scale-[1.02]'
+                : 'bg-slate-950/80 border border-slate-800 text-slate-400 hover:text-slate-200 font-semibold hover:border-slate-700'
+            }`}
+          >
+            <div className="flex items-center gap-1.5">
+              <Building2 className={`w-4 h-4 ${activeCategory === 'NGOS' ? 'text-amber-300' : 'text-slate-400'}`} />
+              <span className="text-xs font-black">{i18nService.t('ngosCategory', 'NGOs & Helpers')}</span>
+            </div>
+            <span className={`text-[10px] font-extrabold px-2 py-0.2 rounded-full ${
+              activeCategory === 'NGOS' ? 'bg-slate-800 text-slate-200 border border-slate-600' : 'bg-slate-900 text-slate-500 border border-slate-800'
+            }`}>
+              {ngos.length} Registered
+            </span>
+          </button>
 
-            <button
-              onClick={() => setActiveCategory('BOATS_CARS')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-black whitespace-nowrap transition-all ${
-                activeCategory === 'BOATS_CARS'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'text-blue-300 hover:text-white'
-              }`}
-            >
-              🚤 🚗 BOATS & CARS
-            </button>
+          {/* Tile 3: BOATS & CARS */}
+          <button
+            onClick={() => setActiveCategory('BOATS_CARS')}
+            className={`p-2.5 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer text-center min-h-[64px] ${
+              activeCategory === 'BOATS_CARS'
+                ? 'bg-slate-700 text-white font-black shadow-md border border-slate-500 ring-1 ring-slate-400 scale-[1.02]'
+                : 'bg-slate-950/80 border border-slate-800 text-slate-400 hover:text-slate-200 font-semibold hover:border-slate-700'
+            }`}
+          >
+            <div className="flex items-center gap-1.5">
+              <Anchor className={`w-4 h-4 ${activeCategory === 'BOATS_CARS' ? 'text-cyan-300' : 'text-slate-400'}`} />
+              <span className="text-xs font-black">{i18nService.t('boatsCarsCategory', 'Boats & 4x4')}</span>
+            </div>
+            <span className={`text-[10px] font-extrabold px-2 py-0.2 rounded-full ${
+              activeCategory === 'BOATS_CARS' ? 'bg-slate-800 text-slate-200 border border-slate-600' : 'bg-slate-900 text-slate-500 border border-slate-800'
+            }`}>
+              Rescue Vehicles
+            </span>
+          </button>
 
-            <button
-              onClick={() => setActiveCategory('VOLUNTEERS')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-black whitespace-nowrap transition-all ${
-                activeCategory === 'VOLUNTEERS'
-                  ? 'bg-purple-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              🙋 LOGISTICS & SERVICES ({volunteers.length})
-            </button>
-          </div>
+          {/* Tile 4: LOGISTICS & SERVICES */}
+          <button
+            onClick={() => setActiveCategory('VOLUNTEERS')}
+            className={`p-2.5 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer text-center min-h-[64px] ${
+              activeCategory === 'VOLUNTEERS'
+                ? 'bg-slate-700 text-white font-black shadow-md border border-slate-500 ring-1 ring-slate-400 scale-[1.02]'
+                : 'bg-slate-950/80 border border-slate-800 text-slate-400 hover:text-slate-200 font-semibold hover:border-slate-700'
+            }`}
+          >
+            <div className="flex items-center gap-1.5">
+              <Truck className={`w-4 h-4 ${activeCategory === 'VOLUNTEERS' ? 'text-emerald-300' : 'text-slate-400'}`} />
+              <span className="text-xs font-black">{i18nService.t('logisticsCategory', 'Logistics')}</span>
+            </div>
+            <span className={`text-[10px] font-extrabold px-2 py-0.2 rounded-full ${
+              activeCategory === 'VOLUNTEERS' ? 'bg-slate-800 text-slate-200 border border-slate-600' : 'bg-slate-900 text-slate-500 border border-slate-800'
+            }`}>
+              {volunteers.length} Services
+            </span>
+          </button>
 
+        </div>
+
+        {/* Native Search Bar Input */}
+        <div className="relative w-full pt-1">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-[58%] -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search boat, car, name, district..."
+            placeholder={i18nService.t('searchPlaceholder', 'Search boat, car, name, district...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full sm:w-64 px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400"
+            className="w-full bg-slate-950 border border-slate-700/80 rounded-2xl pl-10 pr-8 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-transparent"
           />
+          {searchQuery && (
+            <button 
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-[58%] -translate-y-1/2 text-slate-400 hover:text-white text-xs font-black p-0.5"
+            >
+              ✕
+            </button>
+          )}
         </div>
       </div>
 
       {/* Directory Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div id="ngo-cards-list-container" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         
         {/* NGO CARDS */}
         {(activeCategory === 'ALL' || activeCategory === 'NGOS') && filteredNgos.map((ngo) => (
@@ -224,7 +286,7 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
                 <div className="flex flex-wrap gap-1">
                   {Array.isArray(ngo.operatingZones) && ngo.operatingZones.map((zone, idx) => (
                     <span key={idx} className="px-2 py-0.5 text-[10px] font-bold bg-blue-500/10 text-blue-300 border border-blue-500/30 rounded-md">
-                      📍 {zone}
+                      {zone}
                     </span>
                   ))}
                 </div>
@@ -248,7 +310,7 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
 
             {/* Call Buttons */}
             <div className="pt-2 border-t border-slate-800/80 flex items-center gap-2">
-              {ngo.showPhone !== false ? (
+              {(ngo.showPhone !== false || isAuthorizedPartner) ? (
                 <>
                   <a
                     href={`tel:${ngo.phone?.replace(/[^0-9]/g, '')}`}
@@ -269,9 +331,9 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
                   </a>
                 </>
               ) : (
-                <div className="flex-1 py-2 px-3 bg-slate-900/50 border border-slate-800 text-slate-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all min-h-[40px] italic">
+                <div className="flex-1 py-2 px-3 bg-slate-900/50 border border-slate-800 text-slate-400 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all min-h-[40px] italic" title="Number hidden from public guests. Log in as a registered NGO to view.">
                   <Phone className="w-3.5 h-3.5 opacity-50" />
-                  <span>Number Hidden</span>
+                  <span>Number Protected (NGO Partners Only)</span>
                 </div>
               )}
             </div>
@@ -292,7 +354,7 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
 
               <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">District / Operating Location:</span>
-                <span className="text-xs font-bold text-amber-300">📍 {vol.district || 'Assam'}</span>
+                <span className="text-xs font-bold text-amber-300">{vol.district || 'Assam'}</span>
               </div>
 
               {vol.offerings && (

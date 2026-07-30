@@ -72,9 +72,9 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
       }, isAutoVerified);
 
       if (isAutoVerified) {
-        setSuccessMsg('⚡ Verified NGO Dispatch Logged! Your delivery has been auto-verified and published directly to the live request timeline.');
+        setSuccessMsg('Verified NGO Dispatch Logged! Your delivery has been auto-verified and published directly to the live request timeline.');
       } else {
-        setSuccessMsg('✅ Relief delivery log submitted! The Admin Verification Team will connect with you via WhatsApp for photo verification before publishing to the live timeline.');
+        setSuccessMsg('Relief delivery log submitted! The Admin Verification Team will connect with you via WhatsApp for photo verification before publishing to the live timeline.');
       }
 
       setTimeout(() => {
@@ -279,8 +279,8 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
                 onChange={(e) => setStatusUpdate(e.target.value)}
                 className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
               >
-                <option value="In Progress">🟡 In Progress (Partially Fulfilled - More supplies/rescue needed)</option>
-                <option value="Rescued">🟢 Rescued / Fully Resolved (All needs met)</option>
+                <option value="In Progress">In Progress (Partially Fulfilled - More supplies/rescue needed)</option>
+                <option value="Rescued">Rescued / Fully Resolved (All needs met)</option>
               </select>
             </div>
 
@@ -299,7 +299,7 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
                 className="px-5 py-2.5 text-xs font-black text-slate-950 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 rounded-xl shadow-lg flex items-center gap-2 active:scale-95 transition-all"
               >
                 <Send className="w-4 h-4" />
-                <span>{isNgoAuthenticated ? '⚡ PUBLISH INSTANT RELIEF LOG' : 'SUBMIT FOR ADMIN VERIFICATION'}</span>
+                <span>{isNgoAuthenticated ? 'PUBLISH INSTANT RELIEF LOG' : 'SUBMIT FOR ADMIN VERIFICATION'}</span>
               </button>
             </div>
 

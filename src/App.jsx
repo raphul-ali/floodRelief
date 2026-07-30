@@ -13,8 +13,10 @@ import LoginModal from './components/LoginModal';
 import FloatingSOSButton from './components/FloatingSOSButton';
 import EmergencyServices from './components/EmergencyServices';
 import PublicRequestsList from './components/PublicRequestsList';
+import MobileBottomDock from './components/MobileBottomDock';
 import { storageService } from './services/storageService';
 import { authService } from './services/authService';
+import { i18nService } from './services/i18nService';
 import { RefreshCw, Lock, Key, Mail, ShieldCheck, AlertTriangle, Eye, EyeOff, LogOut } from 'lucide-react';
 
 export default function App() {
@@ -72,24 +74,22 @@ export default function App() {
     const stopAutoRefresh = authService.startSessionAutoRefresh();
 
     const handleDataChanged = () => loadData();
-    const handleAuthChanged = () => {
-      const auth = authService.getCurrentUser();
-      setCurrentAuth(auth);
-    };
+    const handleAuthChanged = () => setCurrentAuth(authService.getCurrentUser());
+    const handleLangChanged = () => setLangState(i18nService.getLanguage());
 
-    const handlePopState = () => checkPath();
-
-    window.addEventListener('popstate', handlePopState);
-    window.addEventListener('hashchange', handlePopState);
     window.addEventListener('flood_data_changed', handleDataChanged);
     window.addEventListener('flood_auth_changed', handleAuthChanged);
+    window.addEventListener('flood_lang_changed', handleLangChanged);
+    window.addEventListener('popstate', checkPath);
+    window.addEventListener('hashchange', checkPath);
     
     return () => {
       stopAutoRefresh();
-      window.removeEventListener('popstate', handlePopState);
-      window.removeEventListener('hashchange', handlePopState);
       window.removeEventListener('flood_data_changed', handleDataChanged);
       window.removeEventListener('flood_auth_changed', handleAuthChanged);
+      window.removeEventListener('flood_lang_changed', handleLangChanged);
+      window.removeEventListener('popstate', checkPath);
+      window.removeEventListener('hashchange', checkPath);
     };
   }, []);
 
@@ -256,7 +256,14 @@ export default function App() {
   const handleTabChange = (tabName) => {
     setActiveTab(tabName);
     setTimeout(() => {
-      if (tabName === 'emergency') {
+      if (tabName === 'ngos') {
+        const ngoEl = document.getElementById('ngo-cards-list-container') || document.getElementById('ngo-directory-container');
+        if (ngoEl) {
+          const yOffset = -90; // Offset for sticky header
+          const y = ngoEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      } else if (tabName === 'emergency') {
         const emergencyEl = document.getElementById('emergency-filters-section');
         if (emergencyEl) {
           const yOffset = -90; // Offset for sticky header
@@ -272,7 +279,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-red-500 selection:text-white">
+    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans selection:bg-red-500 selection:text-white">
       
       {/* Fixed Header Bar (Zero Admin Buttons) */}
       <Header
@@ -282,6 +289,7 @@ export default function App() {
         openSupplyModal={openSupplyModal}
         urgentCount={urgentCount}
         pendingCount={pendingCount}
+        requestsCount={victimRequests.length}
         currentAuth={currentAuth}
         openLoginModal={() => setIsLoginModalOpen(true)}
         onLogout={handleLogout}
@@ -341,6 +349,7 @@ export default function App() {
           <NGODirectory 
             ngos={ngos} 
             volunteers={volunteers}
+            currentAuth={currentAuth}
             openLoginModal={(mode = 'REGISTER', regRole = 'NGO') => {
               setLoginModalMode(mode);
               setLoginModalRegRole(regRole);
@@ -379,20 +388,27 @@ export default function App() {
       )}
 
       {/* Public Footer (Zero Admin Links) */}
-      <footer className="bg-slate-950 border-t border-slate-800/80 py-6 text-center text-xs text-slate-500 space-y-2 pb-20 sm:pb-6">
+      <footer className="bg-slate-950 border-t border-slate-800/80 py-6 text-center text-xs text-slate-500 space-y-2 pb-24 sm:pb-6">
         <div className="flex flex-wrap items-center justify-center gap-4 text-slate-400">
-          <button onClick={() => storageService.resetToDefaultSeed()} className="hover:text-amber-400 font-semibold flex items-center gap-1">
-            <RefreshCw className="w-3.5 h-3.5" /> Reset Demo Sample Data
-          </button>
-          <span>|</span>
           <button onClick={() => setIsLoginModalOpen(true)} className="hover:text-amber-400 font-semibold flex items-center gap-1">
-            🤝 Partner Portal Login
+            {i18nService.t('partnerLogin', 'Partner Portal Login')}
           </button>
           <span>|</span>
-          <span>Open-Source Assam Flood Relief Network</span>
+          <span>{i18nService.t('openSourceNetwork', 'Open-Source Assam Flood Relief Network')}</span>
         </div>
-        <p>© 2026 Assam Flood Victims & NGO Portal. Independent Community Network.</p>
+        <p>{i18nService.t('copyright', '© 2026 Assam Flood Victims & NGO Portal. Independent Community Network.')}</p>
       </footer>
+
+      {/* Native Mobile Bottom Navigation Dock */}
+      <MobileBottomDock
+        activeTab={activeTab}
+        setActiveTab={handleTabChange}
+        openRescueModal={openRescueModal}
+        openSupplyModal={openSupplyModal}
+        urgentCount={pendingCount}
+        requestsCount={victimRequests.length}
+        currentAuth={currentAuth}
+      />
 
     </div>
   );

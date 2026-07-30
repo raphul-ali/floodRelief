@@ -41,17 +41,17 @@ export const ASSAM_DISTRICTS = [
 ];
 
 export const VOLUNTEER_ROLES = [
-  "🚤 Free Motorboat / Rescue Boat Service",
-  "🚗 Free Car / SUV / 4x4 Transport Service",
-  "🚚 Free Goods Truck / Pickup Van",
-  "🩺 Free Medical Doctor / Paramedic"
+  "Free Motorboat / Rescue Boat Service",
+  "Free Car / SUV / 4x4 Transport Service",
+  "Free Goods Truck / Pickup Van",
+  "Free Medical Doctor / Paramedic"
 ];
 
 export const NGO_TYPES = [
-  "🏢 Registered NGO / Relief Organization",
-  "📦 Free Food & Water Supply Donor",
-  "📢 Social Media Influencer / Fundraiser",
-  "🤝 Individual Volunteer Helper / Self Help Worker"
+  "Registered NGO / Relief Organization",
+  "Free Food & Water Supply Donor",
+  "Social Media Influencer / Fundraiser",
+  "Individual Volunteer Helper / Self Help Worker"
 ];
 
 
@@ -742,6 +742,41 @@ export const storageService = {
         (v.name && v.name.toLowerCase().includes(cleanId)) ||
         (v.phone && cleanPhone && v.phone.replace(/[^0-9]/g, '').includes(cleanPhone))
       ) || null;
+    }
+  },
+
+  getAllUsers: () => {
+    try {
+      const ngos = storageService.getNGOs(true).map(n => ({
+        id: n.id,
+        userType: 'NGO',
+        name: n.name,
+        email: n.email || 'N/A',
+        password: n.password || '(Standard Account Password)',
+        phone: n.phone || 'N/A',
+        district: (n.operatingZones && n.operatingZones[0]) || n.address || 'Assam',
+        verified: !!n.verified,
+        createdAt: n.createdAt || n.created_at || new Date().toISOString(),
+        raw: n
+      }));
+
+      const vols = storageService.getVolunteers(true).map(v => ({
+        id: v.id,
+        userType: 'VOLUNTEER',
+        name: v.name,
+        email: v.email || 'N/A',
+        password: v.password || '(Standard Account Password)',
+        phone: v.phone || 'N/A',
+        district: v.district || 'Assam',
+        verified: !!v.verified,
+        createdAt: v.createdAt || v.created_at || new Date().toISOString(),
+        raw: v
+      }));
+
+      return [...ngos, ...vols];
+    } catch (e) {
+      console.error("Failed to load all users:", e);
+      return [];
     }
   },
 

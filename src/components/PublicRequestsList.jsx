@@ -13,7 +13,7 @@ export default function PublicRequestsList({ victimRequests = [] }) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-7 shadow-xl space-y-3">
+      <div className="bg-slate-800 border border-slate-700 rounded-3xl p-5 sm:p-7 shadow-xl space-y-3">
         <h2 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight">Public Rescue & Relief Requests</h2>
         <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
           Live tracking of all rescue and relief requests. Contact details are hidden to protect privacy. Registered NGOs and volunteers can view full details in the Partner Dashboard to respond and deliver aid.
@@ -21,7 +21,7 @@ export default function PublicRequestsList({ victimRequests = [] }) {
       </div>
 
       {victimRequests.length === 0 ? (
-        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-12 text-center space-y-3">
+        <div className="bg-slate-800/60 border border-slate-700 rounded-2xl p-12 text-center space-y-3">
           <Package className="w-12 h-12 text-slate-600 mx-auto" />
           <h3 className="text-lg font-bold text-white">No Requests Found</h3>
           <p className="text-xs text-slate-400 max-w-sm mx-auto">
@@ -36,7 +36,7 @@ export default function PublicRequestsList({ victimRequests = [] }) {
               const totalPeopleCount = req.peopleCount || ((req.malesCount || 0) + (req.femalesCount || 0) + (req.childrenCount || 0));
               
               return (
-                <div key={req.id} className={`bg-slate-900/80 border rounded-2xl overflow-hidden shadow-lg flex flex-col justify-between transition-all ${
+                <div key={req.id} className={`bg-slate-800 border rounded-2xl overflow-hidden shadow-lg flex flex-col justify-between transition-all ${
                   isUrgent ? 'border-red-500/40 hover:border-red-400' : 'border-amber-500/30 hover:border-amber-400'
                 }`}>
                   <div className={`px-4 py-2.5 flex items-center justify-between text-xs font-bold border-b ${
@@ -62,7 +62,7 @@ export default function PublicRequestsList({ victimRequests = [] }) {
                       <div>
                         <h3 className="font-black text-white">{req.name}</h3>
                         <p className="text-[10px] text-slate-400 mt-1 font-bold">
-                          Requested by: {req.requestedByRole === 'CITIZEN' ? '👤 Citizen' : req.requestedByRole === 'NGO' ? '🏛️ NGO' : '🚚 Volunteer'}
+                          Requested by: {req.requestedByRole === 'CITIZEN' ? 'Citizen' : req.requestedByRole === 'NGO' ? 'NGO' : 'Volunteer'}
                         </p>
                       </div>
                       <span className="text-[10px] font-mono text-slate-500 shrink-0 bg-slate-950 px-2 py-1 rounded border border-slate-800">

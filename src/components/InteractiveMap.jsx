@@ -72,22 +72,22 @@ export default function InteractiveMap({ victimRequests = [], ngos = [] }) {
 
       const maskedPhone = victim.phone ? `+91 ******${victim.phone.slice(-4)}` : 'Protected';
       const phoneButtonHtml = isAuthorizedUser
-        ? `<a href="tel:${victim.phone}" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded inline-flex items-center gap-1">📞 Call ${victim.phone}</a>`
-        : `<div class="bg-slate-900 border border-slate-700 text-amber-300 text-[11px] font-bold px-2.5 py-1.5 rounded-lg">🔒 Contact: ${maskedPhone} (Log in as NGO/Volunteer to view)</div>`;
+        ? `<a href="tel:${victim.phone}" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded inline-flex items-center gap-1">Call ${victim.phone}</a>`
+        : `<div class="bg-slate-900 border border-slate-700 text-amber-300 text-[11px] font-bold px-2.5 py-1.5 rounded-lg">Contact: ${maskedPhone} (Log in as NGO/Volunteer to view)</div>`;
 
       const popupContent = document.createElement('div');
       popupContent.className = "p-1 space-y-2 font-sans";
       popupContent.innerHTML = `
         <div class="flex items-center justify-between gap-2 border-b border-slate-700 pb-1.5">
           <span class="font-black text-sm ${victim.isUrgentRescue ? 'text-red-400' : 'text-amber-400'}">
-            ${victim.isUrgentRescue ? '🚨 ASSAM STRANDED SOS' : '📦 RELIEF REQUEST'}
+            ${victim.isUrgentRescue ? 'ASSAM STRANDED SOS' : 'RELIEF REQUEST'}
           </span>
           <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-300 font-bold">${victim.status}</span>
         </div>
         <div>
           <div class="font-extrabold text-sm text-white">${victim.name}</div>
-          <div class="text-xs text-amber-300 font-bold">📍 District: ${victim.district || 'Assam'}</div>
-          <div class="text-xs text-slate-300 mt-0.5">👥 ${victim.peopleCount} People trapped</div>
+          <div class="text-xs text-amber-300 font-bold">District: ${victim.district || 'Assam'}</div>
+          <div class="text-xs text-slate-300 mt-0.5">${victim.peopleCount > 0 ? victim.peopleCount + ' People trapped' : (victim.familiesCount > 0 ? victim.familiesCount + ' Families trapped' : '0 People trapped')}</div>
           <div class="text-[11px] text-slate-400 mt-1">Needs: ${(Array.isArray(victim.needs) ? victim.needs.join(', ') : victim.needs)}</div>
         </div>
         <div class="pt-2 flex items-center justify-between gap-2">
@@ -107,9 +107,9 @@ export default function InteractiveMap({ victimRequests = [], ngos = [] }) {
       const popupContent = document.createElement('div');
       popupContent.className = "p-1 space-y-1 font-sans";
       popupContent.innerHTML = `
-        <div class="font-bold text-xs text-blue-400">🛡️ ASSAM RESCUE BASE</div>
+        <div class="font-bold text-xs text-blue-400">ASSAM RESCUE BASE</div>
         <div class="font-black text-sm text-white">${ngo.name}</div>
-        <div class="text-xs text-slate-300">📞 ${ngo.phone}</div>
+        <div class="text-xs text-slate-300">${ngo.phone}</div>
         <div class="text-[11px] text-slate-400">Zones: ${ngo.operatingZones.slice(0, 3).join(', ')}</div>
       `;
 

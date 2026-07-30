@@ -1,17 +1,92 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
 @import "leaflet/dist/leaflet.css";
 @import "tailwindcss";
 
 :root {
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, .font-heading {
+  font-family: 'Outfit', 'Inter', sans-serif;
+}
+
+/* Native Mobile App Touch Scale & Shadow Utilities */
+.shadow-app-card {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.45), 0 4px 10px -2px rgba(0, 0, 0, 0.3);
+}
+
+.shadow-app-dock {
+  box-shadow: 0 -8px 25px -3px rgba(0, 0, 0, 0.6), 0 -4px 10px -2px rgba(0, 0, 0, 0.4);
+}
+
+/* Language-specific font overrides for Hindi (Devanagari) & Assamese (Bengali) */
+.lang-hi, html[lang="hi"] {
+  font-family: 'Noto Sans Devanagari', 'Plus Jakarta Sans', system-ui, sans-serif !important;
+}
+
+.lang-as, html[lang="as"] {
+  font-family: 'Noto Sans Bengali', 'Plus Jakarta Sans', system-ui, sans-serif !important;
+}
+
+/* Relax heavy font weights for Hindi & Assamese to prevent crowded/bled Devanagari letters */
+.lang-hi .font-black,
+.lang-hi .font-extrabold,
+.lang-hi .font-bold,
+.lang-as .font-black,
+.lang-as .font-extrabold,
+.lang-as .font-bold {
+  font-weight: 600 !important;
+  letter-spacing: 0.01em !important;
+}
+
+.lang-hi button,
+.lang-hi h1,
+.lang-hi h2,
+.lang-hi h3,
+.lang-hi label,
+.lang-hi span,
+.lang-as button,
+.lang-as h1,
+.lang-as h2,
+.lang-as h3,
+.lang-as label,
+.lang-as span {
+  text-transform: none !important;
 }
 
 body {
-  background-color: #030712; /* slate-950 */
-  color: #f9fafb;
+  background-color: #0f172a; /* slate-900 */
+  color: #f8fafc;
   overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Mobile Safe Area Inset Support */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Mobile Bottom Sheet Animations */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Custom scrollbars */
@@ -20,62 +95,43 @@ body {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #030712;
+  background: #0f172a;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1f2937;
+  background: #334155;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #374151;
-}
-
-/* Animations */
-@keyframes pulse-red {
-  0% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8);
-  }
-  70% {
-    box-shadow: 0 0 0 14px rgba(239, 68, 68, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-  }
-}
-
-.animate-urgent-pulse {
-  animation: pulse-red 1.8s infinite;
+  background: #475569;
 }
 
 /* Custom Leaflet Map styling overrides */
 .leaflet-container {
   width: 100%;
   height: 100%;
-  background: #0b0f19 !important;
+  background: #0f172a !important;
   font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
 
 .leaflet-popup-content-wrapper {
-  background: #111827 !important;
-  color: #f9fafb !important;
-  border-radius: 16px !important;
-  border: 1px solid rgba(239, 68, 68, 0.4) !important;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7) !important;
+  background: #1e293b !important;
+  color: #f8fafc !important;
+  border-radius: 12px !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4) !important;
 }
 
 .leaflet-popup-tip {
-  background: #111827 !important;
+  background: #1e293b !important;
 }
 
 /* Custom Leaflet Marker CSS */
 .custom-pin-urgent {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background: #ef4444;
-  border: 3px solid #ffffff;
-  box-shadow: 0 0 15px #ef4444;
-  animation: pulse-red 1.5s infinite;
+  background: #dc2626;
+  border: 2.5px solid #ffffff;
 }
 
 .custom-pin-standard {
