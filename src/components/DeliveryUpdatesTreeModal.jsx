@@ -4,8 +4,8 @@ import { X, Package, CheckCircle2, Clock, MapPin, Users, Building2, ShieldCheck 
 export default function DeliveryUpdatesTreeModal({ request, deliveryLogs = [], onClose }) {
   if (!request) return null;
 
-  // Filter logs for this specific request ID or district matching
-  const requestLogs = deliveryLogs.filter(log => log.requestId === request.id || (log.district === request.district && log.recipientName === request.name));
+  // Strictly filter logs for this specific request ID
+  const requestLogs = deliveryLogs.filter(log => log && request && log.requestId === request.id);
   const isRescue = request.isUrgentRescue || request.is_urgent_rescue;
 
   const totalDeliveries = requestLogs.length;

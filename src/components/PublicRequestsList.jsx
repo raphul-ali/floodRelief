@@ -79,9 +79,6 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
                     <div className="flex justify-between items-start gap-2">
                       <div>
                         <h3 className="font-black text-white text-base">{req.name}</h3>
-                        <p className="text-[10px] text-slate-400 mt-0.5 font-bold">
-                          Requested by: {req.requestedByRole === 'CITIZEN' ? 'Citizen' : req.requestedByRole === 'NGO' ? 'NGO' : 'Volunteer'}
-                        </p>
                       </div>
                       <span className="text-[10px] font-mono text-slate-400 shrink-0 bg-slate-950 px-2 py-1 rounded-lg border border-slate-800">
                         {new Date(req.createdAt).toLocaleDateString()}

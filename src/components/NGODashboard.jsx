@@ -631,23 +631,6 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                           </span>
                         </div>
 
-                        {/* Requested By Identity Badge */}
-                        <div className="flex items-center gap-1.5 text-[11px] font-bold bg-slate-950 p-2 rounded-xl border border-slate-800">
-                          <span className="text-slate-400 font-semibold">Requested by:</span>
-                          {req.requestedByRole === 'NGO' ? (
-                            <span className="px-2 py-0.5 rounded-md font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
-                              NGO: {req.requestedByName}
-                            </span>
-                          ) : req.requestedByRole === 'VOLUNTEER' ? (
-                            <span className="px-2 py-0.5 rounded-md font-black bg-purple-500/20 text-purple-300 border border-purple-500/40 flex items-center gap-1">
-                              Volunteer: {req.requestedByName}
-                            </span>
-                          ) : (
-                            <span className="px-2 py-0.5 rounded-md font-extrabold bg-slate-900 text-amber-300 border border-slate-700 flex items-center gap-1">
-                              Individual Citizen: {req.requestedByName || req.name}
-                            </span>
-                          )}
-                        </div>
 
                         {/* Location Badge */}
                         <div className="p-2.5 bg-slate-950 border border-slate-800 rounded-xl space-y-1.5">
