@@ -342,7 +342,7 @@ export default function App() {
         )}
 
         {activeTab === 'public_requests' && (
-          <PublicRequestsList victimRequests={victimRequests} />
+          <PublicRequestsList victimRequests={victimRequests} deliveryLogs={storageService.getDeliveryLogs()} />
         )}
 
         {activeTab === 'ngos' && (

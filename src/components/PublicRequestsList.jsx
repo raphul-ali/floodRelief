@@ -1,8 +1,26 @@
-import React, { useState } from 'react';
-import { AlertTriangle, MapPin, Package, Clock, ShieldCheck, ChevronLeft, ChevronRight, Users } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { AlertTriangle, MapPin, Package, Clock, ShieldCheck, ChevronLeft, ChevronRight, Users, Activity } from 'lucide-react';
+import DeliveryUpdatesTreeModal from './DeliveryUpdatesTreeModal';
+import { storageService } from '../services/storageService';
 
-export default function PublicRequestsList({ victimRequests = [] }) {
+export default function PublicRequestsList({ victimRequests = [], deliveryLogs: propDeliveryLogs }) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [activeTreeRequest, setActiveTreeRequest] = useState(null);
+  const [deliveryLogs, setDeliveryLogs] = useState(propDeliveryLogs || []);
+
+  useEffect(() => {
+    const fetchLogs = () => {
+      if (propDeliveryLogs) {
+        setDeliveryLogs(propDeliveryLogs);
+      } else {
+        setDeliveryLogs(storageService.getDeliveryLogs());
+      }
+    };
+    fetchLogs();
+    window.addEventListener('flood_data_changed', fetchLogs);
+    return () => window.removeEventListener('flood_data_changed', fetchLogs);
+  }, [propDeliveryLogs]);
+
   const itemsPerPage = 12;
 
   const totalPages = Math.ceil(victimRequests.length / itemsPerPage);
@@ -109,15 +127,25 @@ export default function PublicRequestsList({ victimRequests = [] }) {
                     )}
                   </div>
                   
-                  <div className="p-3 bg-slate-950 border-t border-slate-800 flex justify-between items-center text-xs">
-                    <div className="flex items-center gap-1.5 text-slate-400 font-mono font-bold bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
-                      <span>Phone: +91 ******{req.phone ? req.phone.slice(-4) : 'XXXX'}</span>
+                  <div className="p-3 bg-slate-950 border-t border-slate-800 space-y-2">
+                    <div className="flex justify-between items-center text-xs">
+                      <div className="flex items-center gap-1.5 text-slate-400 font-mono font-bold bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
+                        <span>Phone: +91 ******{req.phone ? req.phone.slice(-4) : 'XXXX'}</span>
+                      </div>
+                      {req.verified && (
+                        <span className="flex items-center gap-1 text-emerald-400 font-black bg-emerald-950/50 px-2 py-1 rounded-lg border border-emerald-900/60">
+                          <ShieldCheck className="w-3.5 h-3.5" /> Verified
+                        </span>
+                      )}
                     </div>
-                    {req.verified && (
-                      <span className="flex items-center gap-1 text-emerald-400 font-black bg-emerald-950/50 px-2 py-1 rounded-lg border border-emerald-900/60">
-                        <ShieldCheck className="w-3.5 h-3.5" /> Verified
-                      </span>
-                    )}
+
+                    <button
+                      onClick={() => setActiveTreeRequest(req)}
+                      className="w-full py-2 px-3 bg-slate-900 hover:bg-slate-800 text-emerald-300 border border-slate-700 hover:border-emerald-500/50 rounded-xl text-xs font-black shadow-md flex items-center justify-center gap-1.5 active:scale-95 transition-all"
+                    >
+                      <Activity className="w-4 h-4 text-emerald-400" />
+                      <span>SEE UPDATES & IMPACT TREE</span>
+                    </button>
                   </div>
                 </div>
               )
@@ -146,6 +174,15 @@ export default function PublicRequestsList({ victimRequests = [] }) {
             </div>
           )}
         </>
+      )}
+
+      {/* Modal for Viewing Relief Delivery Updates Tree */}
+      {activeTreeRequest && (
+        <DeliveryUpdatesTreeModal
+          request={activeTreeRequest}
+          deliveryLogs={deliveryLogs}
+          onClose={() => setActiveTreeRequest(null)}
+        />
       )}
     </div>
   );

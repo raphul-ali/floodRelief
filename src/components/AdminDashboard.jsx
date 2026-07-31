@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, ShieldAlert, MessageSquare, Phone, CheckCircle2, XCircle, 
   Search, RefreshCw, Lock, Key, Clock, Package, HeartHandshake, UserCheck, AlertTriangle, ExternalLink, Bell, Edit2, Save, X,
-  Users, ChevronLeft, ChevronRight, Eye, EyeOff
+  User, Users, ChevronLeft, ChevronRight, Eye, EyeOff
 } from 'lucide-react';
 import { storageService, ASSAM_DISTRICTS } from '../services/storageService';
 import { isSupabaseConfigured } from '../services/supabaseClient';
