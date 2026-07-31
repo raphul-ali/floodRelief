@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Lock, Key, ShieldCheck, HeartHandshake, Mail, UserCheck, AlertTriangle, ArrowRight, CheckCircle2, Building2, Send, Hash, Phone, Eye, EyeOff } from 'lucide-react';
 import { authService } from '../services/authService';
 import { securityService } from '../services/securityService';
@@ -43,6 +43,44 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
   const [regLogoUrl, setRegLogoUrl] = useState('');
   const [logoError, setLogoError] = useState('');
   const [regShowPhone, setRegShowPhone] = useState(false);
+  const logoFileInputRef = useRef(null);
+
+  const handleClearLogo = () => {
+    setRegLogoUrl('');
+    setLogoError('');
+    if (logoFileInputRef.current) {
+      logoFileInputRef.current.value = '';
+    }
+  };
+
+  const handleLogoChange = (e) => {
+    const file = e.target.files?.[0];
+    setLogoError('');
+    if (!file) {
+      handleClearLogo();
+      return;
+    }
+
+    const result = securityService.validateLogoFile(file);
+    if (!result.valid) {
+      setLogoError(result.error);
+      setRegLogoUrl('');
+      // Remove invalid image selection from file input
+      if (e.target) {
+        e.target.value = '';
+      }
+      if (logoFileInputRef.current) {
+        logoFileInputRef.current.value = '';
+      }
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setRegLogoUrl(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
 
   // NGO Operating Zones State
   const [regZoneMode, setRegZoneMode] = useState('WHOLE_ASSAM'); // 'WHOLE_ASSAM' | 'CUSTOM_DISTRICTS'
@@ -716,37 +754,61 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
 
                     <div className="flex items-center gap-2">
                       {regLogoUrl ? (
-                        <img src={regLogoUrl} alt="Logo preview" className="w-11 h-11 rounded-xl object-cover border border-amber-400 shrink-0" />
+                        <div className="relative shrink-0 group">
+                          <img src={regLogoUrl} alt="Logo preview" className="w-11 h-11 rounded-xl object-cover border-2 border-amber-400" />
+                          <button
+                            type="button"
+                            onClick={handleClearLogo}
+                            className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-600 hover:bg-red-500 text-white rounded-full shadow-lg flex items-center justify-center transition-transform active:scale-95 border border-slate-900"
+                            title="Remove selected logo image"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
                       ) : (
                         <div className="w-11 h-11 rounded-xl bg-slate-950 border border-dashed border-slate-700 flex items-center justify-center text-slate-500 shrink-0 text-[10px] font-black">
                           LOGO
                         </div>
                       )}
-                      <input
-                        type="file"
-                        accept="image/jpeg,image/jpg,image/png"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          setLogoError('');
-                          if (!file) return;
-                          const result = securityService.validateLogoFile(file);
-                          if (!result.valid) {
-                            setLogoError(result.error);
-                            setRegLogoUrl('');
-                            return;
-                          }
-                          const reader = new FileReader();
-                          reader.onloadend = () => setRegLogoUrl(reader.result);
-                          reader.readAsDataURL(file);
-                        }}
-                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-slate-300 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400 cursor-pointer min-h-[44px]"
-                      />
+
+                      <div className="relative flex-1 flex items-center gap-1.5">
+                        <input
+                          ref={logoFileInputRef}
+                          type="file"
+                          accept="image/jpeg,image/jpg,image/png"
+                          onChange={handleLogoChange}
+                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-slate-300 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400 cursor-pointer min-h-[44px]"
+                        />
+
+                        {regLogoUrl && (
+                          <button
+                            type="button"
+                            onClick={handleClearLogo}
+                            className="px-2.5 py-2 bg-red-950/80 hover:bg-red-900 text-red-300 border border-red-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 shrink-0 transition-colors min-h-[44px]"
+                            title="Remove selected image"
+                          >
+                            <X className="w-4 h-4 text-red-400" />
+                            <span className="hidden sm:inline">Remove</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     {logoError && (
-                      <p className="text-[11px] font-bold text-red-400 mt-1 flex items-center gap-1 animate-fadeIn">
-                        <span>{logoError}</span>
-                      </p>
+                      <div className="p-2 bg-red-950/40 border border-red-800/60 rounded-xl mt-1.5 flex items-center justify-between gap-2 animate-fadeIn">
+                        <p className="text-[11px] font-bold text-red-400 flex items-center gap-1.5">
+                          <X className="w-3.5 h-3.5 shrink-0 text-red-400" />
+                          <span>{logoError}</span>
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setLogoError('')}
+                          className="text-red-400 hover:text-white p-0.5"
+                          title="Dismiss error"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
                     )}
                   </div>
                 )}
