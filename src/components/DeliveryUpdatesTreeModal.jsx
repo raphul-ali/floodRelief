@@ -50,8 +50,8 @@ export default function DeliveryUpdatesTreeModal({ request, deliveryLogs = [], o
           <div className="col-span-2 sm:col-span-1 p-3 bg-slate-950 border border-slate-800 rounded-2xl space-y-1">
             <span className="text-[10px] font-extrabold text-slate-400 uppercase">{isRescue ? 'Rescue Status' : 'Delivery Status'}</span>
             <p className="text-xs font-black text-white flex items-center gap-1.5">
-              <span className={`w-2 h-2 rounded-full ${request.status === 'Rescued' ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse'}`}></span>
-              {request.status === 'Rescued' ? 'Fulfilled' : request.status || 'Active Demand'}
+              <span className={`w-2 h-2 rounded-full ${request.status === 'Rescued' || request.status === 'Fulfilled' ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse'}`}></span>
+              {request.status || 'Active Demand'}
             </p>
           </div>
         </div>

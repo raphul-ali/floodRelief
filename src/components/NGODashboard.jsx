@@ -727,7 +727,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                                 className="flex-1 w-full py-2 px-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 rounded-xl text-xs font-black shadow-md flex items-center justify-center gap-1.5 active:scale-95 transition-all"
                               >
                                 <Plus className="w-4 h-4" />
-                                <span>LOG RELIEF DELIVERY</span>
+                                <span>UPDATE STATUS</span>
                               </button>
                             )}
 

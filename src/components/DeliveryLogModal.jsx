@@ -106,7 +106,7 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
           </div>
           <div>
             <h3 className="text-lg font-black text-white flex items-center gap-2">
-              {isRescue ? 'Log Rescue Operation' : 'Log Relief Delivery'}
+              {isRescue ? 'Update Rescue Status' : 'Update Delivery Status'}
             </h3>
             <p className="text-xs text-slate-400">
               Update {isRescue ? 'rescue' : 'supply delivery'} status for <span className="text-amber-300 font-bold">{request.name}</span> ({request.id})
