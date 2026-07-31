@@ -31,6 +31,7 @@ export default function App() {
   const [ngos, setNgos] = useState([]);
   const [volunteers, setVolunteers] = useState([]);
   const [pendingCount, setPendingCount] = useState(0);
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
   const [currentAuth, setCurrentAuth] = useState(authService.getCurrentUser());
 
@@ -66,14 +67,17 @@ export default function App() {
     checkPath();
     loadData();
 
-    // Trigger immediate Supabase Cloud Data Sync if configured
-    storageService.syncWithSupabase();
-
-
+    // Trigger immediate Supabase Cloud Data Sync in parallel
+    storageService.syncWithSupabase().finally(() => {
+      setIsLoadingData(false);
+    });
 
     const stopAutoRefresh = authService.startSessionAutoRefresh();
 
-    const handleDataChanged = () => loadData();
+    const handleDataChanged = () => {
+      loadData();
+      setIsLoadingData(false);
+    };
     const handleAuthChanged = () => {
       const user = authService.getCurrentUser();
       setCurrentAuth(user);
@@ -349,7 +353,7 @@ export default function App() {
         )}
 
         {activeTab === 'public_requests' && (
-          <PublicRequestsList victimRequests={victimRequests} deliveryLogs={storageService.getDeliveryLogs()} />
+          <PublicRequestsList victimRequests={victimRequests} deliveryLogs={storageService.getDeliveryLogs()} isLoading={isLoadingData} />
         )}
 
         {activeTab === 'ngos' && (

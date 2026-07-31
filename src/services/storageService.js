@@ -851,17 +851,17 @@ export const storageService = {
   syncWithSupabase: async () => {
     if (!isSupabaseConfigured || !supabase) return;
     
-    // 1. Fetch Victim SOS Requests from Supabase
     try {
-      const { data: victims, error: vErr } = await supabase
-        .from('victim_requests')
-        .select('*')
-        .order('created_at', { ascending: false });
+      // Execute all Supabase queries in parallel to drastically minimize loading time
+      const [victimsRes, logsRes, ngosRes, volsRes] = await Promise.all([
+        supabase.from('victim_requests').select('*').order('created_at', { ascending: false }),
+        supabase.from('delivery_logs').select('*').order('created_at', { ascending: false }),
+        supabase.from('ngos').select('*').order('created_at', { ascending: false }),
+        supabase.from('volunteers').select('*').order('created_at', { ascending: false })
+      ]);
 
-      if (vErr) {
-        console.error("Supabase victim_requests fetch error:", vErr);
-      } else if (Array.isArray(victims)) {
-        const formattedVictims = victims.map(v => ({
+      if (!victimsRes.error && Array.isArray(victimsRes.data)) {
+        cloudMemoryCache.victims = victimsRes.data.map(v => ({
           id: v.id,
           createdAt: v.created_at,
           name: v.name,
@@ -888,23 +888,10 @@ export const storageService = {
           requestedByName: v.requested_by_name || v.name,
           requestedByPhone: v.requested_by_phone || v.phone
         }));
-        cloudMemoryCache.victims = formattedVictims;
       }
-    } catch (err) {
-      console.error("Supabase victim_requests processing error:", err);
-    }
 
-    // 2. Fetch Delivery Logs from Supabase
-    try {
-      const { data: logs, error: lErr } = await supabase
-        .from('delivery_logs')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (lErr) {
-        console.error("Supabase delivery_logs fetch error:", lErr);
-      } else if (Array.isArray(logs)) {
-        const formattedLogs = logs.map(l => ({
+      if (!logsRes.error && Array.isArray(logsRes.data)) {
+        cloudMemoryCache.deliveryLogs = logsRes.data.map(l => ({
           logId: l.log_id || l.id,
           createdAt: l.created_at,
           requestId: l.request_id,
@@ -920,23 +907,10 @@ export const storageService = {
           statusUpdate: l.status_update,
           verified: l.verified
         }));
-        cloudMemoryCache.deliveryLogs = formattedLogs;
       }
-    } catch (err) {
-      console.error("Supabase delivery_logs processing error:", err);
-    }
 
-    // 3. Fetch NGOs from Supabase
-    try {
-      const { data: ngos, error: nErr } = await supabase
-        .from('ngos')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (nErr) {
-        console.error("Supabase ngos fetch error:", nErr);
-      } else if (Array.isArray(ngos)) {
-        const formattedNgos = ngos.map(n => ({
+      if (!ngosRes.error && Array.isArray(ngosRes.data)) {
+        cloudMemoryCache.ngos = ngosRes.data.map(n => ({
           id: n.id,
           name: n.name,
           contactPerson: n.contact_person,
@@ -950,23 +924,10 @@ export const storageService = {
           verified: n.verified,
           activeTeams: n.active_teams || 1
         }));
-        cloudMemoryCache.ngos = formattedNgos;
       }
-    } catch (err) {
-      console.error("Supabase ngos processing error:", err);
-    }
 
-    // 4. Fetch Volunteers from Supabase
-    try {
-      const { data: vols, error: volErr } = await supabase
-        .from('volunteers')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (volErr) {
-        console.error("Supabase volunteers fetch error:", volErr);
-      } else if (Array.isArray(vols)) {
-        const formattedVols = vols.map(v => ({
+      if (!volsRes.error && Array.isArray(volsRes.data)) {
+        cloudMemoryCache.volunteers = volsRes.data.map(v => ({
           id: v.id,
           name: v.name,
           roleType: v.role_type,
@@ -980,16 +941,11 @@ export const storageService = {
           createdAt: v.created_at,
           verified: v.verified
         }));
-        cloudMemoryCache.volunteers = formattedVols;
       }
-    } catch (err) {
-      console.error("Supabase volunteers processing error:", err);
-    }
 
-    try {
       notifyDataChanged();
     } catch (err) {
-      console.error("Supabase notifyDataChanged error:", err);
+      console.error("Supabase parallel sync error:", err);
     }
   }
 };

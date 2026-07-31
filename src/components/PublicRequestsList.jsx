@@ -1,9 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { AlertTriangle, MapPin, Package, Clock, ShieldCheck, ChevronLeft, ChevronRight, Users, Activity } from 'lucide-react';
+import { AlertTriangle, MapPin, Package, Clock, ShieldCheck, ChevronLeft, ChevronRight, Users, Activity, Loader2 } from 'lucide-react';
 import DeliveryUpdatesTreeModal from './DeliveryUpdatesTreeModal';
 import { storageService } from '../services/storageService';
 
-export default function PublicRequestsList({ victimRequests = [], deliveryLogs: propDeliveryLogs }) {
+function RequestCardSkeleton() {
+  return (
+    <div className="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl animate-pulse space-y-4 p-4 min-h-[220px] flex flex-col justify-between">
+      <div className="flex justify-between items-center pb-2 border-b border-slate-800/60">
+        <div className="h-4 w-36 bg-slate-800 rounded-lg"></div>
+        <div className="h-4 w-16 bg-slate-800 rounded-full"></div>
+      </div>
+      <div className="space-y-2">
+        <div className="h-5 w-3/4 bg-slate-800 rounded-lg"></div>
+        <div className="h-3 w-1/2 bg-slate-800/60 rounded-md"></div>
+      </div>
+      <div className="h-10 w-full bg-slate-950 rounded-xl border border-slate-800/80"></div>
+      <div className="flex gap-2">
+        <div className="h-5 w-16 bg-slate-800 rounded-lg"></div>
+        <div className="h-5 w-20 bg-slate-800 rounded-lg"></div>
+        <div className="h-5 w-24 bg-slate-800 rounded-lg"></div>
+      </div>
+      <div className="h-9 w-full bg-slate-800/70 rounded-xl"></div>
+    </div>
+  );
+}
+
+export default function PublicRequestsList({ victimRequests = [], deliveryLogs: propDeliveryLogs, isLoading = false }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTreeRequest, setActiveTreeRequest] = useState(null);
   const [deliveryLogs, setDeliveryLogs] = useState(propDeliveryLogs || []);
@@ -38,7 +60,19 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
         </p>
       </div>
 
-      {victimRequests.length === 0 ? (
+      {isLoading ? (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2.5 text-xs font-bold text-amber-300 bg-amber-950/40 p-3.5 rounded-2xl border border-amber-900/40 shadow-lg animate-pulse">
+            <Loader2 className="w-4 h-4 animate-spin text-amber-400 shrink-0" />
+            <span>Connecting to live Assam Flood Relief network & syncing latest request cards...</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {Array.from({ length: 6 }).map((_, idx) => (
+              <RequestCardSkeleton key={idx} />
+            ))}
+          </div>
+        </div>
+      ) : victimRequests.length === 0 ? (
         <div className="bg-slate-800/60 border border-slate-700 rounded-2xl p-12 text-center space-y-3">
           <Package className="w-12 h-12 text-slate-600 mx-auto" />
           <h3 className="text-lg font-bold text-white">No Requests Found</h3>
