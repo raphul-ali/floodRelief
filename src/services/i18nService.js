@@ -21,7 +21,7 @@ const translations = {
     login: 'Login',
     logout: 'Logout',
     requestRescue: 'REQUEST RESCUE',
-    reliefForm: 'RELIEF FORM',
+    reliefForm: 'REQUEST RELIEF',
     dashboard: 'Dashboard',
     checkRequests: 'Requests',
     ngosAndVolunteers: 'NGOs',

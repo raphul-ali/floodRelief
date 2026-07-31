@@ -30,7 +30,7 @@ export default function Header({
     <header className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-xl border-b border-slate-800 shadow-2xl w-full max-w-full overflow-x-hidden">
       
       {/* Top Disclaimer & Community Banner */}
-      <div className="bg-slate-950/70 text-slate-200 text-[10px] sm:text-xs font-semibold px-3 py-1 flex items-center justify-between gap-2 border-b border-slate-800/80">
+      <div className="hidden sm:flex bg-slate-950/70 text-slate-200 text-[10px] sm:text-xs font-semibold px-3 py-1 items-center justify-between gap-2 border-b border-slate-800/80">
         <div className="flex items-center gap-1.5 truncate">
           <span className="px-1.5 py-0.2 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded font-black text-[9px] sm:text-[10px] uppercase shrink-0">
             {i18nService.t('noticeBadge', 'Private Initiative')}
@@ -100,23 +100,24 @@ export default function Header({
           {/* Top Right Action Buttons */}
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             
-            {/* Desktop-Visible Rescue & Relief Buttons */}
+            {/* Desktop-Visible Relief & Rescue Buttons */}
             <div className="hidden sm:flex items-center gap-2 mr-1">
               <button
-                onClick={openRescueModal}
-                className="flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] sm:min-h-[42px] rounded-xl text-xs font-extrabold bg-red-600 hover:bg-red-700 active:bg-red-800 text-white border border-red-500 shadow-sm active:scale-95 transition-all uppercase tracking-wider cursor-pointer"
-                title="Request Emergency Rescue"
-              >
-                <ShieldAlert className="w-4 h-4 text-white shrink-0" />
-                <span>{i18nService.t('requestRescue', 'REQUEST RESCUE')}</span>
-              </button>
-              <button
                 onClick={openSupplyModal}
-                className="flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] sm:min-h-[42px] rounded-xl text-xs font-extrabold bg-slate-800 hover:bg-slate-700 active:bg-slate-900 text-white border border-slate-700 shadow-sm active:scale-95 transition-all uppercase tracking-wider cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 min-h-[38px] sm:min-h-[42px] rounded-xl text-xs font-black bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 active:scale-95 text-slate-950 border border-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.4)] transition-all uppercase tracking-wider cursor-pointer"
                 title="Submit Relief Support Form"
               >
-                <Package className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>{i18nService.t('reliefForm', 'RELIEF FORM')}</span>
+                <Package className="w-4 h-4 text-slate-950 shrink-0" />
+                <span>{i18nService.t('reliefForm', 'REQUEST RELIEF')}</span>
+              </button>
+
+              <button
+                onClick={openRescueModal}
+                className="flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] sm:min-h-[42px] rounded-xl text-xs font-extrabold bg-red-950/80 hover:bg-red-900 text-red-200 border border-red-500/60 shadow-sm active:scale-95 transition-all uppercase tracking-wider cursor-pointer"
+                title="Request Emergency Rescue"
+              >
+                <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" />
+                <span>{i18nService.t('requestRescue', 'REQUEST RESCUE')}</span>
               </button>
             </div>
 
