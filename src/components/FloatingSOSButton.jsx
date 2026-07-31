@@ -12,7 +12,7 @@ export default function FloatingSOSButton({ openModal, openSupplyModal }) {
   }, []);
 
   return (
-    <div className="fixed bottom-20 sm:bottom-8 right-3 sm:right-8 z-40 flex flex-col items-end gap-2.5 pointer-events-none">
+    <div className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] sm:bottom-8 right-3 sm:right-8 z-40 flex flex-col items-end gap-2.5 pointer-events-none">
       
       {/* Floating Rescue SOS Button */}
       <button
