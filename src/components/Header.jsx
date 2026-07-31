@@ -113,10 +113,11 @@ export default function Header({
 
               <button
                 onClick={openRescueModal}
-                className="flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] sm:min-h-[42px] rounded-xl text-xs font-extrabold bg-red-950/80 hover:bg-red-900 text-red-200 border border-red-500/60 shadow-sm active:scale-95 transition-all uppercase tracking-wider cursor-pointer"
+                style={{ backgroundColor: '#dc2626', opacity: 1 }}
+                className="flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] sm:min-h-[42px] rounded-xl text-xs font-black bg-[#dc2626] hover:bg-[#b91c1c] active:bg-[#991b1b] text-white border-2 border-red-400 shadow-md active:scale-95 transition-all uppercase tracking-wider cursor-pointer"
                 title="Request Emergency Rescue"
               >
-                <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" />
+                <ShieldAlert className="w-4 h-4 text-white shrink-0" />
                 <span>{i18nService.t('requestRescue', 'REQUEST RESCUE')}</span>
               </button>
             </div>

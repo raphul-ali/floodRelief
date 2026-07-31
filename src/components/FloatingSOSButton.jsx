@@ -23,12 +23,13 @@ export default function FloatingSOSButton({ openModal, openSupplyModal }) {
         <span>{i18nService.t('reliefForm', 'REQUEST RELIEF')}</span>
       </button>
 
-      {/* Floating Rescue SOS Button (Secondary) */}
+      {/* Floating Rescue SOS Button (Secondary - Guaranteed Solid Red) */}
       <button
         onClick={openModal}
-        className="pointer-events-auto flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-2xl bg-red-950/90 hover:bg-red-900 text-red-200 font-extrabold text-xs sm:text-sm uppercase tracking-wider shadow-app-card border border-red-500/60 active:scale-95 transition-all duration-150 cursor-pointer"
+        style={{ backgroundColor: '#dc2626', opacity: 1 }}
+        className="pointer-events-auto flex items-center gap-2 px-4 sm:px-5 py-3 rounded-2xl bg-[#dc2626] hover:bg-[#b91c1c] active:bg-[#991b1b] text-white font-black text-xs sm:text-sm uppercase tracking-wider shadow-[0_4px_20px_rgba(220,38,38,0.6)] border-2 border-red-400 active:scale-95 transition-all duration-150 cursor-pointer ring-2 ring-red-500/50"
       >
-        <ShieldAlert className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 shrink-0" />
+        <ShieldAlert className="w-4 h-4 sm:w-5 sm:h-5 text-white shrink-0" />
         <span>{i18nService.t('requestRescue', 'REQUEST RESCUE')}</span>
       </button>
 
