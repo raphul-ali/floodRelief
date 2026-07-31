@@ -201,11 +201,10 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
   };
 
   const getGoogleMapsUrl = (req) => {
-    if (req.latitude && req.longitude) {
+    if (req && req.latitude && req.longitude) {
       return `https://www.google.com/maps?q=${req.latitude},${req.longitude}`;
     }
-    const query = `${req.locationName || req.villageName || ''}, ${req.district}, Assam, India`;
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    return null;
   };
 
   const getWhatsAppLink = (phone, text) => {
@@ -647,16 +646,18 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                             </div>
                           </div>
 
-                          <a
-                            href={getGoogleMapsUrl(req)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="mt-1.5 w-full py-1.5 px-3 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 rounded-lg text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all"
-                          >
-                            <Navigation className="w-3.5 h-3.5 text-blue-400" />
-                            <span>Navigate in Google Maps</span>
-                            <ExternalLink className="w-3 h-3 text-blue-400" />
-                          </a>
+                          {req.latitude && req.longitude && (
+                            <a
+                              href={getGoogleMapsUrl(req)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-1.5 w-full py-1.5 px-3 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 rounded-lg text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all"
+                            >
+                              <Navigation className="w-3.5 h-3.5 text-blue-400" />
+                              <span>Navigate in Google Maps</span>
+                              <ExternalLink className="w-3 h-3 text-blue-400" />
+                            </a>
+                          )}
                         </div>
 
                         {/* Needed Items */}
