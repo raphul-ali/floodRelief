@@ -217,8 +217,8 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
     }
   };
 
-  // Registration Handler — Direct registration with pending admin approval state
-  const handleDirectRegister = (e) => {
+  // Registration Handler — Direct registration with instant auto-approval & auto-login for NGOs
+  const handleDirectRegister = async (e) => {
     e.preventDefault();
     setRegError('');
     setRegSuccess(false);
@@ -253,7 +253,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
       if (regRole === 'NGO') {
         const finalZones = ['Whole Assam (All 35 Districts)'];
 
-        authService.registerNgo({
+        await authService.registerNgo({
           name: regName,
           contactPerson: regName,
           phone: fullPhone,
@@ -264,6 +264,11 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
           services: regNgoType,
           showPhone: regShowPhone
         }, regPassword);
+
+        // Auto-login newly registered & approved NGO
+        await authService.loginNgo(regEmail, regPassword);
+        if (onClose) onClose();
+        return;
       } else {
         authService.registerVolunteer({
           name: regName,
@@ -274,9 +279,8 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
           offerings: regAddress || 'Local relief volunteer support',
           showPhone: regShowPhone
         }, regPassword);
+        setRegSuccess(true);
       }
-
-      setRegSuccess(true);
     } catch (err) {
       setRegError(err.message || 'Registration failed.');
     }
