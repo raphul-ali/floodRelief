@@ -8,6 +8,7 @@ import { storageService, ASSAM_DISTRICTS } from '../services/storageService';
 import { authService } from '../services/authService';
 import DeliveryLogModal from './DeliveryLogModal';
 import DeliveryUpdatesTreeModal from './DeliveryUpdatesTreeModal';
+import { parseNeedsTags } from './VictimRequestForm';
 
 export default function NGODashboard({ victimRequests = [], ngos = [] }) {
   const currentUser = authService.getCurrentUser();
@@ -653,7 +654,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                         <div className="space-y-1">
                           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Supplies / Help Needed:</span>
                           <div className="flex flex-wrap gap-1">
-                            {Array.isArray(req.needs) && req.needs.map((item, idx) => (
+                            {parseNeedsTags(req.needs).map((item, idx) => (
                               <span key={idx} className="px-2 py-0.5 text-[11px] font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/30 rounded-md">
                                 {item}
                               </span>

@@ -5,6 +5,21 @@ import { authService } from '../services/authService';
 import DistrictSelect from './DistrictSelect';
 import { i18nService } from '../services/i18nService';
 
+export const parseNeedsTags = (needs) => {
+  if (!needs) return [];
+  let rawList = Array.isArray(needs) ? needs : [needs];
+  const tags = [];
+  rawList.forEach(item => {
+    if (typeof item === 'string') {
+      item.split(/[,;\n]+/).forEach(part => {
+        const trimmed = part.trim();
+        if (trimmed) tags.push(trimmed);
+      });
+    }
+  });
+  return tags;
+};
+
 // Removed SUPPLY_NEEDS array
 
 export default function VictimRequestForm({ onClose, onRequestSubmitted, initialUrgent = true }) {
@@ -127,7 +142,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
         requestedByPhone,
         peopleCount: totalPeopleCount,
         locationName: locationAddressFormatted,
-        needs: formData.isUrgentRescue ? ['Emergency Motorboat Rescue & Life Evacuation'] : [formData.customNeeds],
+        needs: formData.isUrgentRescue ? ['Emergency Motorboat Rescue & Life Evacuation'] : parseNeedsTags(formData.customNeeds),
         latitude: attachGps ? formData.latitude : null,
         longitude: attachGps ? formData.longitude : null
       });
@@ -455,17 +470,32 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
             {/* ONLY SHOW SUPPLY TEXT BOX IF IN MATERIAL RELIEF MODE */}
             {!formData.isUrgentRescue && (
               <div className="space-y-2">
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
-                  Materials & Food Needed
-                </label>
+                <div className="flex justify-between items-center">
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    Materials & Food Needed *
+                  </label>
+                  <span className="text-[10px] text-amber-400 font-bold">Use commas (,) to separate items</span>
+                </div>
                 <textarea
                   rows="3"
-                  placeholder="e.g. Cooked Meals, Drinking Water, Blankets, Baby Food..."
+                  placeholder="e.g. Phenyle, Bleaching Powder, Dettol Soap, Tirpal, Mosquito Nets..."
                   value={formData.customNeeds}
                   onChange={(e) => setFormData(prev => ({ ...prev, customNeeds: e.target.value }))}
                   className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400 text-sm"
                   required={!formData.isUrgentRescue}
                 />
+                {formData.customNeeds && (
+                  <div className="space-y-1 pt-1">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Generated Supply Tags:</span>
+                    <div className="flex flex-wrap gap-1">
+                      {parseNeedsTags(formData.customNeeds).map((tag, idx) => (
+                        <span key={idx} className="px-2 py-0.5 text-[11px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-lg">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

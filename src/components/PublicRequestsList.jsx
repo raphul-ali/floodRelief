@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AlertTriangle, MapPin, Package, Clock, ShieldCheck, ChevronLeft, ChevronRight, Users, Activity, Loader2 } from 'lucide-react';
 import DeliveryUpdatesTreeModal from './DeliveryUpdatesTreeModal';
 import { storageService } from '../services/storageService';
+import { parseNeedsTags } from './VictimRequestForm';
 
 function RequestCardSkeleton() {
   return (
@@ -138,15 +139,18 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
                       </div>
                     </div>
 
-                    {Array.isArray(req.needs) && req.needs.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {req.needs.map((item, idx) => (
-                          <span key={idx} className="px-2 py-0.5 text-[10px] font-bold bg-slate-950 text-slate-300 rounded-lg border border-slate-800">
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    {(() => {
+                      const tags = parseNeedsTags(req.needs);
+                      return tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {tags.map((item, idx) => (
+                            <span key={idx} className="px-2 py-0.5 text-[10px] font-bold bg-slate-950 text-slate-300 rounded-lg border border-slate-800">
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                      );
+                    })()}
                     
                     {req.details && (
                       <div className="text-xs text-slate-400 italic bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80 leading-relaxed">
