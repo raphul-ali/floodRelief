@@ -20,9 +20,8 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
     villageName: '',
     pinCode: '',
     landmark: '',
-    malesCount: 1,
-    femalesCount: 1,
-    childrenCount: 0,
+    peopleCount: 1,
+    familiesCount: 0,
     latitude: null,
     longitude: null,
     isUrgentRescue: true,
@@ -65,7 +64,7 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
     );
   };
 
-  const totalPeopleCount = (parseInt(formData.malesCount) || 0) + (parseInt(formData.femalesCount) || 0) + (parseInt(formData.childrenCount) || 0);
+  const totalPeopleCount = (parseInt(formData.peopleCount) || 0) || ((parseInt(formData.malesCount) || 0) + (parseInt(formData.femalesCount) || 0) + (parseInt(formData.childrenCount) || 0));
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -255,47 +254,20 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
             </div>
           </div>
 
-          {/* Demographics Row: Males, Females, Children */}
-          <div className="p-3.5 bg-slate-950/80 border border-slate-800 rounded-xl space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black text-amber-300 uppercase tracking-wider">Demographics Breakdown</span>
-              <span className="text-xs font-black text-white bg-slate-900 px-2 py-0.5 rounded border border-amber-500/30">Total: {totalPeopleCount}</span>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              <div>
-                <label className="block text-[11px] font-bold text-slate-300 mb-1">Males</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={formData.malesCount}
-                  onChange={(e) => setFormData(prev => ({ ...prev, malesCount: Math.max(0, parseInt(e.target.value) || 0) }))}
-                  className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white font-extrabold text-xs"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-bold text-slate-300 mb-1">Females</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={formData.femalesCount}
-                  onChange={(e) => setFormData(prev => ({ ...prev, femalesCount: Math.max(0, parseInt(e.target.value) || 0) }))}
-                  className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white font-extrabold text-xs"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-bold text-slate-300 mb-1">Children</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={formData.childrenCount}
-                  onChange={(e) => setFormData(prev => ({ ...prev, childrenCount: Math.max(0, parseInt(e.target.value) || 0) }))}
-                  className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white font-extrabold text-xs"
-                />
-              </div>
-            </div>
+          {/* Demographics Row: Number of Families Needing Help */}
+          <div className="p-3.5 bg-slate-950/80 border border-slate-800 rounded-xl space-y-1.5">
+            <label className="block text-xs font-bold text-slate-300">
+              Number of Families Needing Help *
+            </label>
+            <input
+              type="number"
+              min="1"
+              required
+              value={formData.familiesCount || ''}
+              onChange={(e) => setFormData(prev => ({ ...prev, familiesCount: Math.max(1, parseInt(e.target.value) || 0), peopleCount: (Math.max(1, parseInt(e.target.value) || 0)) * 4 }))}
+              placeholder="e.g. 50"
+              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-extrabold text-sm focus:outline-none focus:border-amber-400"
+            />
           </div>
 
           {/* Situation Notes */}

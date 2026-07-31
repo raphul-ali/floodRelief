@@ -81,7 +81,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
 
   // Removed toggleNeed function
 
-  const totalPeopleCount = (parseInt(formData.malesCount) || 0) + (parseInt(formData.femalesCount) || 0) + (parseInt(formData.childrenCount) || 0);
+  const totalPeopleCount = (parseInt(formData.peopleCount) || 0) || ((parseInt(formData.malesCount) || 0) + (parseInt(formData.femalesCount) || 0) + (parseInt(formData.childrenCount) || 0));
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -307,19 +307,6 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
               </div>
             </div>
 
-            {/* Alternate Phone */}
-            <div>
-              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                {i18nService.t('alternatePhone', 'Alternate Phone Number (Optional)')}
-              </label>
-              <input
-                type="tel"
-                placeholder="e.g. 94350 98765"
-                value={formData.altPhone}
-                onChange={(e) => setFormData(prev => ({ ...prev, altPhone: e.target.value }))}
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm"
-              />
-            </div>
 
             {/* Village Name, District, and PIN Code */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -448,63 +435,21 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
               </div>
             </div>
 
-            {/* Demographics: Males, Females, Children, Families Counters */}
-            <div className="p-4 bg-slate-950/80 border border-slate-800 rounded-xl space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                <div className="flex items-center gap-2 text-xs font-black text-amber-300 uppercase tracking-wider">
-                  <Users className="w-4 h-4 text-amber-400" />
-                  <span>Demographics Needing Rescue</span>
-                </div>
-                <span className="text-[10px] sm:text-xs font-black text-white bg-slate-900 px-2.5 py-0.5 rounded-full border border-amber-500/30">
-                  Total: {totalPeopleCount} People{formData.familiesCount > 0 ? `, ${formData.familiesCount} Families` : ''}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-300 mb-1">Males</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={formData.malesCount}
-                    onChange={(e) => setFormData(prev => ({ ...prev, malesCount: Math.max(0, parseInt(e.target.value) || 0) }))}
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-extrabold text-sm focus:outline-none focus:border-amber-400"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-300 mb-1">Females</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={formData.femalesCount}
-                    onChange={(e) => setFormData(prev => ({ ...prev, femalesCount: Math.max(0, parseInt(e.target.value) || 0) }))}
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-extrabold text-sm focus:outline-none focus:border-amber-400"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-300 mb-1">Children</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={formData.childrenCount}
-                    onChange={(e) => setFormData(prev => ({ ...prev, childrenCount: Math.max(0, parseInt(e.target.value) || 0) }))}
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-extrabold text-sm focus:outline-none focus:border-amber-400"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] sm:text-xs font-bold text-slate-300 mb-1">Families</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={formData.familiesCount}
-                    onChange={(e) => setFormData(prev => ({ ...prev, familiesCount: Math.max(0, parseInt(e.target.value) || 0) }))}
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-extrabold text-sm focus:outline-none focus:border-amber-400"
-                  />
-                </div>
-              </div>
+            {/* Demographics: Number of Families Needing Help */}
+            <div className="p-4 bg-slate-950/80 border border-slate-800 rounded-xl space-y-2">
+              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <Users className="w-4 h-4 text-amber-400" />
+                <span>Number of Families Needing Help *</span>
+              </label>
+              <input
+                type="number"
+                min="1"
+                required
+                value={formData.familiesCount || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, familiesCount: Math.max(1, parseInt(e.target.value) || 0), peopleCount: (Math.max(1, parseInt(e.target.value) || 0)) * 4 }))}
+                placeholder="e.g. 50"
+                className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white font-extrabold text-sm focus:outline-none focus:border-amber-400"
+              />
             </div>
 
             {/* ONLY SHOW SUPPLY TEXT BOX IF IN MATERIAL RELIEF MODE */}

@@ -531,12 +531,7 @@ export default function AdminDashboard({ onDataUpdated }) {
 
 
                   <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1">
-                    <p className="text-slate-300"><strong className="text-white">Affected:</strong> {(() => {
-                      const tp = (req.peopleCount || 0) > 0 ? req.peopleCount : ((req.malesCount || 0) + (req.femalesCount || 0) + (req.childrenCount || 0));
-                      if (tp === 0 && req.familiesCount > 0) return `${req.familiesCount} Families`;
-                      if (tp === 0) return '0 People';
-                      return `${tp} People ${req.familiesCount > 0 ? `& ${req.familiesCount} Families` : ''}`;
-                    })()}</p>
+                    <p className="text-slate-300"><strong className="text-white">Affected:</strong> {req.familiesCount > 0 ? `${req.familiesCount} Families` : `${req.peopleCount || 1} People`}</p>
                     <p className="text-slate-300"><strong className="text-white">Phone:</strong> {req.phone}</p>
                     {req.details && <p className="text-slate-400 italic">"{req.details}"</p>}
                   </div>

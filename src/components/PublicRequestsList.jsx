@@ -119,14 +119,11 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
                       </span>
                     </div>
 
-                    {(totalPeopleCount > 0 || req.familiesCount > 0) && (
+                    {(req.familiesCount > 0 || totalPeopleCount > 0) && (
                       <div className="flex items-center gap-1.5 text-xs text-amber-300 font-bold bg-amber-950/40 px-2.5 py-1.5 rounded-xl border border-amber-900/40 w-fit">
                         <Users className="w-4 h-4 text-amber-400" />
                         <span>
-                          {totalPeopleCount > 0 ? `${totalPeopleCount} People` : ''} 
-                          {totalPeopleCount > 0 && req.familiesCount > 0 ? ' & ' : ''}
-                          {req.familiesCount > 0 ? `${req.familiesCount} Families` : ''} 
-                          {' Need Help'}
+                          {req.familiesCount > 0 ? `${req.familiesCount} Families Need Help` : `${totalPeopleCount} People Need Help`}
                         </span>
                       </div>
                     )}
