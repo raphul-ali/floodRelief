@@ -20,7 +20,7 @@ import { i18nService } from './services/i18nService';
 import { RefreshCw, Lock, Key, Mail, ShieldCheck, AlertTriangle, Eye, EyeOff, LogOut } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState(authService.getCurrentUser().role === 'GUEST' ? 'ngos' : 'dashboard');
+  const [activeTab, setActiveTab] = useState(authService.getCurrentUser().role === 'GUEST' ? 'public_requests' : 'dashboard');
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [loginModalMode, setLoginModalMode] = useState('NGO_LOGIN'); // 'NGO_LOGIN' | 'VOLUNTEER_LOGIN' | 'REGISTER'
@@ -74,7 +74,13 @@ export default function App() {
     const stopAutoRefresh = authService.startSessionAutoRefresh();
 
     const handleDataChanged = () => loadData();
-    const handleAuthChanged = () => setCurrentAuth(authService.getCurrentUser());
+    const handleAuthChanged = () => {
+      const user = authService.getCurrentUser();
+      setCurrentAuth(user);
+      if (user.role === 'GUEST') {
+        setActiveTab('public_requests');
+      }
+    };
     const handleLangChanged = () => setLangState(i18nService.getLanguage());
 
     window.addEventListener('flood_data_changed', handleDataChanged);
@@ -105,6 +111,7 @@ export default function App() {
 
   const handleLogout = () => {
     authService.logout();
+    setActiveTab('public_requests');
   };
 
   const handleSecretAdminLogin = (e) => {
