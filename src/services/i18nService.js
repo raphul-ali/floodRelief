@@ -62,7 +62,7 @@ const translations = {
     materialsNeeded: 'Materials & Food Needed',
     materialsPlaceholder: 'e.g. Cooked Meals, Drinking Water, Blankets, Baby Food...',
     situationNotes: 'Situation Notes / Water Level Status',
-    publishRequest: 'PUBLISH RELIEF SUPPLY REQUEST',
+    publishRequest: 'SUBMIT REQUEST',
     requestRegistered: 'Request Registered. Someone will help you soon.',
     requestRegisteredSub: 'Your request has been published to nearby verified NGOs, rescue boat operators, and logistics volunteers.',
     returnToPortal: 'Return to Portal',
