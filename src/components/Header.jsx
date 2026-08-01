@@ -91,7 +91,7 @@ export default function Header({
             {/* Home Button in Top Header */}
             <button
               onClick={() => setActiveTab(currentAuth.role === 'GUEST' ? 'ngos' : 'dashboard')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] sm:min-h-[42px] rounded-xl text-[11px] sm:text-xs font-extrabold border transition-all duration-150 active:scale-95 shadow-sm ${
+              className={`flex items-center justify-center gap-1 px-2.5 sm:px-3 py-1.5 min-h-[36px] sm:min-h-[42px] rounded-xl text-[11px] sm:text-xs font-extrabold border transition-all duration-150 active:scale-95 shadow-sm ${
                 (activeTab === 'dashboard' || activeTab === 'ngos')
                   ? 'bg-indigo-600 text-white border-indigo-500 shadow-indigo-950/50'
                   : 'bg-slate-800 hover:bg-slate-700 active:bg-slate-900 text-slate-200 border-slate-700'
@@ -99,20 +99,20 @@ export default function Header({
               title="Home"
             >
               <Home className="w-4 h-4 text-indigo-300 shrink-0" />
-              <span>{i18nService.t('home')}</span>
+              <span className="hidden sm:inline">{i18nService.t('home')}</span>
             </button>
 
             {/* Language Selector Dropdown */}
-            <div className="flex items-center gap-1 bg-slate-800 px-2 py-1 rounded-xl border border-slate-700 shrink-0 min-h-[38px] sm:min-h-[42px]">
-              <Globe className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+            <div className="flex items-center gap-1 bg-slate-800/90 px-1.5 py-0.5 rounded-lg border border-slate-700/80 shrink-0 h-7 sm:h-8">
+              <Globe className="w-3 h-3 text-cyan-400 shrink-0" />
               <select
                 value={currentLang}
                 onChange={(e) => i18nService.setLanguage(e.target.value)}
-                className="bg-transparent text-cyan-300 text-[11px] font-bold focus:outline-none cursor-pointer"
+                className="bg-transparent text-cyan-300 text-[10px] sm:text-[11px] font-bold focus:outline-none cursor-pointer"
               >
                 {LANGUAGES.map(l => (
-                  <option key={l.code} value={l.code} className="bg-slate-900 text-white font-semibold">
-                    {l.native} ({l.label})
+                  <option key={l.code} value={l.code} className="bg-slate-900 text-white font-semibold text-xs">
+                    {l.code === 'en' ? 'EN' : l.native}
                   </option>
                 ))}
               </select>
@@ -122,10 +122,11 @@ export default function Header({
             {currentAuth.role === 'GUEST' ? (
               <button
                 onClick={openLoginModal}
-                className="flex items-center gap-1 px-3 py-1.5 min-h-[38px] sm:min-h-[42px] rounded-xl text-[11px] sm:text-xs font-extrabold bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white border border-indigo-500 shadow-sm active:scale-95 transition-all duration-150"
+                className="flex items-center justify-center gap-1 px-2.5 sm:px-3 py-1.5 min-h-[36px] sm:min-h-[42px] rounded-xl text-[11px] sm:text-xs font-extrabold bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white border border-indigo-500 shadow-sm active:scale-95 transition-all duration-150"
+                title="Login"
               >
                 <Lock className="w-3.5 h-3.5 text-indigo-200" />
-                <span>{i18nService.t('login')}</span>
+                <span className="hidden sm:inline">{i18nService.t('login')}</span>
               </button>
             ) : currentAuth.role !== 'GUEST' ? (
               <div className="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-xl pl-3 pr-1 py-1 shadow-md shrink-0">
