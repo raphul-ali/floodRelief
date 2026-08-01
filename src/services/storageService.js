@@ -107,20 +107,27 @@ export const storageService = {
       throw new Error("Invalid PIN Code. Please provide a valid 6-digit postal PIN code.");
     }
 
+    const isRescue = Boolean(requestData.isUrgentRescue);
+    const rawPhone = requestData.phone ? securityService.sanitizeText(requestData.phone) : '';
+    const nameVal = requestData.name ? securityService.limitLength(securityService.sanitizeText(requestData.name), 60) : (isRescue ? `Rescue Victim (${rawPhone})` : 'Relief Requester');
+    const villageVal = requestData.villageName ? securityService.limitLength(securityService.sanitizeText(requestData.villageName), 100) : (isRescue ? 'Emergency Rescue Spot' : 'Assam Village');
+    const districtVal = requestData.district ? securityService.sanitizeText(requestData.district) : 'Jorhat';
+    const locationVal = requestData.locationName ? securityService.limitLength(securityService.sanitizeText(requestData.locationName), 250) : `${villageVal}, ${districtVal}`;
+
     const sanitized = {
       ...requestData,
-      name: securityService.limitLength(securityService.sanitizeText(requestData.name), 60),
-      phone: securityService.limitLength(securityService.sanitizeText(requestData.phone), 20),
+      name: nameVal,
+      phone: rawPhone,
       altPhone: securityService.limitLength(securityService.sanitizeText(requestData.altPhone), 20),
-      district: securityService.sanitizeText(requestData.district),
-      villageName: securityService.limitLength(securityService.sanitizeText(requestData.villageName), 100),
+      district: districtVal,
+      villageName: villageVal,
       pinCode: securityService.limitLength(securityService.sanitizeText(requestData.pinCode), 10),
       landmark: securityService.limitLength(securityService.sanitizeText(requestData.landmark), 150),
-      locationName: securityService.limitLength(securityService.sanitizeText(requestData.locationName), 250),
+      locationName: locationVal,
       details: securityService.limitLength(securityService.sanitizeText(requestData.details), 400),
       requestedByRole: requestData.requestedByRole ? securityService.sanitizeText(requestData.requestedByRole) : 'CITIZEN',
-      requestedByName: requestData.requestedByName ? securityService.limitLength(securityService.sanitizeText(requestData.requestedByName), 80) : securityService.limitLength(securityService.sanitizeText(requestData.name), 60),
-      requestedByPhone: requestData.requestedByPhone ? securityService.limitLength(securityService.sanitizeText(requestData.requestedByPhone), 20) : securityService.limitLength(securityService.sanitizeText(requestData.phone), 20),
+      requestedByName: requestData.requestedByName ? securityService.limitLength(securityService.sanitizeText(requestData.requestedByName), 80) : nameVal,
+      requestedByPhone: requestData.requestedByPhone ? securityService.limitLength(securityService.sanitizeText(requestData.requestedByPhone), 20) : rawPhone,
     };
 
     const requests = storageService.getVictimRequests(true);

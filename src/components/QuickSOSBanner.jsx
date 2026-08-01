@@ -156,132 +156,68 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           
-          {/* Main Quick Inputs Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {/* Inputs Grid: Phone & People Count */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             
             {/* Phone */}
             <div>
-              <label className="block text-xs font-black text-amber-300 uppercase tracking-wider mb-1">
-                1. Your Mobile Phone *
+              <label className="block text-xs font-black text-amber-300 uppercase tracking-wider mb-1.5">
+                Mobile Phone Number *
               </label>
               <div className="relative">
-                <Phone className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                <Phone className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
                 <input
                   type="tel"
                   required
                   placeholder="e.g. 98640 12345"
                   value={formData.phone}
                   onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  className="w-full pl-9 pr-3 py-2.5 bg-slate-950 border-2 border-amber-500/60 rounded-xl text-white font-black text-sm focus:outline-none focus:border-amber-400 font-mono"
+                  className="w-full pl-10 pr-3.5 py-3 bg-slate-900 border-2 border-amber-500/80 rounded-xl text-white font-black text-base focus:outline-none focus:border-amber-400 font-mono shadow-inner"
                 />
               </div>
             </div>
 
-            {/* Name */}
+            {/* Number of People Needing Rescue */}
             <div>
-              <label className="block text-xs font-black text-slate-300 uppercase tracking-wider mb-1">
-                2. Victim / Contact Name *
-              </label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. Ramesh Sharma"
-                value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm"
-              />
-            </div>
-
-            {/* Searchable District Combobox */}
-            <div>
-              <label className="block text-xs font-black text-slate-300 uppercase tracking-wider mb-1">
-                3. District (Jorhat & Sivasagar Top)
-              </label>
-              <DistrictSelect
-                value={formData.district}
-                onChange={(selected) => setFormData(prev => ({ ...prev, district: selected }))}
-              />
-            </div>
-
-          </div>
-
-          {/* Village Name, PIN Code, and Landmark */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
-            <div>
-              <label className="block text-xs font-black text-slate-300 uppercase tracking-wider mb-1">
-                4. Village / Panchayat Name *
-              </label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. Kamalabari Village"
-                value={formData.villageName}
-                onChange={(e) => setFormData(prev => ({ ...prev, villageName: e.target.value }))}
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-black text-slate-300 uppercase tracking-wider mb-1">
-                5. PIN Code (6-digit)
+              <label className="block text-xs font-black text-amber-300 uppercase tracking-wider mb-1.5">
+                Number of People Needing Rescue *
               </label>
               <div className="relative">
-                <Hash className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                <Users className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
                 <input
-                  type="text"
-                  maxLength="6"
-                  placeholder="e.g. 785104"
-                  value={formData.pinCode}
-                  onChange={(e) => setFormData(prev => ({ ...prev, pinCode: e.target.value.replace(/[^0-9]/g, '') }))}
-                  className="w-full pl-9 pr-3 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm font-mono"
+                  type="number"
+                  min="1"
+                  required
+                  placeholder="e.g. 5 people stranded"
+                  value={formData.peopleCount || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, peopleCount: Math.max(1, parseInt(e.target.value) || 0) }))}
+                  className="w-full pl-10 pr-3.5 py-3 bg-slate-900 border-2 border-slate-600 rounded-xl text-white font-black text-base focus:outline-none focus:border-amber-400 shadow-inner"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-black text-slate-300 uppercase tracking-wider mb-1">
-                6. GPS Location
-              </label>
-              <button
-                type="button"
-                onClick={handleDetectLocation}
-                disabled={isLocating}
-                className="w-full py-2.5 px-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition-all"
-              >
-                <Navigation className={`w-4 h-4 ${isLocating ? 'animate-spin' : ''}`} />
-                <span>{isLocating ? 'Acquiring...' : formData.latitude ? 'GPS Pinned' : '1-Tap Detect GPS'}</span>
-              </button>
-            </div>
           </div>
 
-          {/* Demographics Row: Number of Families Needing Help */}
-          <div className="p-3.5 bg-slate-950/80 border border-slate-800 rounded-xl space-y-1.5">
-            <label className="block text-xs font-bold text-slate-300">
-              Number of Families Needing Help *
-            </label>
-            <input
-              type="number"
-              min="1"
-              required
-              value={formData.familiesCount || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, familiesCount: Math.max(1, parseInt(e.target.value) || 0), peopleCount: (Math.max(1, parseInt(e.target.value) || 0)) * 4 }))}
-              placeholder="e.g. 50"
-              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-extrabold text-sm focus:outline-none focus:border-amber-400"
-            />
-          </div>
-
-          {/* Situation Notes */}
-          <div>
-            <label className="block text-xs font-black text-slate-300 uppercase tracking-wider mb-1">
-              Water Level & Spot Notes
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. Water 4ft high, trapped on roof of house near dike"
-              value={formData.details}
-              onChange={(e) => setFormData(prev => ({ ...prev, details: e.target.value }))}
-              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm"
-            />
+          {/* GPS Location Button */}
+          <div className="flex items-center gap-3 bg-slate-900 p-2.5 rounded-xl border border-slate-700">
+            <button
+              type="button"
+              onClick={handleDetectLocation}
+              disabled={isLocating}
+              className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition-all min-h-[42px] ${
+                formData.latitude
+                  ? 'bg-emerald-600/30 text-emerald-200 border border-emerald-500'
+                  : 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50'
+              }`}
+            >
+              <Navigation className={`w-4 h-4 ${isLocating ? 'animate-spin' : ''}`} />
+              <span>{isLocating ? 'Acquiring GPS...' : formData.latitude ? 'GPS Pinned (Click to Refetch)' : 'Tap to Attach GPS Location'}</span>
+            </button>
+            {formData.latitude && (
+              <span className="text-[10px] text-emerald-400 font-mono font-bold px-2 py-1 bg-slate-800 rounded-lg shrink-0 border border-emerald-500/30">
+                GPS Attached
+              </span>
+            )}
           </div>
 
           {/* Submit Action */}
@@ -291,7 +227,7 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
             className="w-full py-4 mb-8 sm:mb-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-base uppercase tracking-wider shadow-lg border border-red-500 transition-all flex items-center justify-center gap-3 active:scale-98"
           >
             <ShieldAlert className="w-6 h-6" />
-            <span>{isSubmitting ? i18nService.t('transmitting', 'TRANSMITTING SOS...') : i18nService.t('transmitSos', 'TRANSMIT EMERGENCY RESCUE SOS NOW')}</span>
+            <span>{isSubmitting ? 'SUBMITTING...' : 'SUBMIT'}</span>
           </button>
 
         </form>

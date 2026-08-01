@@ -14,9 +14,9 @@ const translations = {
     notice: 'Independent community relief bridge. This is NOT an official government website.',
     noticeBadge: 'Private Initiative',
     govtHelpline: 'Govt Helpline: 1070',
-    appTitle: 'ASSAM FLOOD VICTIMS & NGO PORTAL',
-    shortTitle: 'ASSAM FLOOD RELIEF',
-    subTitle: 'Direct Rescue Bridge Connecting Citizens with NGOs & Rescue Boats',
+    appTitle: 'HELP AXOM',
+    shortTitle: 'HELP AXOM',
+    subTitle: 'UNITY. RELIEF. REBUILD.',
     home: 'HOME',
     login: 'Login',
     logout: 'Logout',
@@ -106,8 +106,8 @@ const translations = {
 
     // Footer
     partnerLogin: 'Partner Portal Login',
-    openSourceNetwork: 'Open-Source Assam Flood Relief Network',
-    copyright: '© 2026 Assam Flood Victims & NGO Portal. Independent Community Network.'
+    openSourceNetwork: 'HELP AXOM — Unity. Relief. Rebuild.',
+    copyright: '© 2026 HELP AXOM. Unity. Relief. Rebuild. Independent Community Network.'
   },
 
   as: {
@@ -115,9 +115,9 @@ const translations = {
     notice: 'স্বতন্ত্ৰ সম্প্ৰদায় ৰাহাত সেতু। এইখন চৰকাৰী ৱেবছাইট নহয়।',
     noticeBadge: 'ব্যক্তিগত উদ্যোগ',
     govtHelpline: 'চৰকাৰী হেল্পলাইন: ১০৭০',
-    appTitle: 'অসম বানপীড়িত আৰু বেচৰকাৰী সংস্থা পৰ্টেল',
-    shortTitle: 'অসম বান ৰাহাত',
-    subTitle: 'নাগৰিকক বেচৰকাৰী সংস্থা আৰু উদ্ধাৰকাৰী নাওৰ সৈতে সংযোগ কৰা প্ৰত্যক্ষ সেতু',
+    appTitle: 'হেল্প অসম (HELP AXOM)',
+    shortTitle: 'HELP AXOM',
+    subTitle: 'একতা। ৰাহাত। পুনৰ্নিৰ্মাণ। (UNITY. RELIEF. REBUILD.)',
     home: 'গৃহ',
     login: 'লগইন',
     logout: 'লগআউট',
@@ -207,8 +207,8 @@ const translations = {
 
     // Footer
     partnerLogin: 'অংশীদাৰ প’ৰ্টেল লগইন',
-    openSourceNetwork: 'মুক্ত উৎস অসম বান ৰাহাত নেটৱৰ্ক',
-    copyright: '© ২০২৬ অসম বানপীড়িত আৰু বেচৰকাৰী সংস্থা পৰ্টেল।'
+    openSourceNetwork: 'হেল্প অসম — একতা। ৰাহাত। পুনৰ্নিৰ্মাণ।',
+    copyright: '© ২০২৬ হেল্প অসম (HELP AXOM)। একতা। ৰাহাত। পুনৰ্নিৰ্মাণ।'
   },
 
   hi: {
@@ -216,9 +216,9 @@ const translations = {
     notice: 'स्वतंत्र सामुदायिक राहत पुल। यह आधिकारिक सरकारी वेबसाइट नहीं है।',
     noticeBadge: 'निजी पहल',
     govtHelpline: 'सरकारी हेल्पलाइन: 1070',
-    appTitle: 'असम बाढ़ पीड़ित एवं एनजीओ पोर्टल',
-    shortTitle: 'असम बाढ़ राहत',
-    subTitle: 'नागरिकों को एनजीओ और बचाव नौकाओं से जोड़ने वाला सीधा बचाव सेतु',
+    appTitle: 'HELP AXOM',
+    shortTitle: 'HELP AXOM',
+    subTitle: 'एकता। राहत। पुनर्निर्माण। (UNITY. RELIEF. REBUILD.)',
     home: 'होम',
     login: 'लॉगिन',
     logout: 'लॉगआउट',
@@ -308,8 +308,8 @@ const translations = {
 
     // Footer
     partnerLogin: 'भागीदार पोर्टल लॉगिन',
-    openSourceNetwork: 'ओपन-सोर्स असम बाढ़ राहत नेटवर्क',
-    copyright: '© 2026 असम बाढ़ पीड़ित एवं एनजीओ पोर्टल।'
+    openSourceNetwork: 'HELP AXOM — एकता। राहत। पुनर्निर्माण।',
+    copyright: '© 2026 HELP AXOM. एकता। राहत। पुनर्निर्माण। स्वतंत्र सामुदायिक राहत नेटवर्क।'
   }
 };
 

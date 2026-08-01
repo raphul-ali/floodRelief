@@ -64,7 +64,7 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
         <div className="space-y-4">
           <div className="flex items-center gap-2.5 text-xs font-bold text-amber-300 bg-amber-950/40 p-3.5 rounded-2xl border border-amber-900/40 shadow-lg animate-pulse">
             <Loader2 className="w-4 h-4 animate-spin text-amber-400 shrink-0" />
-            <span>Connecting to live Assam Flood Relief network & syncing latest request cards...</span>
+            <span>Connecting to live Help Axom network & syncing latest request cards...</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {Array.from({ length: 6 }).map((_, idx) => (

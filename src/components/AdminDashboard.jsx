@@ -171,7 +171,7 @@ export default function AdminDashboard({ onDataUpdated }) {
     const cleanPhone = phone.replace(/[^0-9]/g, '');
     const formatted = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
 
-    let text = `Hello ${name || 'User'}, this is Super Admin from Assam Flood Relief Portal. Regarding your ${reqType === 'FORGOT_PASSWORD' ? 'Forgot Password' : 'Forgot Email'} request for your ${role} account:`;
+    let text = `Hello ${name || 'User'}, this is Super Admin from Help Axom. Regarding your ${reqType === 'FORGOT_PASSWORD' ? 'Forgot Password' : 'Forgot Email'} request for your ${role} account:`;
     if (matchedAccount) {
       text += `\n\nRegistered Account Details:\n• Name: ${matchedAccount.name}\n• Email: ${matchedAccount.email}\n• Password: ${matchedAccount.password || 'Standard Password'}\n• Status: ${matchedAccount.verified ? 'Verified' : 'Pending Admin Verification'}`;
     } else {

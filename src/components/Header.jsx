@@ -15,7 +15,8 @@ export default function Header({
   requestsCount = 0,
   currentAuth = { role: 'GUEST', user: null },
   openLoginModal,
-  onLogout
+  onLogout,
+  openDevModal
 }) {
   const [currentLang, setCurrentLang] = useState(i18nService.getLanguage());
   const isAdmin = currentAuth.role === 'ADMIN';
@@ -29,44 +30,6 @@ export default function Header({
   return (
     <header className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-xl border-b border-slate-800 shadow-2xl w-full max-w-full overflow-x-hidden">
       
-      {/* Top Disclaimer & Community Banner */}
-      <div className="hidden sm:flex bg-slate-950/70 text-slate-200 text-[10px] sm:text-xs font-semibold px-3 py-1 items-center justify-between gap-2 border-b border-slate-800/80">
-        <div className="flex items-center gap-1.5 truncate">
-          <span className="px-1.5 py-0.2 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded font-black text-[9px] sm:text-[10px] uppercase shrink-0">
-            {i18nService.t('noticeBadge', 'Private Initiative')}
-          </span>
-          <span className="text-slate-300 truncate">
-            <strong>Notice:</strong> {i18nService.t('notice')}
-          </span>
-        </div>
-        
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Language Selector Dropdown */}
-          <div className="flex items-center gap-1 bg-slate-950 px-2 py-0.5 rounded border border-slate-700">
-            <Globe className="w-3 h-3 text-cyan-400 shrink-0" />
-            <select
-              value={currentLang}
-              onChange={(e) => i18nService.setLanguage(e.target.value)}
-              className="bg-transparent text-cyan-300 text-[10px] sm:text-[11px] font-bold focus:outline-none cursor-pointer"
-            >
-              {LANGUAGES.map(l => (
-                <option key={l.code} value={l.code} className="bg-slate-900 text-white font-semibold">
-                  {l.native} ({l.label})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <a 
-            href="tel:1070" 
-            className="hover:underline flex items-center gap-1 font-extrabold bg-slate-950 px-2 py-0.5 rounded border border-slate-700 text-amber-300 text-[10px] sm:text-[11px]"
-            title="Official Govt Emergency Helpline"
-          >
-            <PhoneCall className="w-3 h-3 text-amber-400" /> {i18nService.t('govtHelpline', 'Govt Helpline: 1070')}
-          </a>
-        </div>
-      </div>
-
       {/* Main Brand Bar */}
       <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 w-full">
         <div className="flex items-center justify-between min-h-[52px] sm:h-16 py-1 gap-2">
@@ -74,25 +37,28 @@ export default function Header({
           {/* Logo */}
           <div 
             onClick={() => setActiveTab('dashboard')}
-            className="flex items-center gap-2 sm:gap-3 cursor-pointer group shrink min-w-0"
+            className="flex items-center gap-2.5 sm:gap-3.5 cursor-pointer group shrink min-w-0"
           >
-            <div className="p-1.5 sm:p-2 rounded-xl bg-red-600 text-white shadow-md border border-red-500 shrink-0">
-              <ShieldAlert className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            <div className="relative shrink-0">
+              <img 
+                src="/helpaxom_badge.png" 
+                alt="HELP AXOM Emblem" 
+                className="w-10 h-10 sm:w-13 sm:h-13 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform" 
+              />
             </div>
             <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <h1 className="text-[11px] sm:text-lg font-black tracking-tight text-white group-hover:text-slate-200 transition-colors uppercase leading-tight truncate">
-                  <span className="hidden sm:inline">{i18nService.t('appTitle')}</span>
-                  <span className="sm:hidden font-black">{i18nService.t('shortTitle')}</span>
+              <div className="flex items-center gap-2">
+                <h1 className="text-base sm:text-xl font-black tracking-tight text-white group-hover:text-amber-300 transition-colors uppercase leading-none">
+                  HELP AXOM
                 </h1>
                 {urgentCount > 0 && (
-                  <span className="px-1.5 py-0.2 text-[9px] sm:text-xs font-black bg-red-600 text-white rounded-full border border-red-400 shrink-0">
+                  <span className="px-2 py-0.5 text-[9px] sm:text-xs font-black bg-red-600 text-white rounded-full border border-red-400 shrink-0 animate-pulse">
                     {urgentCount} SOS
                   </span>
                 )}
               </div>
-              <p className="text-[10px] text-amber-300 font-bold hidden md:block tracking-wide">
-                {i18nService.t('subTitle')}
+              <p className="text-[10px] sm:text-[11px] font-black text-cyan-400 tracking-wider uppercase mt-1 leading-none">
+                UNITY. RELIEF. REBUILD.
               </p>
             </div>
           </div>
@@ -135,6 +101,22 @@ export default function Header({
               <Home className="w-4 h-4 text-indigo-300 shrink-0" />
               <span>{i18nService.t('home')}</span>
             </button>
+
+            {/* Language Selector Dropdown */}
+            <div className="flex items-center gap-1 bg-slate-800 px-2 py-1 rounded-xl border border-slate-700 shrink-0 min-h-[38px] sm:min-h-[42px]">
+              <Globe className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <select
+                value={currentLang}
+                onChange={(e) => i18nService.setLanguage(e.target.value)}
+                className="bg-transparent text-cyan-300 text-[11px] font-bold focus:outline-none cursor-pointer"
+              >
+                {LANGUAGES.map(l => (
+                  <option key={l.code} value={l.code} className="bg-slate-900 text-white font-semibold">
+                    {l.native} ({l.label})
+                  </option>
+                ))}
+              </select>
+            </div>
 
             {/* Auth Session Button */}
             {currentAuth.role === 'GUEST' ? (

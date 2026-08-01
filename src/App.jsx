@@ -14,15 +14,17 @@ import FloatingSOSButton from './components/FloatingSOSButton';
 import EmergencyServices from './components/EmergencyServices';
 import PublicRequestsList from './components/PublicRequestsList';
 import MobileBottomDock from './components/MobileBottomDock';
+import DeveloperModal from './components/DeveloperModal';
 import { storageService } from './services/storageService';
 import { authService } from './services/authService';
 import { i18nService } from './services/i18nService';
-import { RefreshCw, Lock, Key, Mail, ShieldCheck, AlertTriangle, Eye, EyeOff, LogOut } from 'lucide-react';
+import { RefreshCw, Lock, Key, Mail, ShieldCheck, AlertTriangle, Eye, EyeOff, LogOut, MapPin, Code, Github, Instagram } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState(authService.getCurrentUser().role === 'GUEST' ? 'public_requests' : 'dashboard');
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isDevModalOpen, setIsDevModalOpen] = useState(false);
   const [loginModalMode, setLoginModalMode] = useState('NGO_LOGIN'); // 'NGO_LOGIN' | 'VOLUNTEER_LOGIN' | 'REGISTER'
   const [loginModalRegRole, setLoginModalRegRole] = useState('NGO'); // 'NGO' | 'VOLUNTEER'
   const [modalUrgentMode, setModalUrgentMode] = useState(true);
@@ -115,7 +117,7 @@ export default function App() {
 
   const handleLogout = () => {
     authService.logout();
-    setActiveTab('public_requests');
+    setActiveTab('dashboard');
   };
 
   const handleSecretAdminLogin = (e) => {
@@ -304,6 +306,7 @@ export default function App() {
         currentAuth={currentAuth}
         openLoginModal={() => setIsLoginModalOpen(true)}
         onLogout={handleLogout}
+        openDevModal={() => setIsDevModalOpen(true)}
       />
 
       {/* Main Container */}
@@ -398,16 +401,73 @@ export default function App() {
         />
       )}
 
+      {/* Developer Profile Modal */}
+      {isDevModalOpen && (
+        <DeveloperModal onClose={() => setIsDevModalOpen(false)} />
+      )}
+
       {/* Public Footer (Zero Admin Links) */}
-      <footer className="bg-slate-950 border-t border-slate-800/80 py-6 text-center text-xs text-slate-500 space-y-2 pb-24 sm:pb-6">
-        <div className="flex flex-wrap items-center justify-center gap-4 text-slate-400">
-          <button onClick={() => setIsLoginModalOpen(true)} className="hover:text-amber-400 font-semibold flex items-center gap-1">
-            {i18nService.t('partnerLogin', 'Partner Portal Login')}
-          </button>
-          <span>|</span>
-          <span>{i18nService.t('openSourceNetwork', 'Open-Source Assam Flood Relief Network')}</span>
+      <footer className="bg-slate-950 border-t border-slate-800/80 py-8 px-4 text-center text-xs text-slate-400 space-y-5 pb-28 sm:pb-8 flex flex-col items-center justify-center">
+        
+        {/* Brand Header */}
+        <div className="flex items-center gap-3">
+          <img 
+            src="/helpaxom_badge.png" 
+            alt="HELP AXOM Emblem" 
+            className="w-12 h-12 object-contain drop-shadow-md" 
+          />
+          <div className="text-left">
+            <h3 className="text-lg font-black text-white tracking-tight uppercase leading-none">HELP AXOM</h3>
+            <p className="text-[11px] font-black text-cyan-400 tracking-wider uppercase mt-1 leading-none">UNITY. RELIEF. REBUILD.</p>
+          </div>
         </div>
-        <p>{i18nService.t('copyright', '© 2026 Assam Flood Victims & NGO Portal. Independent Community Network.')}</p>
+
+        {/* Developer Team Section */}
+        <div className="flex flex-col items-center gap-2 p-3 bg-slate-900/90 border border-slate-800 rounded-2xl max-w-sm w-full shadow-md">
+          <div 
+            onClick={() => setIsDevModalOpen(true)}
+            className="flex items-center gap-3 cursor-pointer group w-full"
+          >
+            <img 
+              src="/developer.png" 
+              alt="Raphul Ali" 
+              className="w-10 h-10 rounded-full object-cover border-2 border-amber-400 group-hover:scale-105 transition-transform shrink-0" 
+            />
+            <div className="text-left flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-1">
+                <span className="font-black text-sm text-white group-hover:text-amber-300 transition-colors">Raphul Ali</span>
+                <span className="text-[9px] bg-amber-500/20 text-amber-300 font-extrabold px-2 py-0.5 rounded-full border border-amber-400/30 uppercase shrink-0">
+                  Developer
+                </span>
+              </div>
+              <p className="text-[11px] font-bold text-slate-300">Tinsukia, Assam</p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center gap-3 w-full pt-2 border-t border-slate-800 text-xs">
+            <a 
+              href="https://github.com/raphul-ali" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-slate-300 hover:text-white flex items-center gap-1.5 font-bold underline transition-colors"
+            >
+              <Github className="w-3.5 h-3.5 text-cyan-400" />
+              <span>GitHub</span>
+            </a>
+            <span className="text-slate-700">|</span>
+            <a 
+              href="https://www.instagram.com/r_aphul/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-slate-300 hover:text-pink-400 flex items-center gap-1.5 font-bold underline transition-colors"
+            >
+              <Instagram className="w-3.5 h-3.5 text-pink-400" />
+              <span>Instagram</span>
+            </a>
+          </div>
+        </div>
+
+        <p className="text-slate-500 text-[11px]">{i18nService.t('copyright', '© 2026 HELP AXOM. Unity. Relief. Rebuild. Independent Community Network.')}</p>
       </footer>
 
       {/* Native Mobile Bottom Navigation Dock */}
