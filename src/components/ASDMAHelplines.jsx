@@ -1,117 +1,133 @@
 import React, { useState, useEffect } from 'react';
-import { PhoneCall, Phone, ChevronDown, ChevronUp, Search } from 'lucide-react';
+import { PhoneCall, Phone, ChevronDown, ChevronUp, Search, Radio } from 'lucide-react';
 import { i18nService } from '../services/i18nService';
+import RippleButton from './ui/RippleButton';
 
 export default function ASDMAHelplines() {
   const [, setLangState] = useState(i18nService.getLanguage());
-
-  useEffect(() => {
-    const handleLangChange = () => setLangState(i18nService.getLanguage());
-    window.addEventListener('flood_lang_changed', handleLangChange);
-    return () => window.removeEventListener('flood_lang_changed', handleLangChange);
-  }, []);
-
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded]   = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
+  useEffect(() => {
+    const h = () => setLangState(i18nService.getLanguage());
+    window.addEventListener('flood_lang_changed', h);
+    return () => window.removeEventListener('flood_lang_changed', h);
+  }, []);
+
   const districtHelplines = [
-    { district: "Sivasagar", phone: "8471864355" },
-    { district: "Jorhat", phone: "0376-2300124" },
-    { district: "Majuli Island", phone: "03775-274411" },
-    { district: "Charaideo", phone: "9085412180" },
-    { district: "Golaghat", phone: "9394985421" },
-    { district: "Lakhimpur", phone: "03752-222217" },
-    { district: "Dhemaji", phone: "03753-224128" },
-    { district: "Dibrugarh", phone: "0373-2301525" },
-    { district: "Barpeta", phone: "03665-252125" },
-    { district: "Cachar (Silchar)", phone: "03842-245866" },
-    { district: "Dhubri", phone: "03662-230050" },
-    { district: "Nagaon", phone: "03672-233185" }
+    { district: 'Sivasagar',         phone: '8471864355'    },
+    { district: 'Jorhat',            phone: '0376-2300124'  },
+    { district: 'Majuli Island',     phone: '03775-274411'  },
+    { district: 'Charaideo',         phone: '9085412180'    },
+    { district: 'Golaghat',          phone: '9394985421'    },
+    { district: 'Lakhimpur',         phone: '03752-222217'  },
+    { district: 'Dhemaji',           phone: '03753-224128'  },
+    { district: 'Dibrugarh',         phone: '0373-2301525'  },
+    { district: 'Barpeta',           phone: '03665-252125'  },
+    { district: 'Cachar (Silchar)',   phone: '03842-245866'  },
+    { district: 'Dhubri',            phone: '03662-230050'  },
+    { district: 'Nagaon',            phone: '03672-233185'  },
   ];
 
-  const filteredDistricts = districtHelplines.filter(d => 
-    d.district.toLowerCase().includes(searchTerm.toLowerCase()) || 
+  const filtered = districtHelplines.filter(d =>
+    d.district.toLowerCase().includes(searchTerm.toLowerCase()) ||
     d.phone.includes(searchTerm)
   );
 
   return (
-    <div className="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-3 sm:p-4 shadow-md space-y-3">
-      
-      {/* Compact Summarized Single Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2.5">
-        <div className="flex items-center gap-2">
-          <div className="p-2 bg-red-600/20 text-red-400 rounded-xl border border-red-500/30 shrink-0">
+    <div className="glass-card rounded-2xl overflow-hidden shadow-lifted">
+      {/* Top bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 bg-red-50 border-b border-red-200">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 bg-red-600 rounded-xl text-white shrink-0">
             <PhoneCall className="w-4 h-4" />
           </div>
           <div>
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-xs font-black text-white uppercase tracking-tight">ASDMA Govt Helplines</span>
-              <span className="text-[10px] bg-red-600 text-white font-extrabold px-1.5 py-0.5 rounded">24x7</span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm font-black text-red-900 tracking-tight">
+                ASDMA Govt Helplines
+              </span>
+              <span className="inline-flex items-center gap-1 text-[10px] font-black bg-red-600 text-white px-2 py-0.5 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                24×7
+              </span>
             </div>
-            <p className="text-[11px] text-slate-300 font-medium">Assam Disaster Control Rooms</p>
+            <p className="text-xs text-red-700 font-medium">
+              Assam State Disaster Management Control Rooms
+            </p>
           </div>
         </div>
 
-        {/* Minimal Direct Call Buttons */}
+        {/* Call CTAs + expand */}
         <div className="flex items-center gap-2 shrink-0">
           <a
             href="tel:1070"
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white font-black text-xs rounded-xl shadow border border-red-400/40 active:scale-95 transition-all min-h-[36px]"
+            className="ripple-btn btn-base btn-sos px-3.5 py-2 rounded-xl text-xs font-black gap-1.5 min-h-[38px]"
           >
-            <PhoneCall className="w-3.5 h-3.5 text-amber-300" />
+            <PhoneCall className="w-3.5 h-3.5 shrink-0" />
             <span>1070</span>
           </a>
 
           <a
             href="tel:112"
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-amber-300 font-bold text-xs rounded-xl border border-slate-600 active:scale-95 transition-all min-h-[36px]"
+            className="ripple-btn ripple-dark btn-base btn-glass px-3.5 py-2 rounded-xl text-xs font-bold gap-1.5 min-h-[38px]"
           >
-            <Phone className="w-3.5 h-3.5 text-emerald-400" />
+            <Phone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
             <span>112</span>
           </a>
 
-          <button
+          <RippleButton
+            variant="glass"
+            darkRipple
             onClick={() => setExpanded(!expanded)}
-            className="px-3 py-1.5 bg-slate-900 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold flex items-center gap-1 border border-slate-700 active:scale-95 transition-all min-h-[36px] cursor-pointer"
+            className="px-3.5 py-2 rounded-xl text-xs font-bold gap-1.5 min-h-[38px]"
           >
-            {expanded ? <ChevronUp className="w-4 h-4 text-amber-400" /> : <ChevronDown className="w-4 h-4 text-amber-400" />}
-            <span>Districts ({districtHelplines.length})</span>
-          </button>
+            <Radio className="w-3.5 h-3.5 text-indigo-600" />
+            <span className="hidden sm:inline">Districts</span>
+            <span className="font-black text-slate-600">({districtHelplines.length})</span>
+            {expanded
+              ? <ChevronUp className="w-3.5 h-3.5 text-slate-500" />
+              : <ChevronDown className="w-3.5 h-3.5 text-slate-500" />}
+          </RippleButton>
         </div>
       </div>
 
-      {/* Expandable District Control Rooms List */}
+      {/* Expandable district list */}
       {expanded && (
-        <div className="pt-3 border-t border-slate-700/80 space-y-2.5 animate-fadeIn">
+        <div className="p-4 space-y-3 animate-slide-up bg-white">
+          {/* Search */}
           <div className="relative">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             <input
               type="text"
-              placeholder="Filter district control room..."
+              placeholder="Search district or number…"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-xs placeholder-slate-400 focus:outline-none focus:border-amber-400 font-medium"
+              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 text-xs placeholder-slate-400 focus:outline-none focus:border-indigo-400 font-medium min-h-[38px]"
             />
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-            {filteredDistricts.map((item) => (
+            {filtered.map(item => (
               <a
                 key={item.district}
                 href={`tel:${item.phone.replace(/[^0-9]/g, '')}`}
-                className="p-2 bg-slate-900 border border-slate-700/80 rounded-xl flex items-center justify-between hover:border-amber-400/50 active:scale-95 transition-all"
+                className="ripple-btn ripple-dark group p-2.5 bg-slate-50 border border-slate-200 hover:border-red-300 hover:bg-red-50 rounded-xl flex items-center justify-between transition-all"
               >
                 <div className="truncate">
-                  <span className="text-[11px] font-bold text-white block truncate">{item.district}</span>
-                  <span className="text-[10px] font-mono text-amber-300 block">{item.phone}</span>
+                  <span className="text-[11px] font-bold text-slate-800 block truncate group-hover:text-red-700 transition-colors">
+                    {item.district}
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-500 block group-hover:text-red-600">
+                    {item.phone}
+                  </span>
                 </div>
-                <Phone className="w-3 h-3 text-emerald-400 shrink-0 ml-1" />
+                <Phone className="w-3.5 h-3.5 text-emerald-500 group-hover:text-red-500 shrink-0 ml-2 transition-colors" />
               </a>
             ))}
           </div>
         </div>
       )}
-
     </div>
   );
 }

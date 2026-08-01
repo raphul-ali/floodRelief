@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, Package, CheckCircle2, Clock, MapPin, Users, Building2, ShieldCheck } from 'lucide-react';
+import ExpandableNotes from './ExpandableNotes';
 
 export default function DeliveryUpdatesTreeModal({ request, deliveryLogs = [], onClose }) {
   if (!request) return null;
@@ -137,9 +138,7 @@ export default function DeliveryUpdatesTreeModal({ request, deliveryLogs = [], o
                     )}
 
                     {log.deliveryNotes && (
-                      <div className="p-2.5 bg-slate-50 rounded-xl text-[11px] italic text-slate-700 border border-slate-200">
-                        "{log.deliveryNotes}"
-                      </div>
+                      <ExpandableNotes text={log.deliveryNotes} />
                     )}
                   </div>
 

@@ -325,302 +325,249 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
   };
 
   return (
-    <div className="fixed inset-0 z-[70] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 max-sm:pb-24 max-sm:pt-4 overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-md w-full p-4 sm:p-6 shadow-2xl space-y-4 text-slate-100 relative max-h-[85vh] sm:max-h-[90vh] flex flex-col justify-between my-auto animate-slide-up">
-        
-        {/* Modal Header Row — Title + Close Button */}
-        <div className="flex items-center justify-between gap-2 shrink-0">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-xl bg-slate-800 border border-slate-700 text-indigo-400">
-              <ShieldCheck className="w-4 h-4 text-indigo-400" />
+    <div className="fixed inset-0 z-[70] bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div className="bg-[#111827] border border-[#1f2937] rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[88vh] animate-slide-up">
+
+        {/* ── Modal header ─────────────────────────────────────────── */}
+        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-[#1f2937] shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-[#3b82f6] rounded-xl flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-4 h-4 text-white" />
             </div>
-            <span className="text-sm font-black text-white tracking-tight uppercase">Partner Portal Login</span>
+            <div>
+              <h2 className="text-[15px] font-black text-white leading-none">
+                {activeMode === 'REGISTER' ? 'Create Account' : 'Partner Login'}
+              </h2>
+              <p className="text-[11px] text-[#6b7280] mt-0.5">
+                {activeMode === 'REGISTER'
+                  ? 'Join as NGO or Relief Helper'
+                  : 'Access the partner portal'}
+              </p>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-xl transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center border border-slate-700 bg-slate-800 shrink-0"
-            aria-label="Close"
+            className="w-8 h-8 rounded-full bg-[#1f2937] hover:bg-[#374151] flex items-center justify-center text-[#9ca3af] hover:text-white transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Mode Switcher Tabs */}
-        <div className="flex items-center gap-1 p-1 bg-slate-950 rounded-2xl border border-slate-800 text-xs font-black shrink-0">
+        {/* ── Screen toggle — Login / Register ─────────────────────── */}
+        <div className="flex gap-0 px-5 pt-4 shrink-0">
           <button
-            type="button"
             onClick={() => { setActiveMode('NGO_LOGIN'); setLoginError(''); }}
-            className={`flex-1 py-2.5 px-2 rounded-xl min-h-[40px] transition-all flex items-center justify-center gap-1 text-[11px] sm:text-xs truncate ${
-              activeMode === 'NGO_LOGIN'
-                ? 'bg-amber-600 text-white font-black shadow-md shadow-amber-950/50'
-                : 'text-slate-400 hover:text-white'
+            className={`flex-1 py-2.5 text-sm font-semibold rounded-l-xl border transition-all cursor-pointer ${
+              activeMode !== 'REGISTER'
+                ? 'bg-[#3b82f6] border-[#3b82f6] text-white'
+                : 'bg-[#1f2937] border-[#374151] text-[#9ca3af] hover:text-white'
             }`}
           >
-            <HeartHandshake className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">{i18nService.t('ngoLoginTab', 'NGO Login')}</span>
+            Login
           </button>
-
           <button
-            type="button"
-            onClick={() => { setActiveMode('VOLUNTEER_LOGIN'); setLoginError(''); }}
-            className={`flex-1 py-2.5 px-2 rounded-xl min-h-[40px] transition-all flex items-center justify-center gap-1 text-[11px] sm:text-xs truncate ${
-              activeMode === 'VOLUNTEER_LOGIN'
-                ? 'bg-indigo-600 text-white font-black shadow-md shadow-indigo-950/50'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <UserCheck className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">{i18nService.t('volunteerLoginTab', 'Volunteer Login')}</span>
-          </button>
-
-          <button
-            type="button"
             onClick={() => { setActiveMode('REGISTER'); setRegError(''); setOtpStep(false); }}
-            className={`flex-1 py-2.5 px-2 rounded-xl min-h-[40px] transition-all flex items-center justify-center gap-1 text-[11px] sm:text-xs truncate ${
+            className={`flex-1 py-2.5 text-sm font-semibold rounded-r-xl border transition-all cursor-pointer ${
               activeMode === 'REGISTER'
-                ? 'bg-emerald-600 text-white font-black shadow-md shadow-emerald-950/50'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-[#3b82f6] border-[#3b82f6] text-white'
+                : 'bg-[#1f2937] border-[#374151] text-[#9ca3af] hover:text-white'
             }`}
           >
-            <Building2 className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">{i18nService.t('createAccountTab', 'Create Account')}</span>
+            Register
           </button>
         </div>
 
-        {/* MODE 1: NGO LOGIN */}
-        {activeMode === 'NGO_LOGIN' && (
-          <div className="space-y-4 overflow-y-auto pr-1 flex-1 min-h-0 pb-3">
+        {/* ── Scrollable body ───────────────────────────────────────── */}
+        <div className="flex-1 overflow-y-auto px-5 pb-5 pt-4 space-y-5 min-h-0">
+
+        {/* ══ LOGIN SCREEN ════════════════════════════════════════════ */}
+        {(activeMode === 'NGO_LOGIN' || activeMode === 'VOLUNTEER_LOGIN') && (
+          <div className="space-y-5">
+
+            {/* Role selector */}
             <div>
-              <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-                <span>Verified NGO Portal Login</span>
-              </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Log in to post verified relief dispatches directly to the live request timeline.
-              </p>
+              <p className="text-[12px] text-[#9ca3af] font-medium mb-2">Sign in as:</p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => { setActiveMode('NGO_LOGIN'); setLoginError(''); }}
+                  className={`flex items-center gap-2.5 p-3 rounded-xl border transition-all cursor-pointer text-left ${
+                    activeMode === 'NGO_LOGIN'
+                      ? 'bg-[#1e3a5f] border-[#3b82f6] text-white'
+                      : 'bg-[#1f2937] border-[#374151] text-[#9ca3af] hover:border-[#4b5563]'
+                  }`}
+                >
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${activeMode === 'NGO_LOGIN' ? 'bg-[#3b82f6]' : 'bg-[#374151]'}`}>
+                    <HeartHandshake className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-[12px] font-bold leading-none">NGO Partner</p>
+                    <p className="text-[10px] text-[#9ca3af] mt-0.5">Organization</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setActiveMode('VOLUNTEER_LOGIN'); setLoginError(''); }}
+                  className={`flex items-center gap-2.5 p-3 rounded-xl border transition-all cursor-pointer text-left ${
+                    activeMode === 'VOLUNTEER_LOGIN'
+                      ? 'bg-[#1e3a5f] border-[#3b82f6] text-white'
+                      : 'bg-[#1f2937] border-[#374151] text-[#9ca3af] hover:border-[#4b5563]'
+                  }`}
+                >
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${activeMode === 'VOLUNTEER_LOGIN' ? 'bg-[#3b82f6]' : 'bg-[#374151]'}`}>
+                    <UserCheck className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-[12px] font-bold leading-none">Relief Helper</p>
+                    <p className="text-[10px] text-[#9ca3af] mt-0.5">Boat, Car, Medical</p>
+                  </div>
+                </button>
+              </div>
             </div>
 
+            {/* Error */}
             {loginError && (
-              <div className="p-3 bg-red-950/80 border border-red-500/40 rounded-xl text-red-200 text-xs font-semibold flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
-                <span>{loginError}</span>
+              <div className="flex items-center gap-2 p-3 bg-red-900/30 border border-red-700/50 rounded-xl text-red-300 text-xs">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-red-400" />
+                {loginError}
               </div>
             )}
 
+            {/* Login form */}
             <form onSubmit={handleLoginSubmit} className="space-y-3">
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
-                  Registered Email Address
-                </label>
+                <label className="block text-[12px] font-semibold text-[#d1d5db] mb-1.5">Email</label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
+                  <Mail className="w-4 h-4 text-[#6b7280] absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="ngo@organization.org"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-3 text-sm text-white focus:outline-none focus:border-amber-500 min-h-[44px]"
+                    placeholder={activeMode === 'NGO_LOGIN' ? 'ngo@organization.org' : 'helper@email.com'}
+                    className="w-full bg-[#1f2937] border border-[#374151] rounded-xl pl-9 pr-4 py-3 text-sm text-white placeholder-[#6b7280] focus:outline-none focus:border-[#3b82f6] transition-colors min-h-[46px]"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
-                  Password
-                </label>
+                <label className="block text-[12px] font-semibold text-[#d1d5db] mb-1.5">Password</label>
                 <div className="relative">
-                  <Key className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
+                  <Key className="w-4 h-4 text-[#6b7280] absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter password"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-10 py-3 text-sm text-white focus:outline-none focus:border-amber-500 min-h-[44px]"
+                    placeholder="Enter your password"
+                    className="w-full bg-[#1f2937] border border-[#374151] rounded-xl pl-9 pr-10 py-3 text-sm text-white placeholder-[#6b7280] focus:outline-none focus:border-[#3b82f6] transition-colors min-h-[46px]"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-slate-400 hover:text-white p-1 rounded-lg focus:outline-none"
-                    title={showPassword ? "Hide password" : "Show password"}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b7280] hover:text-white transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                <div className="flex items-center justify-between text-[11px] sm:text-xs pt-1.5 px-0.5">
+                <div className="flex justify-between mt-2 text-[11px]">
                   <button
                     type="button"
                     onClick={() => {
-                      setRecAccountRole('NGO');
+                      setRecAccountRole(activeMode === 'NGO_LOGIN' ? 'NGO' : 'VOLUNTEER');
                       setRecEmail(email || '');
-                      setRecError('');
-                      setRecSuccess(false);
+                      setRecError(''); setRecSuccess(false);
                       setActiveMode('FORGOT_PASSWORD');
                     }}
-                    className="text-amber-400 hover:text-amber-300 font-semibold underline underline-offset-2 flex items-center gap-1"
+                    className="text-[#3b82f6] hover:text-blue-400 font-medium"
                   >
-                    <Key className="w-3 h-3" />
-                    <span>Forgot Password?</span>
+                    Forgot password?
                   </button>
                   <button
                     type="button"
                     onClick={() => {
-                      setRecAccountRole('NGO');
-                      setRecError('');
-                      setRecSuccess(false);
+                      setRecAccountRole(activeMode === 'NGO_LOGIN' ? 'NGO' : 'VOLUNTEER');
+                      setRecError(''); setRecSuccess(false);
                       setActiveMode('FORGOT_EMAIL');
                     }}
-                    className="text-cyan-400 hover:text-cyan-300 font-semibold underline underline-offset-2 flex items-center gap-1"
+                    className="text-[#6b7280] hover:text-[#d1d5db] font-medium"
                   >
-                    <Mail className="w-3 h-3" />
-                    <span>Forgot Email?</span>
+                    Forgot email?
                   </button>
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black rounded-xl text-sm shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 min-h-[46px]"
+                className="w-full py-3 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-bold rounded-xl text-sm transition-colors flex items-center justify-center gap-2 min-h-[48px] mt-2 cursor-pointer"
               >
                 <Lock className="w-4 h-4" />
-                <span>LOG IN TO NGO PORTAL</span>
+                Sign In
               </button>
             </form>
-          </div>
-        )}
 
-        {/* MODE 2: VOLUNTEER LOGIN */}
-        {activeMode === 'VOLUNTEER_LOGIN' && (
-          <div className="space-y-4 overflow-y-auto pr-1 flex-1 min-h-0 pb-3">
-            <div>
-              <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-                <UserCheck className="w-5 h-5 text-purple-400" />
-                <span>Volunteer Account Login</span>
-              </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Log in to manage free boat rescue dispatches, transport, or medical kits.
-              </p>
-            </div>
-
-            {loginError && (
-              <div className="p-3 bg-red-950/80 border border-red-500/40 rounded-xl text-red-200 text-xs font-semibold flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
-                <span>{loginError}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleLoginSubmit} className="space-y-3">
-              <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
-                  Volunteer Email Address
-                </label>
-                <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="volunteer@email.com"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-3 text-sm text-white focus:outline-none focus:border-purple-500 min-h-[44px]"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
-                  Password
-                </label>
-                <div className="relative">
-                  <Key className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter password"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-10 py-3 text-sm text-white focus:outline-none focus:border-purple-500 min-h-[44px]"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-slate-400 hover:text-white p-1 rounded-lg focus:outline-none"
-                    title={showPassword ? "Hide password" : "Show password"}
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-                <div className="flex items-center justify-between text-[11px] sm:text-xs pt-1.5 px-0.5">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setRecAccountRole('VOLUNTEER');
-                      setRecEmail(email || '');
-                      setRecError('');
-                      setRecSuccess(false);
-                      setActiveMode('FORGOT_PASSWORD');
-                    }}
-                    className="text-amber-400 hover:text-amber-300 font-semibold underline underline-offset-2 flex items-center gap-1"
-                  >
-                    <Key className="w-3 h-3" />
-                    <span>Forgot Password?</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setRecAccountRole('VOLUNTEER');
-                      setRecError('');
-                      setRecSuccess(false);
-                      setActiveMode('FORGOT_EMAIL');
-                    }}
-                    className="text-cyan-400 hover:text-cyan-300 font-semibold underline underline-offset-2 flex items-center gap-1"
-                  >
-                    <Mail className="w-3 h-3" />
-                    <span>Forgot Email?</span>
-                  </button>
-                </div>
-              </div>
-
+            <p className="text-center text-[12px] text-[#6b7280]">
+              Don't have an account?{' '}
               <button
-                type="submit"
-                className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black rounded-xl text-sm shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 min-h-[46px]"
+                onClick={() => { setActiveMode('REGISTER'); setRegError(''); setOtpStep(false); }}
+                className="text-[#3b82f6] hover:text-blue-400 font-semibold cursor-pointer"
               >
-                <Lock className="w-4 h-4" />
-                <span>LOG IN AS VOLUNTEER</span>
+                Create one
               </button>
-            </form>
+            </p>
           </div>
         )}
 
-        {/* MODE 3: REGISTER + LIVE INLINE VALIDATION & AUTOMATIC +91 PREFIX */}
+        {/* ══ REGISTER SCREEN ═════════════════════════════════════════ */}
         {activeMode === 'REGISTER' && (
-          <div className="space-y-3 overflow-y-auto pr-1 flex-1 min-h-0 pb-3">
-            <div>
-              <h3 className="text-base sm:text-lg font-black text-white">Register NGO or Volunteer Profile</h3>
-              <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
-                Register your account so citizens, flood victims, and rescue teams can contact you directly via Call & WhatsApp.
-              </p>
-            </div>
+          <div className="space-y-4">
 
-            {/* Account Type Selector */}
-            <div className="flex items-center gap-2 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-bold">
-              <button
-                type="button"
-                onClick={() => { 
-                  setRegRole('NGO'); 
-                  setRegShowPhone(regNgoType.includes('Registered NGO')); 
-                }}
-                className={`flex-1 py-2 rounded-lg text-center min-h-[36px] transition-all ${regRole === 'NGO' ? 'bg-amber-600 text-white font-black shadow-md' : 'text-slate-400'}`}
-              >
-                NGO Account
-              </button>
-              <button
-                type="button"
-                onClick={() => { setRegRole('VOLUNTEER'); setRegShowPhone(false); }}
-                className={`flex-1 py-2 rounded-lg text-center min-h-[36px] transition-all ${regRole === 'VOLUNTEER' ? 'bg-indigo-600 text-white font-black shadow-md' : 'text-slate-400'}`}
-              >
-                Individual Volunteer
-              </button>
+            {/* Role picker cards */}
+            <div>
+              <p className="text-[12px] text-[#9ca3af] font-medium mb-2">Register as:</p>
+              <div className="grid grid-cols-2 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => { setRegRole('NGO'); setRegShowPhone(regNgoType.includes('Registered NGO')); }}
+                  className={`flex flex-col items-start gap-2 p-3.5 rounded-xl border transition-all cursor-pointer text-left ${
+                    regRole === 'NGO'
+                      ? 'bg-[#1e3a5f] border-[#3b82f6]'
+                      : 'bg-[#1f2937] border-[#374151] hover:border-[#4b5563]'
+                  }`}
+                >
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${regRole === 'NGO' ? 'bg-[#3b82f6]' : 'bg-[#374151]'}`}>
+                    <Building2 className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className={`text-[13px] font-bold ${regRole === 'NGO' ? 'text-white' : 'text-[#9ca3af]'}`}>NGO / Org</p>
+                    <p className="text-[10px] text-[#6b7280] mt-0.5 leading-snug">Relief organization, food donor, media</p>
+                  </div>
+                  {regRole === 'NGO' && (
+                    <span className="text-[10px] font-bold text-[#3b82f6]">✓ Selected</span>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => { setRegRole('VOLUNTEER'); setRegShowPhone(false); }}
+                  className={`flex flex-col items-start gap-2 p-3.5 rounded-xl border transition-all cursor-pointer text-left ${
+                    regRole === 'VOLUNTEER'
+                      ? 'bg-[#1e3a5f] border-[#3b82f6]'
+                      : 'bg-[#1f2937] border-[#374151] hover:border-[#4b5563]'
+                  }`}
+                >
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${regRole === 'VOLUNTEER' ? 'bg-[#3b82f6]' : 'bg-[#374151]'}`}>
+                    <UserCheck className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className={`text-[13px] font-bold ${regRole === 'VOLUNTEER' ? 'text-white' : 'text-[#9ca3af]'}`}>Relief Helper</p>
+                    <p className="text-[10px] text-[#6b7280] mt-0.5 leading-snug">Boat owner, 4×4, medical, transport</p>
+                  </div>
+                  {regRole === 'VOLUNTEER' && (
+                    <span className="text-[10px] font-bold text-[#3b82f6]">✓ Selected</span>
+                  )}
+                </button>
+              </div>
             </div>
 
             {regError && (
@@ -649,7 +596,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
 
                 <div className="space-y-3 text-xs leading-relaxed border-t border-b border-slate-800 py-3">
                   <p className="font-semibold text-slate-200">
-                    Your <span className="text-amber-400 font-bold">{regRole === 'NGO' ? 'NGO' : 'Volunteer'}</span> registration for <strong className="text-white">{regName}</strong> has been submitted successfully!
+                    Your <span className="text-blue-400 font-bold">{regRole === 'NGO' ? 'NGO' : 'Relief Helper'}</span> registration for <strong className="text-white">{regName}</strong> has been submitted successfully!
                   </p>
                   
                   <div className="p-3 bg-amber-950/40 border border-amber-500/30 rounded-xl space-y-1.5 text-amber-200">
@@ -816,15 +763,15 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                 {regRole === 'VOLUNTEER' && (
                   <div>
                     <label className="block text-xs font-bold text-slate-300 mb-1">
-                      Volunteer Role Type
+                      Relief Helper Specialty / Role
                     </label>
                     <select
                       value={regRoleType}
                       onChange={(e) => setRegRoleType(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs font-bold text-amber-300 focus:outline-none min-h-[44px]"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs font-bold text-blue-300 focus:outline-none min-h-[44px]"
                       required
                     >
-                      <option value="" disabled>-- Select Volunteer Service Role * --</option>
+                      <option value="" disabled>-- Select Relief Service Role * --</option>
                       {VOLUNTEER_ROLES.map(role => (
                         <option key={role} value={role}>{role}</option>
                       ))}
@@ -968,7 +915,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
 
                 <button
                   type="submit"
-                  className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs sm:text-sm shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 min-h-[46px]"
+                  className="w-full py-3 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-bold rounded-xl text-xs sm:text-sm shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 min-h-[46px]"
                 >
                   <Send className="w-4 h-4" />
                   <span>SUBMIT REGISTRATION FOR APPROVAL</span>
@@ -1249,6 +1196,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
           </div>
         )}
 
+        </div>
       </div>
     </div>
   );

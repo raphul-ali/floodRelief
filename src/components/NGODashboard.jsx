@@ -9,6 +9,7 @@ import { authService } from '../services/authService';
 import DeliveryLogModal from './DeliveryLogModal';
 import DeliveryUpdatesTreeModal from './DeliveryUpdatesTreeModal';
 import { parseNeedsTags } from './VictimRequestForm';
+import ExpandableNotes from './ExpandableNotes';
 
 export default function NGODashboard({ victimRequests = [], ngos = [] }) {
   const currentUser = authService.getCurrentUser();
@@ -656,9 +657,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
 
                         {/* Details */}
                         {req.details && (
-                          <div className="text-xs text-slate-700 italic bg-slate-50 p-2.5 rounded-xl border border-slate-200 leading-relaxed">
-                            "{req.details}"
-                          </div>
+                          <ExpandableNotes text={req.details} />
                         )}
 
                         {/* Actions */}
@@ -719,7 +718,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                               className="flex-1 w-full py-2 px-3 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 hover:border-emerald-500/50 rounded-xl text-xs font-black shadow-md flex items-center justify-center gap-1.5 active:scale-95 transition-all"
                             >
                               <Activity className="w-4 h-4 text-emerald-400" />
-                              <span>SEE UPDATES & IMPACT TREE</span>
+                              <span>SEE PROGRESS & IMPACT TREE</span>
                             </button>
                           </div>
                         </div>

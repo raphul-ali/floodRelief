@@ -12,24 +12,23 @@ export default function FloatingSOSButton({ openModal, openSupplyModal }) {
   }, []);
 
   return (
-    <div className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] sm:bottom-8 right-3 sm:right-8 z-40 flex flex-col items-end gap-2.5 pointer-events-none">
+    <div className="fixed bottom-[calc(5.2rem+env(safe-area-inset-bottom,0px))] sm:bottom-8 right-3 sm:right-8 z-40 flex flex-col items-end gap-3 pointer-events-none">
       
-      {/* Floating Relief Form Button (Primary / High-Attention) */}
+      {/* Floating Relief Form Button (High Attention Amber Relief Button) */}
       <button
         onClick={openSupplyModal}
-        className="pointer-events-auto flex items-center gap-2 px-4 sm:px-5 py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 active:scale-95 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider shadow-[0_4px_25px_rgba(245,158,11,0.5)] border-2 border-amber-200 transition-all duration-150 cursor-pointer ring-2 ring-amber-400/40"
+        className="pointer-events-auto btn-relief flex items-center gap-2.5 px-4.5 sm:px-6 py-3 sm:py-3.5 rounded-2xl text-xs sm:text-sm font-black tracking-wider border-2 border-amber-200 animate-relief-glow min-h-[46px] group"
       >
-        <Package className="w-5 h-5 text-slate-950 shrink-0" />
+        <Package className="w-5 h-5 text-slate-950 shrink-0 group-hover:scale-110 transition-transform" />
         <span>{i18nService.t('reliefForm', 'REQUEST RELIEF')}</span>
       </button>
 
-      {/* Floating Rescue SOS Button (Secondary - Guaranteed Solid Red) */}
+      {/* Floating Rescue SOS Button (Urgent SOS Red Rescue Button) */}
       <button
         onClick={openModal}
-        style={{ backgroundColor: '#dc2626', opacity: 1 }}
-        className="pointer-events-auto flex items-center gap-2 px-4 sm:px-5 py-3 rounded-2xl bg-[#dc2626] hover:bg-[#b91c1c] active:bg-[#991b1b] text-white font-black text-xs sm:text-sm uppercase tracking-wider shadow-[0_4px_20px_rgba(220,38,38,0.6)] border-2 border-red-400 active:scale-95 transition-all duration-150 cursor-pointer ring-2 ring-red-500/50"
+        className="pointer-events-auto btn-sos flex items-center gap-2.5 px-4.5 sm:px-6 py-3 sm:py-3.5 rounded-2xl text-xs sm:text-sm font-black tracking-wider border-2 border-red-400 animate-sos-pulse min-h-[46px] group"
       >
-        <ShieldAlert className="w-4 h-4 sm:w-5 sm:h-5 text-white shrink-0" />
+        <ShieldAlert className="w-5 h-5 text-white shrink-0 group-hover:rotate-12 transition-transform" />
         <span>{i18nService.t('requestRescue', 'REQUEST RESCUE')}</span>
       </button>
 

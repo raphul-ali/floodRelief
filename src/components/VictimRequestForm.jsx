@@ -552,18 +552,18 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg ${
+                className={`w-full py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-xl cursor-pointer min-h-[50px] ${
                   formData.isUrgentRescue
-                    ? 'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white border border-red-500'
-                    : 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white border border-emerald-500 shadow-emerald-950/40'
+                    ? 'btn-sos animate-sos-pulse'
+                    : 'btn-relief animate-relief-glow text-slate-950'
                 }`}
               >
                 {isSubmitting ? (
                   <span>SUBMITTING...</span>
                 ) : (
                   <>
-                    {formData.isUrgentRescue ? <ShieldAlert className="w-5 h-5" /> : <HeartHandshake className="w-5 h-5" />}
-                    <span>{formData.isUrgentRescue ? 'SUBMIT' : i18nService.t('publishRequest', 'SUBMIT REQUEST')}</span>
+                    {formData.isUrgentRescue ? <ShieldAlert className="w-5 h-5 shrink-0 text-white" /> : <HeartHandshake className="w-5 h-5 shrink-0 text-slate-950" />}
+                    <span>{formData.isUrgentRescue ? 'SUBMIT EMERGENCY RESCUE' : i18nService.t('publishRequest', 'SUBMIT RELIEF REQUEST')}</span>
                   </>
                 )}
               </button>

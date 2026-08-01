@@ -17,7 +17,7 @@ import MobileBottomDock from './components/MobileBottomDock';
 import DeveloperModal from './components/DeveloperModal';
 import { storageService } from './services/storageService';
 import { authService } from './services/authService';
-import { i18nService } from './services/i18nService';
+import { i18nService, LANGUAGES } from './services/i18nService';
 import { RefreshCw, Lock, Key, Mail, ShieldCheck, AlertTriangle, Eye, EyeOff, LogOut, MapPin, Code, Github, Instagram } from 'lucide-react';
 
 export default function App() {
@@ -117,7 +117,7 @@ export default function App() {
 
   const handleLogout = () => {
     authService.logout();
-    setActiveTab('dashboard');
+    setActiveTab('public_requests');
   };
 
   const handleSecretAdminLogin = (e) => {
@@ -292,7 +292,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans selection:bg-red-500 selection:text-white">
+    <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col font-sans selection:bg-red-500 selection:text-white">
       
       {/* Fixed Header Bar (Zero Admin Buttons) */}
       <Header
@@ -406,69 +406,68 @@ export default function App() {
         <DeveloperModal onClose={() => setIsDevModalOpen(false)} />
       )}
 
-      {/* Public Footer (Zero Admin Links) */}
-      <footer className="bg-slate-950 border-t border-slate-800/80 py-8 px-4 text-center text-xs text-slate-400 space-y-5 pb-28 sm:pb-8 flex flex-col items-center justify-center">
-        
-        {/* Brand Header */}
-        <div className="flex items-center gap-3">
-          <img 
-            src="/helpaxom_badge.png" 
-            alt="HELP AXOM Emblem" 
-            className="w-12 h-12 object-contain drop-shadow-md" 
-          />
-          <div className="text-left">
-            <h3 className="text-lg font-black text-white tracking-tight uppercase leading-none">HELP AXOM</h3>
-            <p className="text-[11px] font-black text-cyan-400 tracking-wider uppercase mt-1 leading-none">UNITY. RELIEF. REBUILD.</p>
-          </div>
-        </div>
+      {/* Footer — minimal */}
+      <footer className="bg-[#111827] border-t border-[#1f2937] pb-36 sm:pb-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-4">
 
-        {/* Developer Team Section */}
-        <div className="flex flex-col items-center gap-2 p-3 bg-slate-900/90 border border-slate-800 rounded-2xl max-w-sm w-full shadow-md">
-          <div 
-            onClick={() => setIsDevModalOpen(true)}
-            className="flex items-center gap-3 cursor-pointer group w-full"
-          >
-            <img 
-              src="/developer.png" 
-              alt="Raphul" 
-              className="w-10 h-10 rounded-full object-cover border-2 border-amber-400 group-hover:scale-105 transition-transform shrink-0" 
-            />
-            <div className="text-left flex-1 min-w-0">
-              <div className="flex items-center justify-between gap-1">
-                <span className="font-black text-sm text-white group-hover:text-amber-300 transition-colors">Raphul</span>
-                <span className="text-[9px] bg-amber-500/20 text-amber-300 font-extrabold px-2 py-0.5 rounded-full border border-amber-400/30 uppercase shrink-0">
-                  Developer
-                </span>
-              </div>
-              <p className="text-[11px] font-bold text-slate-300">Tinsukia, Assam</p>
+          {/* Language selector */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs text-[#6b7280] font-medium mr-1">Language:</span>
+            {LANGUAGES.map(l => (
+              <button
+                key={l.code}
+                onClick={() => i18nService.setLanguage(l.code)}
+                className={`text-xs font-semibold px-3 py-1 rounded-full border transition-all cursor-pointer ${
+                  i18nService.getLanguage() === l.code
+                    ? 'bg-blue-600 border-blue-600 text-white'
+                    : 'border-[#374151] text-[#6b7280] hover:text-[#d1d5db] hover:border-[#6b7280]'
+                }`}
+              >
+                {l.code === 'en' ? 'English' : l.native}
+              </button>
+            ))}
+          </div>
+
+          <div className="border-t border-[#1f2937] pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+
+            {/* Brand */}
+            <div className="flex items-center gap-2.5">
+              <img src="/helpaxom_badge.png" alt="HELP AXOM" className="w-7 h-7 object-contain opacity-80" />
+              <span className="text-sm font-black text-white/70 tracking-tight uppercase">HELP AXOM</span>
             </div>
-          </div>
 
-          <div className="flex items-center justify-center gap-3 w-full pt-2 border-t border-slate-800 text-xs">
-            <a 
-              href="https://github.com/raphul-ali" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-slate-300 hover:text-white flex items-center gap-1.5 font-bold underline transition-colors"
-            >
-              <Github className="w-3.5 h-3.5 text-cyan-400" />
-              <span>GitHub</span>
-            </a>
-            <span className="text-slate-700">|</span>
-            <a 
-              href="https://www.instagram.com/r_aphul/" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-slate-300 hover:text-pink-400 flex items-center gap-1.5 font-bold underline transition-colors"
-            >
-              <Instagram className="w-3.5 h-3.5 text-pink-400" />
-              <span>Instagram</span>
-            </a>
+            {/* Copyright */}
+            <p className="text-xs text-[#4b5563] order-last sm:order-none">
+              © 2026 HELP AXOM · Independent Community Network · Assam
+            </p>
+
+            {/* Social links */}
+            <div className="flex items-center gap-4 text-xs">
+              <a
+                href="https://github.com/raphul-ali"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#6b7280] hover:text-[#d1d5db] transition-colors flex items-center gap-1.5 font-medium"
+              >
+                <Github className="w-3.5 h-3.5" />
+                GitHub
+              </a>
+              <a
+                href="https://www.instagram.com/r_aphul/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#6b7280] hover:text-[#d1d5db] transition-colors flex items-center gap-1.5 font-medium"
+              >
+                <Instagram className="w-3.5 h-3.5" />
+                Instagram
+              </a>
+            </div>
+
           </div>
         </div>
-
-        <p className="text-slate-500 text-[11px]">{i18nService.t('copyright', '© 2026 HELP AXOM. Unity. Relief. Rebuild. Independent Community Network.')}</p>
       </footer>
+
+
 
       {/* Native Mobile Bottom Navigation Dock */}
       <MobileBottomDock
@@ -482,5 +481,6 @@ export default function App() {
       />
 
     </div>
+
   );
 }

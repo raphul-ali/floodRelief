@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { storageService, ASSAM_DISTRICTS } from '../services/storageService';
 import { isSupabaseConfigured } from '../services/supabaseClient';
+import ExpandableNotes from './ExpandableNotes';
 
 export default function AdminDashboard({ onDataUpdated }) {
   const [activeQueueTab, setActiveQueueTab] = useState('sos'); // 'sos' | 'deliveries' | 'ngos' | 'volunteers' | 'recovery' | 'users'
@@ -533,7 +534,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                   <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1">
                     <p className="text-slate-300"><strong className="text-white">Affected:</strong> {req.familiesCount > 0 ? `${req.familiesCount} Families` : `${req.peopleCount || 1} People`}</p>
                     <p className="text-slate-300"><strong className="text-white">Phone:</strong> {req.phone}</p>
-                    {req.details && <p className="text-slate-400 italic">"{req.details}"</p>}
+                    {req.details && <ExpandableNotes text={req.details} dark={true} className="mt-1" />}
                   </div>
 
                   {/* Actions */}
@@ -629,7 +630,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                   <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1">
                     <p className="text-slate-300"><strong className="text-white">Volunteer Phone:</strong> {log.volunteerPhone}</p>
                     {log.peopleImpacted && <p className="text-slate-300"><strong className="text-white">People Impacted:</strong> {log.peopleImpacted}</p>}
-                    {log.deliveryNotes && <p className="text-slate-400 italic">"{log.deliveryNotes}"</p>}
+                    {log.deliveryNotes && <ExpandableNotes text={log.deliveryNotes} dark={true} className="mt-1" />}
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
@@ -878,8 +879,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                         )}
                         {req.details && (
                           <div className="pt-1 border-t border-slate-800">
-                            <span className="text-slate-400 font-medium block mb-0.5">User Verification Note:</span>
-                            <p className="text-slate-300 italic text-[11px]">"{req.details}"</p>
+                            <ExpandableNotes text={req.details} dark={true} label="User Verification Note:" />
                           </div>
                         )}
                         <div className="text-[10px] text-slate-500 pt-1">
