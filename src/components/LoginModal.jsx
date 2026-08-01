@@ -325,8 +325,8 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-0 sm:p-4 overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-700/80 rounded-3xl max-sm:rounded-b-none max-sm:rounded-t-3xl max-w-md w-full p-4 sm:p-6 shadow-2xl space-y-4 text-slate-100 relative max-h-[92vh] max-sm:max-h-[90vh] flex flex-col justify-between my-auto max-sm:mb-0 max-sm:mt-auto animate-slide-up">
+    <div className="fixed inset-0 z-[70] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 max-sm:pb-24 max-sm:pt-4 overflow-y-auto">
+      <div className="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-md w-full p-4 sm:p-6 shadow-2xl space-y-4 text-slate-100 relative max-h-[85vh] sm:max-h-[90vh] flex flex-col justify-between my-auto animate-slide-up">
         
         {/* Modal Header Row — Title + Close Button */}
         <div className="flex items-center justify-between gap-2 shrink-0">
@@ -389,7 +389,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
 
         {/* MODE 1: NGO LOGIN */}
         {activeMode === 'NGO_LOGIN' && (
-          <div className="space-y-4 overflow-y-auto pr-1">
+          <div className="space-y-4 overflow-y-auto pr-1 flex-1 min-h-0 pb-3">
             <div>
               <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
                 <span>Verified NGO Portal Login</span>
@@ -491,7 +491,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
 
         {/* MODE 2: VOLUNTEER LOGIN */}
         {activeMode === 'VOLUNTEER_LOGIN' && (
-          <div className="space-y-4 overflow-y-auto pr-1">
+          <div className="space-y-4 overflow-y-auto pr-1 flex-1 min-h-0 pb-3">
             <div>
               <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
                 <UserCheck className="w-5 h-5 text-purple-400" />
@@ -594,7 +594,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
 
         {/* MODE 3: REGISTER + LIVE INLINE VALIDATION & AUTOMATIC +91 PREFIX */}
         {activeMode === 'REGISTER' && (
-          <div className="space-y-3 overflow-y-auto pr-1">
+          <div className="space-y-3 overflow-y-auto pr-1 flex-1 min-h-0 pb-3">
             <div>
               <h3 className="text-base sm:text-lg font-black text-white">Register NGO or Volunteer Profile</h3>
               <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
@@ -981,7 +981,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
 
         {/* MODE 4: FORGOT PASSWORD REQUEST */}
         {activeMode === 'FORGOT_PASSWORD' && (
-          <div className="space-y-4 overflow-y-auto pr-1">
+          <div className="space-y-4 overflow-y-auto pr-1 flex-1 min-h-0 pb-3">
             <div>
               <div className="flex items-center gap-2">
                 <div className="p-2 bg-amber-500/20 text-amber-400 rounded-xl border border-amber-500/30">
@@ -1124,7 +1124,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
 
         {/* MODE 5: FORGOT EMAIL REQUEST */}
         {activeMode === 'FORGOT_EMAIL' && (
-          <div className="space-y-4 overflow-y-auto pr-1">
+          <div className="space-y-4 overflow-y-auto pr-1 flex-1 min-h-0 pb-3">
             <div>
               <div className="flex items-center gap-2">
                 <div className="p-2 bg-cyan-500/20 text-cyan-400 rounded-xl border border-cyan-500/30">

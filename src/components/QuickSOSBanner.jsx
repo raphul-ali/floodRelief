@@ -288,7 +288,7 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-base uppercase tracking-wider shadow-lg border border-red-500 transition-all flex items-center justify-center gap-3 active:scale-98"
+            className="w-full py-4 mb-8 sm:mb-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-base uppercase tracking-wider shadow-lg border border-red-500 transition-all flex items-center justify-center gap-3 active:scale-98"
           >
             <ShieldAlert className="w-6 h-6" />
             <span>{isSubmitting ? i18nService.t('transmitting', 'TRANSMITTING SOS...') : i18nService.t('transmitSos', 'TRANSMIT EMERGENCY RESCUE SOS NOW')}</span>

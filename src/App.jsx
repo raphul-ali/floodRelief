@@ -186,7 +186,7 @@ export default function App() {
           </div>
         ) : (
           /* Secret Mobile-Optimized Admin Login Screen */
-          <div className="w-[94vw] max-w-md mx-auto my-4 sm:my-12 bg-slate-900 border border-red-900/60 rounded-3xl p-5 sm:p-8 shadow-2xl space-y-5">
+          <div className="w-[94vw] max-w-md mx-auto mt-4 mb-24 sm:my-12 bg-slate-900 border border-red-900/60 rounded-3xl p-5 sm:p-8 shadow-2xl space-y-5">
             <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-red-600 to-rose-700 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-red-950">
               <Lock className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
             </div>

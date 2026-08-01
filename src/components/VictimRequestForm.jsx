@@ -161,8 +161,8 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-6 bg-slate-950/85 backdrop-blur-lg overflow-y-auto">
-      <div className={`relative w-full max-w-2xl bg-slate-900 border-2 rounded-2xl max-sm:rounded-b-none max-sm:rounded-t-3xl shadow-2xl overflow-hidden my-auto max-sm:mb-0 max-sm:mt-auto max-h-[92vh] max-sm:max-h-[90vh] flex flex-col animate-slide-up ${
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-6 max-sm:pb-24 max-sm:pt-4 bg-slate-950/85 backdrop-blur-lg overflow-y-auto">
+      <div className={`relative w-full max-w-2xl bg-slate-900 border-2 rounded-2xl shadow-2xl overflow-hidden my-auto max-h-[85vh] sm:max-h-[90vh] flex flex-col animate-slide-up ${
         formData.isUrgentRescue ? 'border-red-500 shadow-red-950/80' : 'border-amber-500/40 shadow-amber-950/50'
       }`}>
         

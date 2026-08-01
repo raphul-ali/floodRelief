@@ -16,7 +16,7 @@ export default function MobileBottomDock({
   const isEmergencyActive = activeTab === 'emergency';
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-slate-950/98 backdrop-blur-2xl border-t border-slate-800 shadow-[0_-10px_30px_rgba(0,0,0,0.9)] pb-safe">
+    <div className="fixed bottom-0 left-0 right-0 z-40 sm:hidden bg-slate-950/98 backdrop-blur-2xl border-t border-slate-800 shadow-[0_-10px_30px_rgba(0,0,0,0.9)] pb-safe">
       <div className="grid grid-cols-4 items-center justify-between h-16 px-1.5 py-1.5">
         
         {/* Tab 1: Dashboard / Home */}
