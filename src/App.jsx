@@ -430,12 +430,12 @@ export default function App() {
           >
             <img 
               src="/developer.png" 
-              alt="Raphul Ali" 
+              alt="Raphul" 
               className="w-10 h-10 rounded-full object-cover border-2 border-amber-400 group-hover:scale-105 transition-transform shrink-0" 
             />
             <div className="text-left flex-1 min-w-0">
               <div className="flex items-center justify-between gap-1">
-                <span className="font-black text-sm text-white group-hover:text-amber-300 transition-colors">Raphul Ali</span>
+                <span className="font-black text-sm text-white group-hover:text-amber-300 transition-colors">Raphul</span>
                 <span className="text-[9px] bg-amber-500/20 text-amber-300 font-extrabold px-2 py-0.5 rounded-full border border-amber-400/30 uppercase shrink-0">
                   Developer
                 </span>

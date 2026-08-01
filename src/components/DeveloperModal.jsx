@@ -18,7 +18,7 @@ export default function DeveloperModal({ onClose }) {
         <div className="relative inline-block mx-auto pt-2">
           <img 
             src="/developer.png" 
-            alt="Raphul Ali" 
+            alt="Raphul" 
             className="w-20 h-20 rounded-full object-cover border-4 border-amber-400 shadow-xl mx-auto" 
           />
           <span className="absolute bottom-0 right-0 bg-emerald-500 text-white p-1 rounded-full border-2 border-slate-900">
@@ -28,7 +28,7 @@ export default function DeveloperModal({ onClose }) {
 
         {/* Developer Info */}
         <div>
-          <h2 className="text-xl font-black text-white tracking-tight">Raphul Ali</h2>
+          <h2 className="text-xl font-black text-white tracking-tight">Raphul</h2>
           <p className="text-xs font-bold text-amber-300 flex items-center justify-center gap-1 mt-1">
             <MapPin className="w-3.5 h-3.5 text-amber-400" />
             <span>Tinsukia, Assam</span>
