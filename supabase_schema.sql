@@ -33,7 +33,8 @@ CREATE TABLE victim_requests (
     requested_by_name TEXT,
     requested_by_phone TEXT,
     assigned_ngo TEXT,
-    ground_condition TEXT DEFAULT 'SUBMERGED'
+    ground_condition TEXT DEFAULT 'SUBMERGED',
+    urgency TEXT DEFAULT 'HIGH'
 );
 
 -- 2. Create NGOs Table

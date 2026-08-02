@@ -161,6 +161,7 @@ export const storageService = {
       requestedByRole: requestData.requestedByRole ? securityService.sanitizeText(requestData.requestedByRole) : 'CITIZEN',
       requestedByName: requestData.requestedByName ? securityService.limitLength(securityService.sanitizeText(requestData.requestedByName), 80) : nameVal,
       requestedByPhone: requestData.requestedByPhone ? securityService.limitLength(securityService.sanitizeText(requestData.requestedByPhone), 20) : rawPhone,
+      urgency: requestData.urgency || (isRescue ? 'CRITICAL' : 'HIGH')
     };
 
     const requests = storageService.getVictimRequests(true);
@@ -205,7 +206,8 @@ export const storageService = {
         verified: newRequest.verified || false,
         requested_by_role: newRequest.requestedByRole || 'CITIZEN',
         requested_by_name: newRequest.requestedByName || newRequest.name,
-        requested_by_phone: newRequest.requestedByPhone || newRequest.phone
+        requested_by_phone: newRequest.requestedByPhone || newRequest.phone,
+        urgency: newRequest.urgency
       }]).then(({ error }) => {
         if (error) console.error("Supabase insert error:", error);
       });
