@@ -59,13 +59,45 @@ const notifyDataChanged = () => {
   window.dispatchEvent(new Event("flood_data_changed"));
 };
 
+const INITIAL_HELPLINES = [
+  {
+    id: "db17680f-3faa-43a9-8fd9-1581a6c19904",
+    label: "Sivasagar Control Room",
+    phone_number: "8471864355",
+    sort_order: 1,
+    created_at: "2026-07-29T14:27:40.644789+00:00"
+  },
+  {
+    id: "27d3de65-2b09-4b32-a14a-2d6d309617a8",
+    label: "Charaideo Control Room",
+    phone_number: "9085412180",
+    sort_order: 2,
+    created_at: "2026-07-29T14:27:40.644789+00:00"
+  },
+  {
+    id: "4cc0ca3a-7b75-4a2a-96f2-8cc657794a49",
+    label: "Jorhat Control Room",
+    phone_number: "0376-2300124",
+    sort_order: 3,
+    created_at: "2026-07-29T14:27:40.644789+00:00"
+  },
+  {
+    id: "89d88291-53e5-4454-89f2-7b2ed515b0d2",
+    label: "Toll free (all districts)",
+    phone_number: "1077",
+    sort_order: 4,
+    created_at: "2026-07-29T14:27:40.644789+00:00"
+  }
+];
+
 const cloudMemoryCache = {
   victims: null,
   ngos: null,
   volunteers: null,
   deliveryLogs: null,
   accountRecovery: null,
-  volunteerCollab: null
+  volunteerCollab: null,
+  helplineNumbers: null
 };
 
 export const storageService = {
@@ -124,6 +156,7 @@ export const storageService = {
       pinCode: securityService.limitLength(securityService.sanitizeText(requestData.pinCode), 10),
       landmark: securityService.limitLength(securityService.sanitizeText(requestData.landmark), 150),
       locationName: locationVal,
+      groundCondition: requestData.groundCondition || (isRescue ? 'SUBMERGED' : 'DRY_LAND'),
       details: securityService.limitLength(securityService.sanitizeText(requestData.details), 400),
       requestedByRole: requestData.requestedByRole ? securityService.sanitizeText(requestData.requestedByRole) : 'CITIZEN',
       requestedByName: requestData.requestedByName ? securityService.limitLength(securityService.sanitizeText(requestData.requestedByName), 80) : nameVal,
@@ -166,6 +199,7 @@ export const storageService = {
         longitude: newRequest.longitude,
         is_urgent_rescue: newRequest.isUrgentRescue,
         needs: newRequest.needs,
+        ground_condition: newRequest.groundCondition,
         details: newRequest.details,
         status: newRequest.status,
         verified: newRequest.verified || false,
@@ -851,6 +885,89 @@ export const storageService = {
     notifyDataChanged();
   },
 
+  // --- HELPLINE NUMBERS ---
+  getHelplineNumbers: () => {
+    try {
+      const list = cloudMemoryCache.helplineNumbers || INITIAL_HELPLINES;
+      return [...list].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+    } catch (e) {
+      console.error("Failed to load helpline numbers from storage:", e);
+      return INITIAL_HELPLINES;
+    }
+  },
+
+  addHelplineNumber: async (helplineData) => {
+    const list = storageService.getHelplineNumbers();
+    const newItem = {
+      id: helplineData.id || `hl-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      label: (helplineData.label || '').trim(),
+      phone_number: (helplineData.phone_number || '').trim(),
+      sort_order: Number(helplineData.sort_order) || (list.length + 1),
+      created_at: new Date().toISOString()
+    };
+
+    const updated = [...list, newItem];
+    cloudMemoryCache.helplineNumbers = updated;
+    notifyDataChanged();
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('helpline_numbers').insert([newItem]);
+      } catch (err) {
+        console.error("Failed to insert helpline into Supabase:", err);
+      }
+    }
+    return newItem;
+  },
+
+  updateHelplineNumber: async (id, updateData) => {
+    const list = storageService.getHelplineNumbers();
+    const updated = list.map(item => {
+      if (item.id === id) {
+        return {
+          ...item,
+          label: updateData.label !== undefined ? updateData.label.trim() : item.label,
+          phone_number: updateData.phone_number !== undefined ? updateData.phone_number.trim() : item.phone_number,
+          sort_order: updateData.sort_order !== undefined ? Number(updateData.sort_order) : item.sort_order
+        };
+      }
+      return item;
+    });
+
+    cloudMemoryCache.helplineNumbers = updated;
+    notifyDataChanged();
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const target = updated.find(i => i.id === id);
+        if (target) {
+          await supabase.from('helpline_numbers').update({
+            label: target.label,
+            phone_number: target.phone_number,
+            sort_order: target.sort_order
+          }).eq('id', id);
+        }
+      } catch (err) {
+        console.error("Failed to update helpline in Supabase:", err);
+      }
+    }
+  },
+
+  deleteHelplineNumber: async (id) => {
+    const list = storageService.getHelplineNumbers();
+    const updated = list.filter(item => item.id !== id);
+    cloudMemoryCache.helplineNumbers = updated;
+    notifyDataChanged();
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('helpline_numbers').delete().eq('id', id);
+      } catch (err) {
+        console.error("Failed to delete helpline from Supabase:", err);
+      }
+    }
+  },
+
   resetToDefaultSeed: () => {
     notifyDataChanged();
   },
@@ -860,11 +977,12 @@ export const storageService = {
     
     try {
       // Execute all Supabase queries in parallel to drastically minimize loading time
-      const [victimsRes, logsRes, ngosRes, volsRes] = await Promise.all([
+      const [victimsRes, logsRes, ngosRes, volsRes, helplinesRes] = await Promise.all([
         supabase.from('victim_requests').select('*').order('created_at', { ascending: false }),
         supabase.from('delivery_logs').select('*').order('created_at', { ascending: false }),
         supabase.from('ngos').select('*').order('created_at', { ascending: false }),
-        supabase.from('volunteers').select('*').order('created_at', { ascending: false })
+        supabase.from('volunteers').select('*').order('created_at', { ascending: false }),
+        supabase.from('helpline_numbers').select('*').order('sort_order', { ascending: true })
       ]);
 
       if (!victimsRes.error && Array.isArray(victimsRes.data)) {
@@ -888,6 +1006,7 @@ export const storageService = {
           longitude: v.longitude,
           isUrgentRescue: v.is_urgent_rescue,
           needs: v.needs,
+          groundCondition: v.ground_condition || (v.is_urgent_rescue ? 'SUBMERGED' : 'DRY_LAND'),
           details: v.details,
           status: v.status,
           verified: v.verified,
@@ -947,6 +1066,16 @@ export const storageService = {
           availableStatus: v.available_status,
           createdAt: v.created_at,
           verified: v.verified
+        }));
+      }
+
+      if (!helplinesRes.error && Array.isArray(helplinesRes.data) && helplinesRes.data.length > 0) {
+        cloudMemoryCache.helplineNumbers = helplinesRes.data.map(h => ({
+          id: h.id,
+          label: h.label,
+          phone_number: h.phone_number,
+          sort_order: h.sort_order,
+          created_at: h.created_at
         }));
       }
 

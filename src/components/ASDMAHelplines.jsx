@@ -2,36 +2,35 @@ import React, { useState, useEffect } from 'react';
 import { PhoneCall, Phone, ChevronDown, ChevronUp, Search, Radio } from 'lucide-react';
 import { i18nService } from '../services/i18nService';
 import RippleButton from './ui/RippleButton';
+import { storageService } from '../services/storageService';
 
 export default function ASDMAHelplines() {
   const [, setLangState] = useState(i18nService.getLanguage());
   const [expanded, setExpanded]   = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [helplines, setHelplines] = useState([]);
+
+  const loadHelplines = () => {
+    setHelplines(storageService.getHelplineNumbers());
+  };
 
   useEffect(() => {
-    const h = () => setLangState(i18nService.getLanguage());
-    window.addEventListener('flood_lang_changed', h);
-    return () => window.removeEventListener('flood_lang_changed', h);
+    loadHelplines();
+    const hLang = () => setLangState(i18nService.getLanguage());
+    const hData = () => loadHelplines();
+
+    window.addEventListener('flood_lang_changed', hLang);
+    window.addEventListener('flood_data_changed', hData);
+
+    return () => {
+      window.removeEventListener('flood_lang_changed', hLang);
+      window.removeEventListener('flood_data_changed', hData);
+    };
   }, []);
 
-  const districtHelplines = [
-    { district: 'Sivasagar',         phone: '8471864355'    },
-    { district: 'Jorhat',            phone: '0376-2300124'  },
-    { district: 'Majuli Island',     phone: '03775-274411'  },
-    { district: 'Charaideo',         phone: '9085412180'    },
-    { district: 'Golaghat',          phone: '9394985421'    },
-    { district: 'Lakhimpur',         phone: '03752-222217'  },
-    { district: 'Dhemaji',           phone: '03753-224128'  },
-    { district: 'Dibrugarh',         phone: '0373-2301525'  },
-    { district: 'Barpeta',           phone: '03665-252125'  },
-    { district: 'Cachar (Silchar)',   phone: '03842-245866'  },
-    { district: 'Dhubri',            phone: '03662-230050'  },
-    { district: 'Nagaon',            phone: '03672-233185'  },
-  ];
-
-  const filtered = districtHelplines.filter(d =>
-    d.district.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    d.phone.includes(searchTerm)
+  const filtered = helplines.filter(item =>
+    (item.label || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (item.phone_number || '').includes(searchTerm)
   );
 
   return (
@@ -83,8 +82,8 @@ export default function ASDMAHelplines() {
             className="px-3.5 py-2 rounded-xl text-xs font-bold gap-1.5 min-h-[38px]"
           >
             <Radio className="w-3.5 h-3.5 text-indigo-600" />
-            <span className="hidden sm:inline">Districts</span>
-            <span className="font-black text-slate-600">({districtHelplines.length})</span>
+            <span className="hidden sm:inline">Helplines</span>
+            <span className="font-black text-slate-600">({helplines.length})</span>
             {expanded
               ? <ChevronUp className="w-3.5 h-3.5 text-slate-500" />
               : <ChevronDown className="w-3.5 h-3.5 text-slate-500" />}
@@ -110,16 +109,16 @@ export default function ASDMAHelplines() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {filtered.map(item => (
               <a
-                key={item.district}
-                href={`tel:${item.phone.replace(/[^0-9]/g, '')}`}
+                key={item.id}
+                href={`tel:${(item.phone_number || '').replace(/[^0-9]/g, '')}`}
                 className="ripple-btn ripple-dark group p-2.5 bg-slate-50 border border-slate-200 hover:border-red-300 hover:bg-red-50 rounded-xl flex items-center justify-between transition-all"
               >
                 <div className="truncate">
                   <span className="text-[11px] font-bold text-slate-800 block truncate group-hover:text-red-700 transition-colors">
-                    {item.district}
+                    {item.label}
                   </span>
                   <span className="text-[10px] font-mono text-slate-500 block group-hover:text-red-600">
-                    {item.phone}
+                    {item.phone_number}
                   </span>
                 </div>
                 <Phone className="w-3.5 h-3.5 text-emerald-500 group-hover:text-red-500 shrink-0 ml-2 transition-colors" />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Lock, Key, ShieldCheck, HeartHandshake, Mail, UserCheck, AlertTriangle, ArrowRight, CheckCircle2, Building2, Send, Hash, Phone, Eye, EyeOff } from 'lucide-react';
+import { X, Lock, Key, ShieldCheck, HeartHandshake, Mail, UserCheck, AlertTriangle, ArrowRight, CheckCircle2, Building2, Send, Hash, Phone, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { authService } from '../services/authService';
 import { securityService } from '../services/securityService';
 import { storageService, VOLUNTEER_ROLES, NGO_TYPES, ASSAM_DISTRICTS } from '../services/storageService';
@@ -109,6 +109,8 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
 
   const [regSuccess, setRegSuccess] = useState(false);
   const [regError, setRegError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
 
   const validateRegPhone = (val) => {
     const clean = val.replace(/[^0-9]/g, '');
@@ -182,6 +184,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setLoginError('');
+    setIsLoggingIn(true);
     try {
       if (activeMode === 'NGO_LOGIN') {
         await authService.loginNgo(email, password);
@@ -192,6 +195,8 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
       onClose();
     } catch (err) {
       setLoginError(err.message || 'Login failed.');
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -285,6 +290,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
       return;
     }
 
+    setIsRegistering(true);
     try {
       const fullPhone = `+91 ${regPhone}`;
 
@@ -321,6 +327,8 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
       }
     } catch (err) {
       setRegError(err.message || 'Registration failed.');
+    } finally {
+      setIsRegistering(false);
     }
   };
 
@@ -499,10 +507,20 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
 
               <button
                 type="submit"
-                className="w-full py-3 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-bold rounded-xl text-sm transition-colors flex items-center justify-center gap-2 min-h-[48px] mt-2 cursor-pointer"
+                disabled={isLoggingIn}
+                className="w-full py-3 bg-[#3b82f6] hover:bg-[#2563eb] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-xl text-sm transition-colors flex items-center justify-center gap-2 min-h-[48px] mt-2 cursor-pointer"
               >
-                <Lock className="w-4 h-4" />
-                Sign In
+                {isLoggingIn ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Signing In...</span>
+                  </>
+                ) : (
+                  <>
+                    <Lock className="w-4 h-4" />
+                    <span>Sign In</span>
+                  </>
+                )}
               </button>
             </form>
 
@@ -915,10 +933,20 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
 
                 <button
                   type="submit"
-                  className="w-full py-3 bg-[#3b82f6] hover:bg-[#2563eb] text-white font-bold rounded-xl text-xs sm:text-sm shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 min-h-[46px]"
+                  disabled={isRegistering}
+                  className="w-full py-3 bg-[#3b82f6] hover:bg-[#2563eb] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-xl text-xs sm:text-sm shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 min-h-[46px]"
                 >
-                  <Send className="w-4 h-4" />
-                  <span>SUBMIT REGISTRATION FOR APPROVAL</span>
+                  {isRegistering ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>SUBMITTING...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      <span>SUBMIT REGISTRATION FOR APPROVAL</span>
+                    </>
+                  )}
                 </button>
               </form>
             )}

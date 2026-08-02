@@ -37,7 +37,7 @@ export default function Header({
     : currentAuth.user?.name || currentAuth.user?.email?.split('@')[0] || 'Partner';
 
   return (
-    <header className="sticky top-0 z-50 bg-[#111827] border-b border-[#1f2937] w-full text-white">
+    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 w-full" style={{ boxShadow: '0 1px 6px rgba(0,0,0,0.07)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* ── Brand + Actions bar ─────────────────────────────────────── */}
@@ -55,7 +55,7 @@ export default function Header({
             />
             <div className="leading-none">
               <div className="flex items-center gap-2">
-                <span className="text-[15px] font-black tracking-tight text-white uppercase">
+                <span className="text-[15px] font-black tracking-tight text-gray-900 uppercase">
                   HELP AXOM
                 </span>
                 {urgentCount > 0 && (
@@ -64,7 +64,7 @@ export default function Header({
                   </span>
                 )}
               </div>
-              <p className="hidden sm:block text-[10px] text-[#6b7280] font-medium tracking-[0.1em] uppercase mt-0.5">
+              <p className="hidden sm:block text-[10px] text-gray-400 font-medium tracking-[0.1em] uppercase mt-0.5">
                 Unity · Relief · Rebuild
               </p>
             </div>
@@ -77,13 +77,13 @@ export default function Header({
             <div className="hidden sm:flex items-center gap-2 mr-2">
               <button
                 onClick={openSupplyModal}
-                className="ripple-btn h-9 px-4 rounded-lg text-[13px] font-semibold bg-[#1e3a5f] hover:bg-[#1e40af] border border-[#1e40af]/60 text-blue-200 transition-all cursor-pointer"
+                className="ripple-btn h-9 px-4 rounded-lg text-[13px] font-semibold bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 transition-all cursor-pointer"
               >
                 {i18nService.t('reliefForm', 'Request Relief')}
               </button>
               <button
                 onClick={openRescueModal}
-                className="ripple-btn h-9 px-4 rounded-lg text-[13px] font-semibold bg-red-600 hover:bg-red-700 text-white border border-red-500/40 transition-all cursor-pointer flex items-center gap-1.5"
+                className="ripple-btn h-9 px-4 rounded-lg text-[13px] font-semibold bg-red-600 hover:bg-red-700 text-white border border-red-500/30 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
               >
                 <ShieldAlert className="w-3.5 h-3.5" />
                 {i18nService.t('requestRescue', 'SOS Rescue')}
@@ -94,26 +94,26 @@ export default function Header({
             {currentAuth.role === 'GUEST' ? (
               <button
                 onClick={openLoginModal}
-                className="ripple-btn h-9 px-4 rounded-lg text-[13px] font-semibold bg-[#3b82f6] hover:bg-[#2563eb] text-white transition-all flex items-center gap-1.5 cursor-pointer"
+                className="ripple-btn h-9 px-4 rounded-lg text-[13px] font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
               >
                 <Lock className="w-3.5 h-3.5" />
                 <span>Login</span>
               </button>
             ) : (
               /* Logged-in user chip */
-              <div className="flex items-center gap-2 h-9 bg-[#1f2937] border border-[#374151] rounded-lg px-3">
-                <div className="w-6 h-6 rounded-full bg-[#3b82f6] flex items-center justify-center shrink-0">
+              <div className="flex items-center gap-2 h-9 bg-gray-100 border border-gray-200 rounded-lg px-3">
+                <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
                   <span className="text-[10px] font-black text-white uppercase">
                     {userName.charAt(0)}
                   </span>
                 </div>
-                <span className="text-[13px] font-semibold text-[#e5e7eb] max-w-[90px] truncate hidden sm:block">
+                <span className="text-[13px] font-semibold text-gray-700 max-w-[90px] truncate hidden sm:block">
                   {userName}
                 </span>
                 <button
                   onClick={onLogout}
                   title="Logout"
-                  className="ripple-btn ml-1 text-[#6b7280] hover:text-[#e5e7eb] transition-colors cursor-pointer p-0.5"
+                  className="ripple-btn ml-1 text-gray-400 hover:text-gray-700 transition-colors cursor-pointer p-0.5"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                 </button>
@@ -123,7 +123,7 @@ export default function Header({
         </div>
 
         {/* ── Nav tabs (desktop/tablet) ──────────────────────────────── */}
-        <nav className="hidden sm:flex items-center gap-0 border-t border-[#1f2937]">
+        <nav className="hidden sm:flex items-center gap-0 border-t border-gray-100">
           {tabs.map(({ key, label, Icon, count, danger }) => {
             const isActive = activeTab === key;
             return (
@@ -134,8 +134,8 @@ export default function Header({
                   ripple-btn relative flex items-center gap-2 px-5 py-3 text-[13px] font-medium
                   transition-colors duration-150 cursor-pointer whitespace-nowrap
                   ${isActive
-                    ? danger ? 'text-red-400' : 'text-white'
-                    : danger ? 'text-red-600 hover:text-red-400' : 'text-[#6b7280] hover:text-[#d1d5db]'
+                    ? danger ? 'text-red-600' : 'text-blue-600'
+                    : danger ? 'text-red-400 hover:text-red-600' : 'text-gray-500 hover:text-gray-800'
                   }
                 `}
               >
@@ -148,7 +148,7 @@ export default function Header({
                 )}
                 {/* Active underline */}
                 {isActive && (
-                  <span className={`absolute bottom-0 left-0 right-0 h-[2px] ${danger ? 'bg-red-500' : 'bg-[#3b82f6]'}`} />
+                  <span className={`absolute bottom-0 left-0 right-0 h-[2px] ${danger ? 'bg-red-500' : 'bg-blue-600'}`} />
                 )}
               </button>
             );

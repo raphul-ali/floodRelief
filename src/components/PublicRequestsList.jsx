@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   AlertTriangle, MapPin, Package, Clock, ShieldCheck,
   ChevronLeft, ChevronRight, Users, Activity, Loader2,
-  ArrowUpRight
+  ArrowUpRight, Waves, Droplets, Compass
 } from 'lucide-react';
 import DeliveryUpdatesTreeModal from './DeliveryUpdatesTreeModal';
 import { storageService } from '../services/storageService';
@@ -178,6 +178,30 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
                         </span>
                       )}
                     </p>
+
+                    {/* Ground Condition Pill */}
+                    {req.groundCondition && (
+                      <div className="flex items-center gap-1 flex-wrap">
+                        {req.groundCondition === 'SUBMERGED' && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-black bg-cyan-50 text-cyan-800 border border-cyan-300 px-2 py-0.5 rounded-full">
+                            <Waves className="w-3 h-3 text-cyan-600 shrink-0" />
+                            <span>Submerged (Boat Access Only)</span>
+                          </span>
+                        )}
+                        {req.groundCondition === 'RECEDING' && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-black bg-amber-50 text-amber-800 border border-amber-300 px-2 py-0.5 rounded-full">
+                            <Droplets className="w-3 h-3 text-amber-600 shrink-0" />
+                            <span>Water Receding (Heavy Mud)</span>
+                          </span>
+                        )}
+                        {req.groundCondition === 'DRY_LAND' && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-black bg-emerald-50 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded-full">
+                            <Compass className="w-3 h-3 text-emerald-600 shrink-0" />
+                            <span>Dry Land (Road Accessible)</span>
+                          </span>
+                        )}
+                      </div>
+                    )}
 
                     {/* Need tags */}
                     {(() => {
