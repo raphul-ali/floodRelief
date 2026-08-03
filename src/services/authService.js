@@ -163,62 +163,33 @@ export const authService = {
     const cleanEmail = (email || '').trim().toLowerCase();
     const cleanPass = (password || '').trim();
 
-    let foundNgo = null;
-
-    if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase
-        .from('ngos')
-        .select('*')
-        .eq('email', cleanEmail)
-        .eq('password', cleanPass)
-        .single();
+    try {
+      const res = await fetch('/api/auth/login-ngo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail, password: cleanPass })
+      });
       
-      if (!error && data) {
-        foundNgo = {
-          id: data.id,
-          name: data.name,
-          contactPerson: data.contact_person,
-          phone: data.phone,
-          email: data.email,
-          operatingZones: data.operating_zones,
-          verified: data.verified
-        };
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.detail || "Invalid NGO email or password.");
       }
-    } else {
-      const ngos = storageService.getNGOs(true);
-      foundNgo = ngos.find(n => 
-        n.email && n.email.toLowerCase() === cleanEmail && 
-        (n.password ? n.password === cleanPass : true)
-      );
+      
+      const data = await res.json();
+      const sessionData = {
+        role: data.user.role,
+        user: data.user,
+        accessToken: data.token,
+        refreshToken: null,
+        expiresAt: Date.now() + (24 * 60 * 60 * 1000)
+      };
+      
+      localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(sessionData));
+      notifyAuthChanged();
+      return sessionData;
+    } catch (e) {
+      throw new Error(e.message || "Failed to connect to authentication server.");
     }
-
-    if (!foundNgo) {
-      throw new Error("Invalid NGO email or password. Please check your credentials or register your organization.");
-    }
-
-    if (!foundNgo.verified) {
-      throw new Error("Your NGO account is pending Admin Verification. Our control room will contact you to verify details before activation.");
-    }
-
-    const tokens = generateAuthTokens(foundNgo.id, 'NGO');
-
-    const session = {
-      role: 'NGO',
-      user: {
-        id: foundNgo.id,
-        name: foundNgo.name,
-        contactPerson: foundNgo.contactPerson,
-        phone: foundNgo.phone,
-        email: foundNgo.email,
-        operatingZones: foundNgo.operatingZones,
-        verified: true
-      },
-      ...tokens
-    };
-
-    localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
-    notifyAuthChanged();
-    return session;
   },
 
   /**
@@ -228,66 +199,39 @@ export const authService = {
     const cleanEmail = (email || '').trim().toLowerCase();
     const cleanPass = (password || '').trim();
 
-    let foundVol = null;
-
-    if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase
-        .from('volunteers')
-        .select('*')
-        .eq('email', cleanEmail)
-        .eq('password', cleanPass)
-        .single();
+    try {
+      const res = await fetch('/api/auth/login-volunteer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail, password: cleanPass })
+      });
       
-      if (!error && data) {
-        foundVol = {
-          id: data.id,
-          name: data.name,
-          phone: data.phone,
-          email: data.email,
-          verified: data.verified
-        };
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.detail || "Invalid Volunteer email or password.");
       }
-    } else {
-      const volunteers = storageService.getVolunteers(true);
-      foundVol = volunteers.find(v => 
-        v.email && v.email.toLowerCase() === cleanEmail && 
-        (v.password ? v.password === cleanPass : true)
-      );
+      
+      const data = await res.json();
+      const sessionData = {
+        role: data.user.role,
+        user: data.user,
+        accessToken: data.token,
+        refreshToken: null,
+        expiresAt: Date.now() + (24 * 60 * 60 * 1000)
+      };
+      
+      localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(sessionData));
+      notifyAuthChanged();
+      return sessionData;
+    } catch (e) {
+      throw new Error(e.message || "Failed to connect to authentication server.");
     }
-
-    if (!foundVol) {
-      throw new Error("Invalid Volunteer email or password. Please check your credentials or register.");
-    }
-
-    if (!foundVol.verified) {
-      throw new Error("Your Volunteer account is pending Admin Verification.");
-    }
-
-    const tokens = generateAuthTokens(foundVol.id, 'VOLUNTEER');
-
-    const session = {
-      role: 'VOLUNTEER',
-      user: {
-        id: foundVol.id,
-        name: foundVol.name,
-        roleType: foundVol.roleType,
-        district: foundVol.district,
-        phone: foundVol.phone,
-        email: foundVol.email,
-        verified: true
-      },
-      ...tokens
-    };
-
-    localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
-    notifyAuthChanged();
-    return session;
   },
 
   /**
    * Register a new NGO account
    */
-  registerNgo: (ngoData, password) => {
+  registerNgo: async (ngoData, password) => {
     if (!securityService.validateEmail(ngoData.email)) {
       throw new Error("Invalid Email Address. Please enter a valid email format (e.g. ngo@domain.org).");
     }
@@ -300,28 +244,33 @@ export const authService = {
       throw new Error("Password too weak! Must be at least 8 characters long and contain at least 1 letter, 1 number, and 1 special symbol (@#$%^&*).");
     }
 
-    const ngos = storageService.getNGOs(true);
-    const existing = ngos.find(n => n.email && n.email.toLowerCase() === ngoData.email.toLowerCase());
-    if (existing) {
-      throw new Error("An NGO with this email address is already registered.");
-    }
-
     const formattedPhone = securityService.formatIndianPhone(ngoData.phone);
-
-    const newNgo = storageService.addNGO({
+    const payload = {
       ...ngoData,
       phone: formattedPhone,
-      password: (password || '').trim(),
-      verified: false
-    });
+      password: (password || '').trim()
+    };
 
-    return newNgo;
+    try {
+      const res = await fetch('/api/auth/register-ngo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.detail || "An error occurred during registration.");
+      }
+      return await res.json();
+    } catch (e) {
+      throw new Error(e.message || "Failed to connect to authentication server.");
+    }
   },
 
   /**
    * Register a new Volunteer account
    */
-  registerVolunteer: (volData, password) => {
+  registerVolunteer: async (volData, password) => {
     if (!securityService.validateEmail(volData.email)) {
       throw new Error("Invalid Email Address. Please enter a valid email format (e.g. volunteer@domain.com).");
     }
@@ -334,24 +283,27 @@ export const authService = {
       throw new Error("Password too weak! Must be at least 8 characters long and contain at least 1 letter, 1 number, and 1 special symbol (@#$%^&*).");
     }
 
-    const vols = storageService.getVolunteers(true);
-    if (volData.email) {
-      const existing = vols.find(v => v.email && v.email.toLowerCase() === volData.email.toLowerCase());
-      if (existing) {
-        throw new Error("A volunteer with this email address is already registered.");
-      }
-    }
-
     const formattedPhone = securityService.formatIndianPhone(volData.phone);
-
-    const newVol = storageService.addVolunteer({
+    const payload = {
       ...volData,
       phone: formattedPhone,
-      password: (password || '').trim(),
-      verified: false
-    });
+      password: (password || '').trim()
+    };
 
-    return newVol;
+    try {
+      const res = await fetch('/api/auth/register-volunteer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.detail || "An error occurred during registration.");
+      }
+      return await res.json();
+    } catch (e) {
+      throw new Error(e.message || "Failed to connect to authentication server.");
+    }
   },
 
   /**

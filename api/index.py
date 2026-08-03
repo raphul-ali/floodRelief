@@ -240,6 +240,196 @@ def verify_otp(req: VerifyOtpRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+class RegisterNgoRequest(BaseModel):
+    name: str
+    contactPerson: str
+    phone: str
+    email: str
+    logoUrl: Optional[str] = None
+    address: str
+    operatingZones: List[str]
+    services: List[str]
+    showPhone: bool
+    password: str
+
+@app.post("/api/auth/register-ngo")
+def register_ngo(req: RegisterNgoRequest):
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Database not configured")
+    try:
+        # Check if email exists
+        res = supabase.table('ngos').select('id').eq('email', req.email.lower()).execute()
+        if res.data and len(res.data) > 0:
+            raise HTTPException(status_code=400, detail="An NGO with this email is already registered")
+
+        import uuid
+        ngo_id = f"ngo-assam-{uuid.uuid4()}"
+        hashed_pw = bcrypt.hashpw(req.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        
+        insert_data = {
+            "id": ngo_id,
+            "name": req.name,
+            "contact_person": req.contactPerson,
+            "phone": req.phone,
+            "email": req.email.lower(),
+            "password": hashed_pw,
+            "logo_url": req.logoUrl,
+            "operating_zones": req.operatingZones,
+            "services": req.services,
+            "address": req.address,
+            "verified": False,
+            "active_teams": 1,
+            "show_phone": req.showPhone,
+        }
+        supabase.table('ngos').insert(insert_data).execute()
+        return {"success": True, "ngo_id": ngo_id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+class RegisterVolunteerRequest(BaseModel):
+    name: str
+    roleType: str
+    phone: str
+    email: str
+    district: str
+    offerings: str
+    showPhone: bool
+    password: str
+
+@app.post("/api/auth/register-volunteer")
+def register_volunteer(req: RegisterVolunteerRequest):
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Database not configured")
+    try:
+        res = supabase.table('volunteers').select('id').eq('email', req.email.lower()).execute()
+        if res.data and len(res.data) > 0:
+            raise HTTPException(status_code=400, detail="A volunteer with this email is already registered")
+
+        import uuid
+        vol_id = f"vol-{uuid.uuid4()}"
+        hashed_pw = bcrypt.hashpw(req.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        
+        insert_data = {
+            "id": vol_id,
+            "name": req.name,
+            "role_type": req.roleType,
+            "phone": req.phone,
+            "email": req.email.lower(),
+            "password": hashed_pw,
+            "district": req.district,
+            "offerings": req.offerings,
+            "available_status": "Active Now",
+            "verified": False,
+            "show_phone": req.showPhone,
+        }
+        supabase.table('volunteers').insert(insert_data).execute()
+        return {"success": True, "vol_id": vol_id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/auth/login-ngo")
+def login_ngo(creds: LoginRequest):
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Database not configured")
+    try:
+        res = supabase.table('ngos').select('*').eq('email', creds.email.lower()).execute()
+        if not res.data or len(res.data) == 0:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+            
+        user_record = res.data[0]
+        
+        # Backward compatibility for plain text passwords (if any exist) or bcrypt
+        if user_record['password'].startswith('$2b$') or user_record['password'].startswith('$2a$'):
+            if not bcrypt.checkpw(creds.password.encode('utf-8'), user_record['password'].encode('utf-8')):
+                raise HTTPException(status_code=401, detail="Invalid email or password")
+        else:
+            if creds.password != user_record['password']:
+                raise HTTPException(status_code=401, detail="Invalid email or password")
+                
+        if not user_record.get('verified', False):
+            raise HTTPException(status_code=403, detail="Your NGO account is pending Admin Verification.")
+            
+        import time
+        payload = {
+            "sub": user_record['id'],
+            "email": user_record['email'],
+            "role": "NGO",
+            "name": user_record['name'],
+            "exp": int(time.time()) + (24 * 60 * 60)
+        }
+        token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+        
+        return {
+            "token": token,
+            "user": {
+                "id": user_record['id'],
+                "email": user_record['email'],
+                "role": "NGO",
+                "name": user_record['name'],
+                "contactPerson": user_record.get('contact_person'),
+                "phone": user_record.get('phone'),
+                "operatingZones": user_record.get('operating_zones'),
+                "verified": True
+            }
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/auth/login-volunteer")
+def login_volunteer(creds: LoginRequest):
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Database not configured")
+    try:
+        res = supabase.table('volunteers').select('*').eq('email', creds.email.lower()).execute()
+        if not res.data or len(res.data) == 0:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+            
+        user_record = res.data[0]
+        
+        if user_record['password'].startswith('$2b$') or user_record['password'].startswith('$2a$'):
+            if not bcrypt.checkpw(creds.password.encode('utf-8'), user_record['password'].encode('utf-8')):
+                raise HTTPException(status_code=401, detail="Invalid email or password")
+        else:
+            if creds.password != user_record['password']:
+                raise HTTPException(status_code=401, detail="Invalid email or password")
+                
+        if not user_record.get('verified', False):
+            raise HTTPException(status_code=403, detail="Your Volunteer account is pending Admin Verification.")
+            
+        import time
+        payload = {
+            "sub": user_record['id'],
+            "email": user_record['email'],
+            "role": "VOLUNTEER",
+            "name": user_record['name'],
+            "exp": int(time.time()) + (24 * 60 * 60)
+        }
+        token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+        
+        return {
+            "token": token,
+            "user": {
+                "id": user_record['id'],
+                "email": user_record['email'],
+                "role": "VOLUNTEER",
+                "name": user_record['name'],
+                "roleType": user_record.get('role_type'),
+                "district": user_record.get('district'),
+                "phone": user_record.get('phone'),
+                "verified": True
+            }
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/health")
 def health_check():
     return {"status": "healthy", "supabase_configured": bool(supabase)}

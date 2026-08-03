@@ -593,29 +593,7 @@ export const storageService = {
 
     const updated = [newNgo, ...ngos];
     
-    if (isSupabaseConfigured && supabase) {
-      cloudMemoryCache.ngos = updated;
-      supabase.from('ngos').insert([{
-        id: newNgo.id,
-        name: newNgo.name,
-        contact_person: newNgo.contactPerson,
-        phone: newNgo.phone,
-        email: newNgo.email,
-        password: newNgo.password,
-        logo_url: newNgo.logoUrl || null,
-        operating_zones: newNgo.operatingZones,
-        services: newNgo.services,
-        address: newNgo.address,
-        verified: newNgo.verified,
-        active_teams: newNgo.activeTeams,
-        show_phone: newNgo.showPhone,
-        created_at: new Date().toISOString()
-      }]).then(({ error }) => {
-        if (error) console.error("Supabase NGO insert error:", error);
-      });
-    } else {
-      cloudMemoryCache.ngos = updated;
-    }
+    cloudMemoryCache.ngos = updated;
 
     securityService.recordSubmission();
     notifyDataChanged();
@@ -709,28 +687,7 @@ export const storageService = {
 
     const updated = [newVol, ...vols];
     
-    if (isSupabaseConfigured && supabase) {
-      cloudMemoryCache.volunteers = updated;
-      supabase.from('volunteers').insert([{
-        id: newVol.id,
-        name: newVol.name,
-        role_type: newVol.roleType,
-        phone: newVol.phone,
-        email: newVol.email,
-        password: newVol.password,
-        district: newVol.district,
-        social_link: newVol.socialLink,
-        offerings: newVol.offerings,
-        available_status: newVol.availableStatus,
-        verified: newVol.verified,
-        show_phone: newVol.showPhone,
-        created_at: new Date().toISOString()
-      }]).then(({ error }) => {
-        if (error) console.error("Supabase Volunteer insert error:", error);
-      });
-    } else {
-      cloudMemoryCache.volunteers = updated;
-    }
+    cloudMemoryCache.volunteers = updated;
 
     securityService.recordSubmission();
     notifyDataChanged();
