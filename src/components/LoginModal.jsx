@@ -45,6 +45,11 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
   const [regShowPhone, setRegShowPhone] = useState(false);
   const logoFileInputRef = useRef(null);
 
+  // OTP State
+  const [otpStep, setOtpStep] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+
   const handleClearLogo = () => {
     setRegLogoUrl('');
     setLogoError('');
@@ -95,6 +100,8 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
       setEmailTouched(false);
       setPasswordTouched(false);
       setPhoneTouched(false);
+      setOtpStep(false);
+      setOtpCode('');
     }
   }, [activeMode]);
 
@@ -292,40 +299,51 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
 
     setIsRegistering(true);
     try {
-      const fullPhone = `+91 ${regPhone}`;
-
-      if (regRole === 'NGO') {
-        const finalZones = ['Whole Assam (All 35 Districts)'];
-
-        await authService.registerNgo({
-          name: regName,
-          contactPerson: regName,
-          phone: fullPhone,
-          email: regEmail,
-          logoUrl: regLogoUrl,
-          address: regAddress || 'Assam Operational Zone',
-          operatingZones: finalZones,
-          services: regNgoType,
-          showPhone: regShowPhone
-        }, regPassword);
-
-        setRegSuccess(true);
+      if (!otpStep) {
+        // Step 1: Send OTP
+        await authService.generateEmailOtp(regEmail);
+        setOtpStep(true);
       } else {
-        authService.registerVolunteer({
-          name: regName,
-          roleType: regRoleType,
-          phone: fullPhone,
-          email: regEmail,
-          district: 'Jorhat',
-          offerings: regAddress || 'Local relief volunteer support',
-          showPhone: regShowPhone
-        }, regPassword);
-        setRegSuccess(true);
+        // Step 2: Verify OTP
+        setIsVerifying(true);
+        await authService.verifyEmailOtp(regEmail, otpCode);
+        
+        const fullPhone = `+91 ${regPhone}`;
+
+        if (regRole === 'NGO') {
+          const finalZones = ['Whole Assam (All 35 Districts)'];
+
+          await authService.registerNgo({
+            name: regName,
+            contactPerson: regName,
+            phone: fullPhone,
+            email: regEmail,
+            logoUrl: regLogoUrl,
+            address: regAddress || 'Assam Operational Zone',
+            operatingZones: finalZones,
+            services: regNgoType,
+            showPhone: regShowPhone
+          }, regPassword);
+
+          setRegSuccess(true);
+        } else {
+          authService.registerVolunteer({
+            name: regName,
+            roleType: regRoleType,
+            phone: fullPhone,
+            email: regEmail,
+            district: 'Jorhat',
+            offerings: regAddress || 'Local relief volunteer support',
+            showPhone: regShowPhone
+          }, regPassword);
+          setRegSuccess(true);
+        }
       }
     } catch (err) {
       setRegError(err.message || 'Registration failed.');
     } finally {
       setIsRegistering(false);
+      setIsVerifying(false);
     }
   };
 
@@ -645,6 +663,43 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                   </button>
                 </div>
               </div>
+            ) : otpStep ? (
+              <form onSubmit={handleDirectRegister} className="space-y-4 bg-slate-900 border border-slate-700 rounded-xl p-5">
+                <div className="text-center">
+                  <Mail className="w-10 h-10 text-emerald-400 mx-auto mb-2" />
+                  <h3 className="text-white font-bold mb-1">Verify Your Email</h3>
+                  <p className="text-xs text-slate-400">We've sent a 6-digit code to <strong className="text-slate-200">{regEmail}</strong></p>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">OTP Code</label>
+                  <input
+                    type="text"
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value)}
+                    placeholder="Enter 6-digit code"
+                    maxLength={6}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-3 text-center tracking-widest text-lg font-mono text-white focus:outline-none focus:border-emerald-500"
+                    required
+                  />
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setOtpStep(false)}
+                    className="py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs transition-colors"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isVerifying}
+                    className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-2"
+                  >
+                    {isVerifying ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
+                    <span>Verify & Register</span>
+                  </button>
+                </div>
+              </form>
             ) : (
               <form onSubmit={handleDirectRegister} className="space-y-3">
                 <div>
@@ -928,20 +983,22 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                   )}
                 </div>
 
+
+
                 <button
                   type="submit"
                   disabled={isRegistering}
-                  className="w-full py-3 bg-[#3b82f6] hover:bg-[#2563eb] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-xl text-xs sm:text-sm shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 min-h-[46px]"
+                  className="w-full py-3.5 bg-[#3b82f6] hover:bg-[#2563eb] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-xl text-[13px] transition-colors flex items-center justify-center gap-2 min-h-[48px] shadow-lg shadow-blue-500/20 mt-4 cursor-pointer"
                 >
                   {isRegistering ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>SUBMITTING...</span>
+                      <span>Sending OTP...</span>
                     </>
                   ) : (
                     <>
-                      <Send className="w-4 h-4" />
-                      <span>SUBMIT REGISTRATION FOR APPROVAL</span>
+                      <span>Get Registration OTP</span>
+                      <ArrowRight className="w-4 h-4" />
                     </>
                   )}
                 </button>

@@ -117,9 +117,13 @@ export const storageService = {
 
     if (isSupabaseConfigured && supabase) {
       try {
-        await supabase.from('campaigns').insert([newItem]);
+        const { error } = await supabase.from('campaigns').insert([newItem]);
+        if (error) {
+          console.error("Failed to add campaign to cloud", error);
+          alert("Database Error: " + error.message);
+        }
       } catch (e) {
-        console.error("Failed to add campaign to cloud", e);
+        console.error("Exception adding campaign to cloud", e);
       }
     }
 
@@ -1139,6 +1143,8 @@ export const storageService = {
       }
       if (!campRes.error) {
         cloudMemoryCache.campaigns = campRes.data || [];
+      } else {
+        console.error("Supabase fetch campaigns error:", campRes.error);
       }
 
       notifyDataChanged();

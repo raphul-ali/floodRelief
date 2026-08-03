@@ -358,74 +358,88 @@ export const authService = {
    * Free Email OTP Verification Service
    * Generates a 6-digit OTP code for verifying email address during account creation
    */
-  generateEmailOtp: (email) => {
+  generateEmailOtp: async (email) => {
     if (!email || !email.includes('@')) {
       throw new Error("Please provide a valid email address.");
     }
 
-    // Generate random 6-digit OTP code (e.g. 582901)
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiry = Date.now() + 10 * 60 * 1000; // 10 minutes valid
-
-    const otps = JSON.parse(localStorage.getItem(OTP_STORAGE_KEY) || '{}');
-    otps[email.trim().toLowerCase()] = { code, expiry };
-    localStorage.setItem(OTP_STORAGE_KEY, JSON.stringify(otps));
-
-    console.log(`[FREE EMAIL OTP GENERATED] For ${email}: ${code}`);
-    return { success: true, code, message: `6-Digit OTP code (${code}) dispatched to ${email}` };
+    try {
+      const res = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase() })
+      });
+      
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.detail || "Failed to send OTP code");
+      }
+      return { success: true, message: "OTP code dispatched successfully" };
+    } catch (e) {
+      throw new Error(e.message || "Failed to connect to verification server.");
+    }
   },
 
   /**
    * Verify entered 6-Digit Email OTP
    */
-  verifyEmailOtp: (email, enteredCode) => {
-    const otps = JSON.parse(localStorage.getItem(OTP_STORAGE_KEY) || '{}');
-    const record = otps[email.trim().toLowerCase()];
-
-    if (!record) {
-      throw new Error("No OTP request found for this email address. Please request a new OTP code.");
+  verifyEmailOtp: async (email, enteredCode) => {
+    if (!enteredCode || enteredCode.length < 6) {
+      throw new Error("Please enter the 6-digit OTP code.");
     }
 
-    if (Date.now() > record.expiry) {
-      throw new Error("OTP code expired. Please click 'Resend OTP' for a fresh code.");
+    try {
+      const res = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          email: email.trim().toLowerCase(), 
+          code: enteredCode.trim() 
+        })
+      });
+      
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.detail || "Invalid or expired OTP code.");
+      }
+      return true;
+    } catch (e) {
+      throw new Error(e.message || "Verification failed. Please try again.");
     }
-
-    if (record.code !== enteredCode.trim()) {
-      throw new Error("Incorrect 6-digit OTP code. Please check your email and try again.");
-    }
-
-    // Clear used OTP
-    delete otps[email.trim().toLowerCase()];
-    localStorage.setItem(OTP_STORAGE_KEY, JSON.stringify(otps));
-
-    return true;
   },
 
   /**
-   * Login as Admin Control Officer (Requires raphulali@gmail.com & Raphul@9957422)
+   * Login as Admin Control Officer
    */
-  loginAdmin: (email, password) => {
-    const cleanEmail = (email || '').trim().toLowerCase();
-    const cleanPass = (password || '').trim();
-
-    if (cleanEmail === 'raphulali@gmail.com' && cleanPass === 'Raphul@9957422') {
-      const tokens = generateAuthTokens('admin-raphul', 'ADMIN');
-      const session = {
-        role: 'ADMIN',
-        user: {
-          id: 'admin-raphul',
-          name: 'Raphul Ali (Super Admin)',
-          email: 'raphulali@gmail.com',
-          title: 'Head Platform Administrator'
-        },
-        ...tokens
+  loginAdmin: async (email, password) => {
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.detail || "Invalid Admin Email or Password. Access denied.");
+      }
+      
+      const data = await res.json();
+      
+      // We store the real JWT token from the backend
+      const sessionData = {
+        role: data.user.role,
+        user: data.user,
+        accessToken: data.token, // This is the real JWT
+        refreshToken: null,
+        expiresAt: Date.now() + (24 * 60 * 60 * 1000)
       };
-
-      localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
+      
+      localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(sessionData));
       notifyAuthChanged();
-      return session;
-    } else {
-      throw new Error("Invalid Admin Email or Password. Access denied.");
+      return sessionData;
+    } catch (e) {
+      throw new Error(e.message || "Failed to connect to authentication server.");
     }
   },
 

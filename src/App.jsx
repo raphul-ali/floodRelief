@@ -135,11 +135,11 @@ export default function App() {
     setActiveTab('public_requests');
   };
 
-  const handleSecretAdminLogin = (e) => {
+  const handleSecretAdminLogin = async (e) => {
     e.preventDefault();
     setAdminLoginError('');
     try {
-      authService.loginAdmin(adminEmail, adminPassword);
+      await authService.loginAdmin(adminEmail, adminPassword);
       setAdminPassword('');
       loadData();
     } catch (err) {

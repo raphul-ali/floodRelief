@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+supabase
+pydantic
+python-dotenv
+PyJWT
+bcrypt
+passlib
+resend
