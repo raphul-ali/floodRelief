@@ -7,3 +7,5 @@ PyJWT
 bcrypt
 passlib
 resend
+upstash-redis
+upstash-ratelimit

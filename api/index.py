@@ -24,38 +24,57 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# In-memory rate limiting store (Works per Vercel edge node instance)
-RATE_LIMIT_STORE = {}
-RATE_LIMIT_MAX_REQUESTS = 60 # Max requests per minute
-RATE_LIMIT_WINDOW = 60 # Seconds
+try:
+    from upstash_ratelimit.asyncio import AsyncRatelimit, SlidingWindow
+    from upstash_redis.asyncio import Redis
+    
+    UPSTASH_URL = os.environ.get("UPSTASH_REDIS_REST_URL")
+    UPSTASH_TOKEN = os.environ.get("UPSTASH_REDIS_REST_TOKEN")
+    
+    if UPSTASH_URL and UPSTASH_TOKEN:
+        upstash_redis = Redis(url=UPSTASH_URL, token=UPSTASH_TOKEN)
+        # 30 requests per 10 seconds for general API routes
+        global_ratelimit = AsyncRatelimit(
+            redis=upstash_redis,
+            limiter=SlidingWindow(max_requests=30, window=10)
+        )
+    else:
+        global_ratelimit = None
+except ImportError:
+    global_ratelimit = None
+
+async def check_rate_limit(request: Request):
+    if not global_ratelimit:
+        return # Rate limiting disabled if env vars or package missing
+        
+    ip = (
+        request.headers.get("cf-connecting-ip")
+        or request.headers.get("x-forwarded-for")
+        or (request.client.host if request.client else "unknown")
+    )
+    
+    # x-forwarded-for can be a comma-separated list, take the first
+    if ip and "," in ip:
+        ip = ip.split(",")[0].strip()
+
+    response = await global_ratelimit.limit(ip)
+
+    if not response.allowed:
+        raise HTTPException(status_code=429, detail="Too many requests")
 
 @app.middleware("http")
 async def security_audit_middleware(request: Request, call_next):
     if request.url.path.startswith("/api/"):
         
-        # Rate Limiting Logic
-        ip = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
-        if not ip and request.client:
-            ip = request.client.host
-            
-        current_time = time.time()
-        
-        if ip:
-            if ip not in RATE_LIMIT_STORE:
-                RATE_LIMIT_STORE[ip] = {"count": 1, "start_time": current_time}
-            else:
-                store = RATE_LIMIT_STORE[ip]
-                if current_time - store["start_time"] > RATE_LIMIT_WINDOW:
-                    # Reset window
-                    store["count"] = 1
-                    store["start_time"] = current_time
-                else:
-                    store["count"] += 1
-                    if store["count"] > RATE_LIMIT_MAX_REQUESTS:
-                        return JSONResponse(status_code=429, content={"detail": "Too many requests. Slow down."})
-                        
+        # Rate Limiting
+        if global_ratelimit:
+            try:
+                await check_rate_limit(request)
+            except HTTPException as e:
+                return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
         
         # RBAC is now handled by FastAPI dependencies (Depends(get_current_user))
+        # Rate Limiting is now handled by per-route dependencies (Depends(check_rate_limit))
 
         # Logging logic
         if request.method in ["POST", "PUT", "DELETE"]:
