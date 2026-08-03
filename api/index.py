@@ -25,21 +25,7 @@ app.add_middleware(
 async def security_audit_middleware(request: Request, call_next):
     if request.url.path.startswith("/api/"):
         
-        # Enforce RBAC for EDIT (PUT) and DELETE operations
-        if request.method in ["PUT", "DELETE"]:
-            auth_header = request.headers.get("Authorization")
-            if not auth_header or not auth_header.startswith("Bearer "):
-                return HTTPException(status_code=401, detail="Missing or invalid authentication token")
-            
-            token = auth_header.split(" ")[1]
-            try:
-                payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
-                if payload.get("role") != "ADMIN":
-                    return HTTPException(status_code=403, detail="Admin privileges required")
-            except jwt.ExpiredSignatureError:
-                return HTTPException(status_code=401, detail="Token expired")
-            except jwt.InvalidTokenError:
-                return HTTPException(status_code=401, detail="Invalid token")
+        # RBAC is now handled by FastAPI dependencies (Depends(get_current_user))
 
         # Logging logic
         if request.method in ["POST", "PUT", "DELETE"]:
@@ -76,6 +62,29 @@ if not SUPABASE_URL or not SUPABASE_KEY:
     SUPABASE_KEY = os.environ.get("VITE_SUPABASE_ANON_KEY", "")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL else None
+
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+security = HTTPBearer()
+
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+def require_admin(user: dict = Depends(get_current_user)):
+    if user.get("role") != "ADMIN":
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    return user
+
+def require_auth(user: dict = Depends(get_current_user)):
+    if not user.get("role"):
+        raise HTTPException(status_code=403, detail="Authentication required")
+    return user
 
 # Pydantic Models for our incoming data
 class CampaignCreate(BaseModel):
@@ -444,7 +453,7 @@ def get_campaigns():
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/campaigns")
-def create_campaign(campaign: CampaignCreate):
+def create_campaign(campaign: CampaignCreate, user: dict = Depends(require_admin)):
     try:
         import uuid
         import time
@@ -457,7 +466,7 @@ def create_campaign(campaign: CampaignCreate):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/api/campaigns/{campaign_id}")
-def delete_campaign(campaign_id: str):
+def delete_campaign(campaign_id: str, user: dict = Depends(require_admin)):
     try:
         res = supabase.table('campaigns').delete().eq('id', campaign_id).execute()
         return {"success": True}
@@ -465,7 +474,7 @@ def delete_campaign(campaign_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.put("/api/campaigns/{campaign_id}")
-def update_campaign(campaign_id: str, updates: Dict[str, Any]):
+def update_campaign(campaign_id: str, updates: Dict[str, Any], user: dict = Depends(require_admin)):
     try:
         res = supabase.table('campaigns').update(updates).eq('id', campaign_id).execute()
         return {"success": True}
@@ -495,7 +504,7 @@ def create_victim_request(req: VictimRequestCreate):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/api/victim_requests/{req_id}")
-def delete_victim_request(req_id: str):
+def delete_victim_request(req_id: str, user: dict = Depends(require_admin)):
     try:
         res = supabase.table('victim_requests').delete().eq('id', req_id).execute()
         return {"success": True}
@@ -503,7 +512,7 @@ def delete_victim_request(req_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.put("/api/victim_requests/{req_id}")
-def update_victim_request(req_id: str, updates: Dict[str, Any]):
+def update_victim_request(req_id: str, updates: Dict[str, Any], user: dict = Depends(require_auth)):
     try:
         res = supabase.table('victim_requests').update(updates).eq('id', req_id).execute()
         return {"success": True}
@@ -527,7 +536,7 @@ def create_ngo(req: Request):
 # --- Generic Catch-all POST for simple migration ---
 # To make the migration easy, we can create generic endpoints for tables
 @app.post("/api/db/{table_name}")
-async def create_record(table_name: str, req: Request):
+async def create_record(table_name: str, req: Request, user: dict = Depends(require_auth)):
     try:
         data = await req.json()
         res = supabase.table(table_name).insert(data).execute()
@@ -536,7 +545,7 @@ async def create_record(table_name: str, req: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.put("/api/db/{table_name}/{record_id}")
-async def update_record(table_name: str, record_id: str, req: Request):
+async def update_record(table_name: str, record_id: str, req: Request, user: dict = Depends(require_auth)):
     try:
         data = await req.json()
         res = supabase.table(table_name).update(data).eq('id', record_id).execute()
@@ -545,7 +554,7 @@ async def update_record(table_name: str, record_id: str, req: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/api/db/{table_name}/{record_id}")
-def delete_record(table_name: str, record_id: str):
+def delete_record(table_name: str, record_id: str, user: dict = Depends(require_auth)):
     try:
         supabase.table(table_name).delete().eq('id', record_id).execute()
         return {"success": True}

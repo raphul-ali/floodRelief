@@ -59,6 +59,44 @@ const notifyDataChanged = () => {
   window.dispatchEvent(new Event("flood_data_changed"));
 };
 
+const getAuthToken = () => {
+  try {
+    const sessionStr = localStorage.getItem('flood_relief_auth_session');
+    if (sessionStr) {
+      const session = JSON.parse(sessionStr);
+      return session.accessToken;
+    }
+  } catch (e) {}
+  return null;
+};
+
+const apiRequest = async (endpoint, method = 'GET', body = null) => {
+  const token = getAuthToken();
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
+  const config = { method, headers };
+  if (body) {
+    config.body = JSON.stringify(body);
+  }
+  
+  try {
+    const response = await fetch(endpoint, config);
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.detail || "API request failed");
+    }
+    return await response.json();
+  } catch (e) {
+    console.error(`API Error on ${method} ${endpoint}:`, e);
+    throw e;
+  }
+};
+
 const INITIAL_HELPLINES = [
   {
     id: "db17680f-3faa-43a9-8fd9-1581a6c19904",
@@ -115,16 +153,10 @@ export const storageService = {
       ...campaignData
     };
 
-    if (isSupabaseConfigured && supabase) {
-      try {
-        const { error } = await supabase.from('campaigns').insert([newItem]);
-        if (error) {
-          console.error("Failed to add campaign to cloud", error);
-          alert("Database Error: " + error.message);
-        }
-      } catch (e) {
-        console.error("Exception adding campaign to cloud", e);
-      }
+    try {
+      await apiRequest('/api/campaigns', 'POST', newItem);
+    } catch (e) {
+      console.error("Exception adding campaign via API", e);
     }
 
     if (cloudMemoryCache.campaigns) {
@@ -137,12 +169,10 @@ export const storageService = {
   },
 
   updateCampaign: async (id, updates) => {
-    if (isSupabaseConfigured && supabase) {
-      try {
-        await supabase.from('campaigns').update(updates).eq('id', id);
-      } catch (e) {
-        console.error("Failed to update campaign in cloud", e);
-      }
+    try {
+      await apiRequest('/api/campaigns/' + id, 'PUT', updates);
+    } catch (e) {
+      console.error("Failed to update campaign via API", e);
     }
 
     if (cloudMemoryCache.campaigns) {
@@ -154,12 +184,10 @@ export const storageService = {
   },
 
   deleteCampaign: async (id) => {
-    if (isSupabaseConfigured && supabase) {
-      try {
-        await supabase.from('campaigns').delete().eq('id', id);
-      } catch (e) {
-        console.error("Failed to delete campaign from cloud", e);
-      }
+    try {
+      await apiRequest('/api/campaigns/' + id, 'DELETE');
+    } catch (e) {
+      console.error("Failed to delete campaign via API", e);
     }
 
     if (cloudMemoryCache.campaigns) {
@@ -242,11 +270,8 @@ export const storageService = {
 
     const updated = [newRequest, ...requests];
 
-    if (isSupabaseConfigured && supabase) {
-      // Optimitic memory cache update for live mode
-      cloudMemoryCache.victims = updated;
-      
-      supabase.from('victim_requests').insert([{
+    try {
+      const dbFields = {
         id: newRequest.id,
         created_at: newRequest.createdAt,
         name: newRequest.name,
@@ -274,9 +299,10 @@ export const storageService = {
         requested_by_name: newRequest.requestedByName || newRequest.name,
         requested_by_phone: newRequest.requestedByPhone || newRequest.phone,
         urgency: newRequest.urgency
-      }]).then(({ error }) => {
-        if (error) console.error("Supabase insert error:", error);
-      });
+      };
+      apiRequest('/api/victim_requests', 'POST', dbFields).catch(e => console.error("API insert error:", e));
+    } catch (e) {
+      console.error("Exception adding victim request via API", e);
     }
 
     securityService.recordSubmission();
@@ -300,17 +326,13 @@ export const storageService = {
     });
     cloudMemoryCache.victims = updated;
 
-    // Supabase Sync
-    if (isSupabaseConfigured && supabase) {
-      supabase.from('victim_requests').update({
-        verified: true,
-        status: 'Pending',
-        verified_at: new Date().toISOString(),
-        verified_by: verifierName
-      }).eq('id', requestId).then(({ error }) => {
-        if (error) console.error("Supabase update error:", error);
-      });
-    }
+    // API Sync
+    apiRequest('/api/victim_requests/' + requestId, 'PUT', {
+      verified: true,
+      status: 'Pending',
+      verified_at: new Date().toISOString(),
+      verified_by: verifierName
+    }).catch(e => console.error("API update error:", e));
 
     notifyDataChanged();
   },
@@ -320,11 +342,7 @@ export const storageService = {
     const updated = requests.filter(req => req.id !== requestId);
     cloudMemoryCache.victims = updated;
 
-    if (isSupabaseConfigured && supabase) {
-      supabase.from('victim_requests').delete().eq('id', requestId).then(({ error }) => {
-        if (error) console.error("Supabase delete error:", error);
-      });
-    }
+    apiRequest('/api/victim_requests/' + requestId, 'DELETE').catch(e => console.error("API delete error:", e));
 
     notifyDataChanged();
   },
@@ -342,7 +360,7 @@ export const storageService = {
 
     cloudMemoryCache.victims = updated;
 
-    if (isSupabaseConfigured && supabase && updatedRequest) {
+    if (updatedRequest) {
       // Map JS camelCase back to Supabase snake_case for the update
       const dbFields = {
         name: updatedRequest.name,
@@ -363,9 +381,7 @@ export const storageService = {
         details: updatedRequest.details,
       };
       
-      supabase.from('victim_requests').update(dbFields).eq('id', requestId).then(({ error }) => {
-        if (error) console.error("Supabase edit error:", error);
-      });
+      apiRequest('/api/victim_requests/' + requestId, 'PUT', dbFields).catch(e => console.error("API edit error:", e));
     }
 
     notifyDataChanged();
@@ -385,14 +401,10 @@ export const storageService = {
     });
     cloudMemoryCache.victims = updated;
 
-    if (isSupabaseConfigured && supabase) {
-      supabase.from('victim_requests').update({
-        status: securityService.sanitizeText(status),
-        assigned_ngo: assignedNgo
-      }).eq('id', requestId).then(({ error }) => {
-        if (error) console.error("Supabase update status error:", error);
-      });
-    }
+    apiRequest('/api/victim_requests/' + requestId, 'PUT', {
+      status: securityService.sanitizeText(status),
+      assigned_ngo: assignedNgo
+    }).catch(e => console.error("API update status error:", e));
 
     notifyDataChanged();
   },
@@ -402,11 +414,7 @@ export const storageService = {
     const updated = requests.filter(req => req.id !== requestId);
     cloudMemoryCache.victims = updated;
 
-    if (isSupabaseConfigured && supabase) {
-      supabase.from('victim_requests').delete().eq('id', requestId).then(({ error }) => {
-        if (error) console.error("Supabase delete error:", error);
-      });
-    }
+    apiRequest('/api/victim_requests/' + requestId, 'DELETE').catch(e => console.error("API delete error:", e));
 
     notifyDataChanged();
   },
@@ -470,26 +478,23 @@ export const storageService = {
       );
     }
 
-    if (isSupabaseConfigured && supabase) {
-      supabase.from('delivery_logs').insert([{
-        log_id: newLog.logId,
-        request_id: newLog.requestId,
-        recipient_name: newLog.recipientName,
-        district: newLog.district,
-        delivered_by: newLog.deliveredBy,
-        volunteer_phone: newLog.volunteerPhone,
-        items_delivered: newLog.itemsDelivered,
-        delivery_notes: newLog.deliveryNotes,
-        status_update: newLog.statusUpdate,
-        verified: isVerified,
-        verified_by: newLog.verifiedBy,
-        rescued_count: newLog.rescuedCount,
-        remaining_count: newLog.remainingCount,
-        created_at: newLog.createdAt
-      }]).then(({ error }) => {
-        if (error) console.error("Supabase delivery log insert error:", error);
-      });
-    }
+    const dbLog = {
+      log_id: newLog.logId,
+      request_id: newLog.requestId,
+      recipient_name: newLog.recipientName,
+      district: newLog.district,
+      delivered_by: newLog.deliveredBy,
+      volunteer_phone: newLog.volunteerPhone,
+      items_delivered: newLog.itemsDelivered,
+      delivery_notes: newLog.deliveryNotes,
+      status_update: newLog.statusUpdate,
+      verified: isVerified,
+      verified_by: newLog.verifiedBy,
+      rescued_count: newLog.rescuedCount,
+      remaining_count: newLog.remainingCount,
+      created_at: newLog.createdAt
+    };
+    apiRequest('/api/db/delivery_logs', 'POST', dbLog).catch(e => console.error("API delivery log insert error:", e));
 
     securityService.recordSubmission();
     notifyDataChanged();
@@ -522,14 +527,10 @@ export const storageService = {
       );
     }
 
-    if (isSupabaseConfigured && supabase) {
-      supabase.from('delivery_logs').update({
-        verified: true,
-        verified_by: verifierName
-      }).eq('log_id', logId).then(({ error }) => {
-        if (error) console.error("Supabase verify delivery log error:", error);
-      });
-    }
+    apiRequest('/api/db/delivery_logs/' + logId, 'PUT', {
+      verified: true,
+      verified_by: verifierName
+    }).catch(e => console.error("API verify delivery log error:", e));
 
     notifyDataChanged();
   },
@@ -539,11 +540,7 @@ export const storageService = {
     const updated = logs.filter(log => log.logId !== logId);
     cloudMemoryCache.deliveryLogs = updated;
 
-    if (isSupabaseConfigured && supabase) {
-      supabase.from('delivery_logs').delete().eq('log_id', logId).then(({ error }) => {
-        if (error) console.error("Supabase delete delivery log error:", error);
-      });
-    }
+    apiRequest('/api/db/delivery_logs/' + logId, 'DELETE').catch(e => console.error("API delete delivery log error:", e));
 
     notifyDataChanged();
   },
@@ -605,11 +602,7 @@ export const storageService = {
     const updated = ngos.map(n => n.id === ngoId ? { ...n, verified: true } : n);
     cloudMemoryCache.ngos = updated;
 
-    if (isSupabaseConfigured && supabase) {
-      supabase.from('ngos').update({ verified: true }).eq('id', ngoId).then(({ error }) => {
-        if (error) console.error("Supabase NGO verify error:", error);
-      });
-    }
+    apiRequest('/api/db/ngos/' + ngoId, 'PUT', { verified: true }).catch(e => console.error("API NGO verify error:", e));
 
     notifyDataChanged();
   },
@@ -619,11 +612,7 @@ export const storageService = {
     const updated = ngos.map(n => n.id === ngoId ? { ...n, operatingZones: zones } : n);
     cloudMemoryCache.ngos = updated;
 
-    if (isSupabaseConfigured && supabase) {
-      supabase.from('ngos').update({ operating_zones: zones }).eq('id', ngoId).then(({ error }) => {
-        if (error) console.error("Supabase NGO zones update error:", error);
-      });
-    }
+    apiRequest('/api/db/ngos/' + ngoId, 'PUT', { operating_zones: zones }).catch(e => console.error("API NGO zones update error:", e));
 
     notifyDataChanged();
   },
@@ -633,11 +622,7 @@ export const storageService = {
     const updated = ngos.filter(n => n.id !== ngoId);
     cloudMemoryCache.ngos = updated;
 
-    if (isSupabaseConfigured && supabase) {
-      supabase.from('ngos').delete().eq('id', ngoId).then(({ error }) => {
-        if (error) console.error("Supabase NGO delete error:", error);
-      });
-    }
+    apiRequest('/api/db/ngos/' + ngoId, 'DELETE').catch(e => console.error("API NGO delete error:", e));
 
     notifyDataChanged();
   },
@@ -699,11 +684,7 @@ export const storageService = {
     const updated = vols.map(v => v.id === volId ? { ...v, verified: true } : v);
     cloudMemoryCache.volunteers = updated;
 
-    if (isSupabaseConfigured && supabase) {
-      supabase.from('volunteers').update({ verified: true }).eq('id', volId).then(({ error }) => {
-        if (error) console.error("Supabase Volunteer verify error:", error);
-      });
-    }
+    apiRequest('/api/db/volunteers/' + volId, 'PUT', { verified: true }).catch(e => console.error("API Volunteer verify error:", e));
 
     notifyDataChanged();
   },
@@ -713,11 +694,7 @@ export const storageService = {
     const updated = vols.map(v => v.id === volId ? { ...v, availableStatus: status } : v);
     cloudMemoryCache.volunteers = updated;
 
-    if (isSupabaseConfigured && supabase) {
-      supabase.from('volunteers').update({ available_status: status }).eq('id', volId).then(({ error }) => {
-        if (error) console.error("Supabase Volunteer status update error:", error);
-      });
-    }
+    apiRequest('/api/db/volunteers/' + volId, 'PUT', { available_status: status }).catch(e => console.error("API Volunteer status update error:", e));
 
     notifyDataChanged();
   },
@@ -727,11 +704,7 @@ export const storageService = {
     const updated = vols.filter(v => v.id !== volId);
     cloudMemoryCache.volunteers = updated;
 
-    if (isSupabaseConfigured && supabase) {
-      supabase.from('volunteers').delete().eq('id', volId).then(({ error }) => {
-        if (error) console.error("Supabase Volunteer delete error:", error);
-      });
-    }
+    apiRequest('/api/db/volunteers/' + volId, 'DELETE').catch(e => console.error("API Volunteer delete error:", e));
 
     notifyDataChanged();
   },
@@ -935,13 +908,7 @@ export const storageService = {
     cloudMemoryCache.helplineNumbers = updated;
     notifyDataChanged();
 
-    if (isSupabaseConfigured && supabase) {
-      try {
-        await supabase.from('helpline_numbers').insert([newItem]);
-      } catch (err) {
-        console.error("Failed to insert helpline into Supabase:", err);
-      }
-    }
+    apiRequest('/api/db/helpline_numbers', 'POST', newItem).catch(e => console.error("API insert helpline error:", e));
     return newItem;
   },
 
@@ -962,19 +929,13 @@ export const storageService = {
     cloudMemoryCache.helplineNumbers = updated;
     notifyDataChanged();
 
-    if (isSupabaseConfigured && supabase) {
-      try {
-        const target = updated.find(i => i.id === id);
-        if (target) {
-          await supabase.from('helpline_numbers').update({
-            label: target.label,
-            phone_number: target.phone_number,
-            sort_order: target.sort_order
-          }).eq('id', id);
-        }
-      } catch (err) {
-        console.error("Failed to update helpline in Supabase:", err);
-      }
+    const target = updated.find(i => i.id === id);
+    if (target) {
+      apiRequest('/api/db/helpline_numbers/' + id, 'PUT', {
+        label: target.label,
+        phone_number: target.phone_number,
+        sort_order: target.sort_order
+      }).catch(e => console.error("API helpline update error:", e));
     }
   },
 
@@ -984,13 +945,7 @@ export const storageService = {
     cloudMemoryCache.helplineNumbers = updated;
     notifyDataChanged();
 
-    if (isSupabaseConfigured && supabase) {
-      try {
-        await supabase.from('helpline_numbers').delete().eq('id', id);
-      } catch (err) {
-        console.error("Failed to delete helpline from Supabase:", err);
-      }
-    }
+    apiRequest('/api/db/helpline_numbers/' + id, 'DELETE').catch(e => console.error("API helpline delete error:", e));
   },
 
   resetToDefaultSeed: () => {
@@ -1001,18 +956,25 @@ export const storageService = {
     if (!isSupabaseConfigured || !supabase) return;
     
     try {
-      // Execute all Supabase queries in parallel to drastically minimize loading time
       const [vicRes, logRes, ngoRes, volRes, helpRes, campRes] = await Promise.all([
-        supabase.from('victim_requests').select('*').order('created_at', { ascending: false }),
-        supabase.from('delivery_logs').select('*').order('created_at', { ascending: false }),
-        supabase.from('ngos').select('*').order('created_at', { ascending: false }),
-        supabase.from('volunteers').select('*').order('created_at', { ascending: false }),
-        supabase.from('helpline_numbers').select('*').order('sort_order', { ascending: true }),
-        supabase.from('campaigns').select('*').order('created_at', { ascending: false })
+        apiRequest('/api/victim_requests', 'GET').catch(() => ({ data: [] })),
+        apiRequest('/api/db/delivery_logs', 'GET').catch(() => ({ data: [] })),
+        apiRequest('/api/ngos', 'GET').catch(() => ({ data: [] })),
+        apiRequest('/api/db/volunteers', 'GET').catch(() => ({ data: [] })),
+        apiRequest('/api/db/helpline_numbers', 'GET').catch(() => ({ data: [] })),
+        apiRequest('/api/campaigns', 'GET').catch(() => ({ data: [] }))
       ]);
+      
+      // Map API responses to data variables
+      const vicData = vicRes.data || vicRes || [];
+      const logData = logRes.data || logRes || [];
+      const ngoData = ngoRes.data || ngoRes || [];
+      const volData = volRes.data || volRes || [];
+      const helpData = helpRes.data || helpRes || [];
+      const campData = campRes.data || campRes || [];
 
-      if (!vicRes.error && Array.isArray(vicRes.data)) {
-        cloudMemoryCache.victims = vicRes.data.map(v => ({
+      if (Array.isArray(vicData)) {
+        cloudMemoryCache.victims = vicData.map(v => ({
           id: v.id,
           createdAt: v.created_at,
           name: v.name,
@@ -1042,8 +1004,8 @@ export const storageService = {
         }));
       }
 
-      if (!logRes.error && Array.isArray(logRes.data)) {
-        cloudMemoryCache.deliveryLogs = logRes.data.map(l => ({
+      if (Array.isArray(logData)) {
+        cloudMemoryCache.deliveryLogs = logData.map(l => ({
           logId: l.log_id || l.id,
           createdAt: l.created_at,
           requestId: l.request_id,
@@ -1061,8 +1023,8 @@ export const storageService = {
         }));
       }
 
-      if (!ngoRes.error && Array.isArray(ngoRes.data)) {
-        cloudMemoryCache.ngos = ngoRes.data.map(n => ({
+      if (Array.isArray(ngoData)) {
+        cloudMemoryCache.ngos = ngoData.map(n => ({
           id: n.id,
           name: n.name,
           contactPerson: n.contact_person,
@@ -1078,8 +1040,8 @@ export const storageService = {
         }));
       }
 
-      if (!volRes.error && Array.isArray(volRes.data)) {
-        cloudMemoryCache.volunteers = volRes.data.map(v => ({
+      if (Array.isArray(volData)) {
+        cloudMemoryCache.volunteers = volData.map(v => ({
           id: v.id,
           name: v.name,
           roleType: v.role_type,
@@ -1095,14 +1057,8 @@ export const storageService = {
         }));
       }
 
-      if (!helpRes.error) {
-        cloudMemoryCache.helplineNumbers = helpRes.data || [];
-      }
-      if (!campRes.error) {
-        cloudMemoryCache.campaigns = campRes.data || [];
-      } else {
-        console.error("Supabase fetch campaigns error:", campRes.error);
-      }
+      cloudMemoryCache.helplineNumbers = helpData;
+      cloudMemoryCache.campaigns = campData;
 
       notifyDataChanged();
     } catch (err) {
