@@ -314,7 +314,7 @@ export default function App() {
 
 
         {/* Official ASDMA Emergency Helplines Notice (Only shown for Guest citizens) */}
-        {currentAuth.role === 'GUEST' && <ASDMAHelplines />}
+        {currentAuth.role === 'GUEST' && activeTab === 'home' && <ASDMAHelplines />}
 
         {/* Scroll Target Element */}
         <div ref={mainContentRef} className="scroll-mt-24" />

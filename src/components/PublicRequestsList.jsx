@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
   AlertTriangle, MapPin, Package, Clock, ShieldCheck,
-  ChevronLeft, ChevronRight, Users, Activity, Loader2,
-  ArrowUpRight, Waves, Droplets, Compass
+  ChevronLeft, ChevronRight, ChevronDown, Users, Activity, Loader2,
+  ArrowUpRight, Waves, Droplets, Compass, Filter
 } from 'lucide-react';
 import DeliveryUpdatesTreeModal from './DeliveryUpdatesTreeModal';
 import { storageService } from '../services/storageService';
@@ -51,11 +51,34 @@ function getStatusChip(req, isUrgent, isInProgress) {
   return <span className="status-chip status-chip-neutral">SOS Request</span>;
 }
 
+function getUrgencyChip(urgency) {
+  switch(urgency) {
+    case 'CRITICAL':
+    case 'URGENT':
+      return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-red-100 text-red-800 border border-red-200 uppercase tracking-wider"><AlertTriangle className="w-3 h-3" />{urgency}</span>;
+    case 'HIGH':
+      return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-orange-100 text-orange-800 border border-orange-200 uppercase tracking-wider"><AlertTriangle className="w-3 h-3" />High</span>;
+    case 'MEDIUM':
+    case 'NEEDED':
+      return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-200 uppercase tracking-wider">{urgency}</span>;
+    case 'LOW':
+      return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-100 text-blue-800 border border-blue-200 uppercase tracking-wider">Low</span>;
+    default:
+      if (!urgency) return null;
+      return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-100 text-slate-800 border border-slate-200 uppercase tracking-wider">{urgency}</span>;
+  }
+}
+
 /* ── Main component ──────────────────────────────────────────────────────── */
 export default function PublicRequestsList({ victimRequests = [], deliveryLogs: propDeliveryLogs, isLoading = false }) {
   const [currentPage, setCurrentPage]       = useState(1);
   const [activeTreeRequest, setActiveTreeRequest] = useState(null);
   const [deliveryLogs, setDeliveryLogs]     = useState(propDeliveryLogs || []);
+  
+  // Filter States
+  const [filterType, setFilterType] = useState('ALL');
+  const [filterUrgency, setFilterUrgency] = useState('ALL');
+  const [filterStatus, setFilterStatus] = useState('ALL');
 
   useEffect(() => {
     const fetchLogs = () => {
@@ -66,9 +89,32 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
     return () => window.removeEventListener('flood_data_changed', fetchLogs);
   }, [propDeliveryLogs]);
 
+  // Filtering Logic
+  const filteredRequests = victimRequests.filter(req => {
+    // 1. Type
+    if (filterType === 'SUPPLY' && req.isUrgentRescue === true) return false;
+    if (filterType === 'RESCUE' && req.isUrgentRescue !== true) return false;
+    
+    // 2. Urgency
+    if (filterUrgency !== 'ALL' && req.urgency !== filterUrgency) return false;
+    
+    // 3. Status
+    if (filterStatus !== 'ALL') {
+      const statusStr = (req.status || '').toLowerCase();
+      const isResolved = statusStr === 'rescued' || statusStr === 'fulfilled';
+      const isInProgress = statusStr === 'in progress';
+      const isActive = !isResolved && !isInProgress;
+
+      if (filterStatus === 'Active' && !isActive) return false;
+      if (filterStatus === 'In Progress' && !isInProgress) return false;
+      if (filterStatus === 'Resolved' && !isResolved) return false;
+    }
+    return true;
+  });
+
   const ITEMS_PER_PAGE = 12;
-  const totalPages     = Math.ceil(victimRequests.length / ITEMS_PER_PAGE);
-  const currentRequests = victimRequests.slice(
+  const totalPages     = Math.ceil(filteredRequests.length / ITEMS_PER_PAGE);
+  const currentRequests = filteredRequests.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
@@ -78,26 +124,78 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
     <div className="space-y-6">
 
       {/* Section header */}
-      <div className="glass-card rounded-3xl p-6 sm:p-8 space-y-2">
+      <div className="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-8 space-y-2 sm:space-y-3">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="status-chip status-chip-info">
+          <span className="status-chip status-chip-info text-[10px] sm:text-xs py-0.5 sm:py-1">
             <Activity className="w-3 h-3" />
             Live Tracking
           </span>
           {victimRequests.length > 0 && (
-            <span className="status-chip status-chip-neutral">
+            <span className="status-chip status-chip-neutral text-[10px] sm:text-xs py-0.5 sm:py-1">
               <Users className="w-3 h-3" />
               {victimRequests.length} Requests
             </span>
           )}
         </div>
-        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+        <h2 className="text-lg sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
           Public Rescue &amp; Relief Requests
         </h2>
-        <p className="text-sm text-slate-500 max-w-2xl leading-relaxed">
+        <p className="hidden sm:block text-sm text-slate-500 max-w-2xl leading-relaxed">
           Live tracking of all rescue and relief requests. Contact details are hidden to protect privacy.
           Registered NGOs and volunteers can view full details in the Partner Dashboard.
         </p>
+
+        {/* Filters (Sticky on Mobile) */}
+        <div className="sticky top-14 sm:top-0 sm:static z-30 bg-white/95 backdrop-blur-md sm:bg-transparent -mx-4 sm:mx-0 px-4 sm:px-0 py-3 sm:py-4 sm:border-t sm:border-slate-100 sm:mt-4">
+          <div className="grid grid-cols-2 sm:flex sm:flex-row gap-2 sm:gap-3">
+            <div className="hidden sm:flex items-center gap-2 text-slate-500 text-sm font-semibold shrink-0">
+              <Filter className="w-4 h-4" /> Filters:
+            </div>
+            <div className="relative w-full">
+              <select 
+                value={filterType} 
+                onChange={e => { setFilterType(e.target.value); setCurrentPage(1); }}
+                className="bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl sm:rounded-lg pl-2.5 pr-8 sm:pl-3 sm:pr-8 py-2 sm:py-1.5 focus:ring-2 focus:ring-blue-500 outline-none w-full appearance-none shadow-sm"
+              >
+                <option value="ALL">All Types</option>
+                <option value="SUPPLY">Relief Supplies</option>
+                <option value="RESCUE">Rescue Operations</option>
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            </div>
+            
+            <div className="relative w-full">
+              <select 
+                value={filterUrgency} 
+                onChange={e => { setFilterUrgency(e.target.value); setCurrentPage(1); }}
+                className="bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl sm:rounded-lg pl-2.5 pr-8 sm:pl-3 sm:pr-8 py-2 sm:py-1.5 focus:ring-2 focus:ring-blue-500 outline-none w-full appearance-none shadow-sm"
+              >
+                <option value="ALL">All Urgencies</option>
+                <option value="CRITICAL">Critical</option>
+                <option value="URGENT">Urgent</option>
+                <option value="HIGH">High</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="NEEDED">Needed</option>
+                <option value="LOW">Low</option>
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            </div>
+
+            <div className="relative w-full col-span-2 sm:col-span-1">
+              <select 
+                value={filterStatus} 
+                onChange={e => { setFilterStatus(e.target.value); setCurrentPage(1); }}
+                className="bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl sm:rounded-lg pl-2.5 pr-8 sm:pl-3 sm:pr-8 py-2 sm:py-1.5 focus:ring-2 focus:ring-blue-500 outline-none w-full appearance-none shadow-sm"
+              >
+                <option value="ALL">All Statuses</option>
+                <option value="Active">Active (Waiting)</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved / Fulfilled</option>
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Loading */}
@@ -149,8 +247,11 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
                   className={`card-surface ${accentClass} ${cardBg} rounded-2xl flex flex-col`}
                 >
                   {/* Card header row */}
-                  <div className="flex items-center justify-between gap-2 px-4 pt-4 pb-3 border-b border-slate-100">
-                    {getStatusChip(req, isUrgent, isInProgress)}
+                  <div className="flex items-center justify-between gap-2 px-4 pt-4 pb-3 border-b border-slate-100 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      {getStatusChip(req, isUrgent, isInProgress)}
+                      {getUrgencyChip(req.urgency)}
+                    </div>
                     <span className="text-[11px] font-mono text-slate-400">
                       {new Date(req.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
                     </span>

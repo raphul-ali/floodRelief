@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, ShieldCheck, Megaphone, Anchor, Car } from 'lucide-react';
+import { LifeBuoy, HeartHandshake, Megaphone, Anchor, Car } from 'lucide-react';
 export default function GuestHome({ 
   victimRequests, 
   ngos, 
@@ -27,18 +27,18 @@ export default function GuestHome({
         {/* Requests */}
         <button 
           onClick={() => setActiveTab('public_requests')}
-          className="bg-red-50 hover:bg-red-100 border border-red-200 rounded-3xl p-6 flex items-center justify-between transition-all active:scale-95 group shadow-sm text-left"
+          className="bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl p-5 flex items-center justify-between transition-colors shadow-sm text-left group"
         >
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-red-500 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
-              <Activity className="w-7 h-7" />
+            <div className="w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center group-hover:bg-red-100 transition-colors">
+              <LifeBuoy className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-lg font-black text-slate-900">Relief Requests</h3>
-              <p className="text-xs font-semibold text-slate-500">Live rescue & relief</p>
+              <h3 className="text-lg font-bold text-slate-900">Relief Requests</h3>
+              <p className="text-xs font-medium text-slate-500">Live rescue & relief</p>
             </div>
           </div>
-          <div className="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100 text-red-600 font-black text-lg">
+          <div className="bg-red-50 px-3 py-1.5 rounded-lg text-red-700 font-bold text-sm">
             {requestsCount}
           </div>
         </button>
@@ -46,18 +46,18 @@ export default function GuestHome({
         {/* NGOs / Volunteers */}
         <button 
           onClick={() => setActiveTab('ngos')}
-          className="bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-3xl p-6 flex items-center justify-between transition-all active:scale-95 group shadow-sm text-left"
+          className="bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl p-5 flex items-center justify-between transition-colors shadow-sm text-left group"
         >
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
-              <ShieldCheck className="w-7 h-7" />
+            <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
+              <HeartHandshake className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-lg font-black text-slate-900">Ngos and helpers</h3>
-              <p className="text-xs font-semibold text-slate-500">Verified helpers</p>
+              <h3 className="text-lg font-bold text-slate-900">Ngos and helpers</h3>
+              <p className="text-xs font-medium text-slate-500">Verified helpers</p>
             </div>
           </div>
-          <div className="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100 text-emerald-600 font-black text-lg">
+          <div className="bg-emerald-50 px-3 py-1.5 rounded-lg text-emerald-700 font-bold text-sm">
             {ngoVolCount}
           </div>
         </button>
@@ -65,18 +65,18 @@ export default function GuestHome({
         {/* Campaigns */}
         <button 
           onClick={() => setActiveTab('campaigns')}
-          className="bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-3xl p-6 flex items-center justify-between transition-all active:scale-95 group shadow-sm text-left"
+          className="bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl p-5 flex items-center justify-between transition-colors shadow-sm text-left group"
         >
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-blue-500 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
-              <Megaphone className="w-7 h-7" />
+            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+              <Megaphone className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-lg font-black text-slate-900">Campaigns</h3>
-              <p className="text-xs font-semibold text-slate-500">Relief & Support</p>
+              <h3 className="text-lg font-bold text-slate-900">Campaigns</h3>
+              <p className="text-xs font-medium text-slate-500">Relief & Support</p>
             </div>
           </div>
-          <div className="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100 text-blue-600 font-black text-lg">
+          <div className="text-slate-300 group-hover:text-blue-600 font-bold transition-colors">
             &rarr;
           </div>
         </button>
@@ -84,28 +84,28 @@ export default function GuestHome({
         {/* Transport (Boat/Car) */}
         <button 
           onClick={() => setActiveTab('transport')}
-          className="bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-3xl p-6 flex items-center justify-between transition-all active:scale-95 group shadow-sm text-left cursor-pointer"
+          className="bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl p-5 flex items-center justify-between transition-colors shadow-sm text-left group"
         >
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-amber-500 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform flex-col gap-1">
+            <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center group-hover:bg-amber-100 transition-colors flex-col gap-1">
               <div className="flex items-center justify-center w-full h-full pb-1">
-                <Anchor className="w-5 h-5 absolute -translate-x-2 translate-y-1" />
-                <Car className="w-5 h-5 absolute translate-x-3 -translate-y-1" />
+                <Anchor className="w-4 h-4 absolute -translate-x-1.5 translate-y-1" />
+                <Car className="w-4 h-4 absolute translate-x-2.5 -translate-y-1" />
               </div>
             </div>
             <div>
-              <h3 className="text-lg font-black text-slate-900">Transport Help</h3>
-              <p className="text-xs font-semibold text-slate-500">Boats & Cars</p>
+              <h3 className="text-lg font-bold text-slate-900">Transport Help</h3>
+              <p className="text-xs font-medium text-slate-500">Boats & Cars</p>
             </div>
           </div>
           <div className="flex gap-2">
-            <div className="bg-white px-2 py-1.5 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center justify-center min-w-[2.5rem]">
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Boat</span>
-              <span className="text-amber-600 font-black text-sm">{boatCount}</span>
+            <div className="bg-amber-50 px-2 py-1 rounded-lg flex flex-col items-center justify-center min-w-[2rem]">
+              <span className="text-[9px] font-bold text-amber-700/60 uppercase tracking-wider">Boat</span>
+              <span className="text-amber-700 font-bold text-xs">{boatCount}</span>
             </div>
-            <div className="bg-white px-2 py-1.5 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center justify-center min-w-[2.5rem]">
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Car</span>
-              <span className="text-amber-600 font-black text-sm">{carCount}</span>
+            <div className="bg-amber-50 px-2 py-1 rounded-lg flex flex-col items-center justify-center min-w-[2rem]">
+              <span className="text-[9px] font-bold text-amber-700/60 uppercase tracking-wider">Car</span>
+              <span className="text-amber-700 font-bold text-xs">{carCount}</span>
             </div>
           </div>
         </button>
