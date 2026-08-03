@@ -112,7 +112,12 @@ CREATE TABLE campaigns (
     location TEXT,
     date TEXT,
     status TEXT DEFAULT 'Active',
-    image_url TEXT
+    image_url TEXT,
+    campaign_type TEXT,
+    target_count TEXT,
+    contact_person TEXT,
+    whatsapp_number TEXT,
+    map_link TEXT
 );
 
 -- Seed initial Helpline Numbers

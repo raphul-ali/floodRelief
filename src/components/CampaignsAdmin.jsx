@@ -8,12 +8,22 @@ export default function CampaignsAdmin() {
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [date, setDate] = useState('');
+  const [campaignType, setCampaignType] = useState('');
+  const [targetCount, setTargetCount] = useState('');
+  const [contactPerson, setContactPerson] = useState('');
+  const [whatsappNumber, setWhatsappNumber] = useState('');
+  const [mapLink, setMapLink] = useState('');
   const [isEditing, setIsEditing] = useState(null);
   
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editLocation, setEditLocation] = useState('');
   const [editDate, setEditDate] = useState('');
+  const [editCampaignType, setEditCampaignType] = useState('');
+  const [editTargetCount, setEditTargetCount] = useState('');
+  const [editContactPerson, setEditContactPerson] = useState('');
+  const [editWhatsappNumber, setEditWhatsappNumber] = useState('');
+  const [editMapLink, setEditMapLink] = useState('');
 
   const loadData = () => {
     setCampaigns(storageService.getCampaigns());
@@ -28,11 +38,23 @@ export default function CampaignsAdmin() {
   const handleAdd = async (e) => {
     e.preventDefault();
     if (!title.trim()) return alert("Title is required");
-    await storageService.addCampaign({ title, description, location, date, status: 'Active' });
+    await storageService.addCampaign({ 
+      title, description, location, date, status: 'Active',
+      campaign_type: campaignType,
+      target_count: targetCount,
+      contact_person: contactPerson,
+      whatsapp_number: whatsappNumber,
+      map_link: mapLink
+    });
     setTitle('');
     setDescription('');
     setLocation('');
     setDate('');
+    setCampaignType('');
+    setTargetCount('');
+    setContactPerson('');
+    setWhatsappNumber('');
+    setMapLink('');
   };
 
   const handleDelete = async (id) => {
@@ -47,6 +69,11 @@ export default function CampaignsAdmin() {
     setEditDescription(c.description || '');
     setEditLocation(c.location || '');
     setEditDate(c.date || '');
+    setEditCampaignType(c.campaign_type || '');
+    setEditTargetCount(c.target_count || '');
+    setEditContactPerson(c.contact_person || '');
+    setEditWhatsappNumber(c.whatsapp_number || '');
+    setEditMapLink(c.map_link || '');
   };
 
   const handleUpdate = async () => {
@@ -54,7 +81,12 @@ export default function CampaignsAdmin() {
       title: editTitle,
       description: editDescription,
       location: editLocation,
-      date: editDate
+      date: editDate,
+      campaign_type: editCampaignType,
+      target_count: editTargetCount,
+      contact_person: editContactPerson,
+      whatsapp_number: editWhatsappNumber,
+      map_link: editMapLink
     });
     setIsEditing(null);
   };
@@ -68,9 +100,14 @@ export default function CampaignsAdmin() {
         </h3>
         <form onSubmit={handleAdd} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input type="text" placeholder="Campaign Title" value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white" required />
+            <input type="text" placeholder="Campaign Title" value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white md:col-span-2" required />
+            <input type="text" placeholder="Campaign Type (e.g. Medical, Free House)" value={campaignType} onChange={e => setCampaignType(e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white" />
+            <input type="text" placeholder="Target Count (e.g. 50 ppl)" value={targetCount} onChange={e => setTargetCount(e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white" />
             <input type="text" placeholder="Date / Duration" value={date} onChange={e => setDate(e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white" />
-            <input type="text" placeholder="Location" value={location} onChange={e => setLocation(e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white md:col-span-2" />
+            <input type="text" placeholder="Location" value={location} onChange={e => setLocation(e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white" />
+            <input type="text" placeholder="Contact Person" value={contactPerson} onChange={e => setContactPerson(e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white" />
+            <input type="text" placeholder="WhatsApp Number (e.g. +91XXXXXXXXXX)" value={whatsappNumber} onChange={e => setWhatsappNumber(e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white" />
+            <input type="text" placeholder="Google Maps Link" value={mapLink} onChange={e => setMapLink(e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white md:col-span-2" />
             <textarea placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white md:col-span-2 min-h-[100px]"></textarea>
           </div>
           <button type="submit" className="px-5 py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl flex items-center gap-2">
@@ -90,9 +127,14 @@ export default function CampaignsAdmin() {
                 <div className="space-y-3">
                   <input type="text" value={editTitle} onChange={e => setEditTitle(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold" />
                   <div className="grid grid-cols-2 gap-3">
+                    <input type="text" value={editCampaignType} onChange={e => setEditCampaignType(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Campaign Type" />
+                    <input type="text" value={editTargetCount} onChange={e => setEditTargetCount(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Target Count" />
                     <input type="text" value={editDate} onChange={e => setEditDate(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Date" />
                     <input type="text" value={editLocation} onChange={e => setEditLocation(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Location" />
+                    <input type="text" value={editContactPerson} onChange={e => setEditContactPerson(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Contact Person" />
+                    <input type="text" value={editWhatsappNumber} onChange={e => setEditWhatsappNumber(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="WhatsApp Number" />
                   </div>
+                  <input type="text" value={editMapLink} onChange={e => setEditMapLink(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Map Link" />
                   <textarea value={editDescription} onChange={e => setEditDescription(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm min-h-[80px]" placeholder="Description" />
                   <div className="flex gap-2">
                     <button onClick={handleUpdate} className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold flex items-center gap-1"><Save className="w-4 h-4"/> Save</button>
@@ -104,9 +146,13 @@ export default function CampaignsAdmin() {
                   <div>
                     <h4 className="font-bold text-slate-900 text-lg">{c.title}</h4>
                     <p className="text-sm text-slate-500 mt-1">{c.description}</p>
-                    <div className="flex gap-4 mt-3 text-xs font-semibold text-slate-600">
-                      <span>{c.date}</span>
-                      <span>{c.location}</span>
+                    <div className="flex gap-4 mt-3 text-xs font-semibold text-slate-600 flex-wrap">
+                      {c.campaign_type && <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-md">{c.campaign_type}</span>}
+                      {c.target_count && <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-md">{c.target_count}</span>}
+                      {c.date && <span>{c.date}</span>}
+                      {c.location && <span>{c.location}</span>}
+                      {c.contact_person && <span>Contact: {c.contact_person}</span>}
+                      {c.whatsapp_number && <span>WA: {c.whatsapp_number}</span>}
                     </div>
                   </div>
                   <div className="flex gap-2 shrink-0">
