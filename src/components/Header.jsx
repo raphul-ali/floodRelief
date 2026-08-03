@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   ShieldAlert, HeartHandshake, FileText,
-  Siren, Package, Lock, LogOut, User, ChevronDown
+  Siren, Package, Lock, LogOut, User, ChevronDown, ChevronLeft
 } from 'lucide-react';
 import { i18nService } from '../services/i18nService';
 
@@ -43,11 +43,22 @@ export default function Header({
         {/* ── Brand + Actions bar ─────────────────────────────────────── */}
         <div className="flex items-center justify-between h-14 sm:h-16 gap-3">
 
-          {/* Logo */}
-          <div
-            onClick={() => setActiveTab(currentAuth.role === 'GUEST' ? 'public_requests' : 'dashboard')}
-            className="flex items-center gap-2.5 cursor-pointer shrink-0"
-          >
+          {/* Back Button & Logo */}
+          <div className="flex items-center gap-1 sm:gap-2.5">
+            {activeTab !== 'home' && activeTab !== 'dashboard' && (
+              <button
+                onClick={() => window.history.back()}
+                className="flex items-center p-1 -ml-2 text-gray-600 hover:text-gray-900 transition-colors cursor-pointer pr-2"
+                title="Go Back"
+              >
+                <ChevronLeft className="w-6 h-6" />
+                <span className="text-sm font-semibold -ml-1">Back</span>
+              </button>
+            )}
+            <div
+              onClick={() => setActiveTab(currentAuth.role === 'GUEST' ? 'public_requests' : 'dashboard')}
+              className="flex items-center gap-2.5 cursor-pointer shrink-0"
+            >
             <img
               src="/helpaxom_badge.png"
               alt="HELP AXOM"
@@ -67,6 +78,7 @@ export default function Header({
               <p className="hidden sm:block text-[10px] text-gray-400 font-medium tracking-[0.1em] uppercase mt-0.5">
                 Unity · Relief · Rebuild
               </p>
+            </div>
             </div>
           </div>
 

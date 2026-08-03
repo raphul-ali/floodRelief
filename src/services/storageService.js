@@ -97,11 +97,73 @@ const cloudMemoryCache = {
   deliveryLogs: null,
   accountRecovery: null,
   volunteerCollab: null,
-  helplineNumbers: null
+  helplineNumbers: null,
+  campaigns: null
 };
 
 export const storageService = {
   
+  // --- CAMPAIGNS ---
+  getCampaigns: () => {
+    return cloudMemoryCache.campaigns || [];
+  },
+
+  addCampaign: async (campaignData) => {
+    const newItem = {
+      id: securityService.generateUUID(),
+      created_at: new Date().toISOString(),
+      ...campaignData
+    };
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('campaigns').insert([newItem]);
+      } catch (e) {
+        console.error("Failed to add campaign to cloud", e);
+      }
+    }
+
+    if (cloudMemoryCache.campaigns) {
+      cloudMemoryCache.campaigns = [newItem, ...cloudMemoryCache.campaigns];
+    } else {
+      cloudMemoryCache.campaigns = [newItem];
+    }
+    notifyDataChanged();
+    return newItem;
+  },
+
+  updateCampaign: async (id, updates) => {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('campaigns').update(updates).eq('id', id);
+      } catch (e) {
+        console.error("Failed to update campaign in cloud", e);
+      }
+    }
+
+    if (cloudMemoryCache.campaigns) {
+      cloudMemoryCache.campaigns = cloudMemoryCache.campaigns.map(item => 
+        item.id === id ? { ...item, ...updates } : item
+      );
+      notifyDataChanged();
+    }
+  },
+
+  deleteCampaign: async (id) => {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('campaigns').delete().eq('id', id);
+      } catch (e) {
+        console.error("Failed to delete campaign from cloud", e);
+      }
+    }
+
+    if (cloudMemoryCache.campaigns) {
+      cloudMemoryCache.campaigns = cloudMemoryCache.campaigns.filter(item => item.id !== id);
+      notifyDataChanged();
+    }
+  },
+
   // --- VICTIM SOS REQUESTS ---
   getVictimRequests: (includeUnverified = false) => {
     try {
@@ -979,16 +1041,17 @@ export const storageService = {
     
     try {
       // Execute all Supabase queries in parallel to drastically minimize loading time
-      const [victimsRes, logsRes, ngosRes, volsRes, helplinesRes] = await Promise.all([
+      const [vicRes, logRes, ngoRes, volRes, helpRes, campRes] = await Promise.all([
         supabase.from('victim_requests').select('*').order('created_at', { ascending: false }),
         supabase.from('delivery_logs').select('*').order('created_at', { ascending: false }),
         supabase.from('ngos').select('*').order('created_at', { ascending: false }),
         supabase.from('volunteers').select('*').order('created_at', { ascending: false }),
-        supabase.from('helpline_numbers').select('*').order('sort_order', { ascending: true })
+        supabase.from('helpline_numbers').select('*').order('sort_order', { ascending: true }),
+        supabase.from('campaigns').select('*').order('created_at', { ascending: false })
       ]);
 
-      if (!victimsRes.error && Array.isArray(victimsRes.data)) {
-        cloudMemoryCache.victims = victimsRes.data.map(v => ({
+      if (!vicRes.error && Array.isArray(vicRes.data)) {
+        cloudMemoryCache.victims = vicRes.data.map(v => ({
           id: v.id,
           createdAt: v.created_at,
           name: v.name,
@@ -1018,8 +1081,8 @@ export const storageService = {
         }));
       }
 
-      if (!logsRes.error && Array.isArray(logsRes.data)) {
-        cloudMemoryCache.deliveryLogs = logsRes.data.map(l => ({
+      if (!logRes.error && Array.isArray(logRes.data)) {
+        cloudMemoryCache.deliveryLogs = logRes.data.map(l => ({
           logId: l.log_id || l.id,
           createdAt: l.created_at,
           requestId: l.request_id,
@@ -1037,8 +1100,8 @@ export const storageService = {
         }));
       }
 
-      if (!ngosRes.error && Array.isArray(ngosRes.data)) {
-        cloudMemoryCache.ngos = ngosRes.data.map(n => ({
+      if (!ngoRes.error && Array.isArray(ngoRes.data)) {
+        cloudMemoryCache.ngos = ngoRes.data.map(n => ({
           id: n.id,
           name: n.name,
           contactPerson: n.contact_person,
@@ -1054,8 +1117,8 @@ export const storageService = {
         }));
       }
 
-      if (!volsRes.error && Array.isArray(volsRes.data)) {
-        cloudMemoryCache.volunteers = volsRes.data.map(v => ({
+      if (!volRes.error && Array.isArray(volRes.data)) {
+        cloudMemoryCache.volunteers = volRes.data.map(v => ({
           id: v.id,
           name: v.name,
           roleType: v.role_type,
@@ -1071,14 +1134,11 @@ export const storageService = {
         }));
       }
 
-      if (!helplinesRes.error && Array.isArray(helplinesRes.data) && helplinesRes.data.length > 0) {
-        cloudMemoryCache.helplineNumbers = helplinesRes.data.map(h => ({
-          id: h.id,
-          label: h.label,
-          phone_number: h.phone_number,
-          sort_order: h.sort_order,
-          created_at: h.created_at
-        }));
+      if (!helpRes.error) {
+        cloudMemoryCache.helplineNumbers = helpRes.data || [];
+      }
+      if (!campRes.error) {
+        cloudMemoryCache.campaigns = campRes.data || [];
       }
 
       notifyDataChanged();

@@ -312,7 +312,7 @@ export const authService = {
       ...ngoData,
       phone: formattedPhone,
       password: (password || '').trim(),
-      verified: true
+      verified: false
     });
 
     return newNgo;

@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, ShieldAlert, MessageSquare, Phone, CheckCircle2, XCircle, 
   Search, RefreshCw, Lock, Key, Clock, Package, HeartHandshake, UserCheck, AlertTriangle, ExternalLink, Bell, Edit2, Save, X,
-  User, Users, ChevronLeft, ChevronRight, Eye, EyeOff
+  User, Users, ChevronLeft, ChevronRight, Eye, EyeOff, Megaphone
 } from 'lucide-react';
 import { storageService, ASSAM_DISTRICTS } from '../services/storageService';
 import { isSupabaseConfigured } from '../services/supabaseClient';
 import ExpandableNotes from './ExpandableNotes';
+import CampaignsAdmin from './CampaignsAdmin';
 
 export default function AdminDashboard({ onDataUpdated }) {
-  const [activeQueueTab, setActiveQueueTab] = useState('sos'); // 'sos' | 'deliveries' | 'ngos' | 'volunteers' | 'recovery' | 'users'
+  const [activeQueueTab, setActiveQueueTab] = useState('sos'); // 'sos' | 'deliveries' | 'ngos' | 'volunteers' | 'recovery' | 'users' | 'campaigns'
   const [viewMode, setViewMode] = useState('PENDING'); // 'PENDING' | 'ALL_LIVE'
   
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -520,6 +521,19 @@ export default function AdminDashboard({ onDataUpdated }) {
           <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-red-500/20 text-red-300 border border-red-500/40">
             {helplinesList.length}
           </span>
+        </button>
+
+        {/* Tab 8: Campaigns */}
+        <button
+          onClick={() => setActiveQueueTab('campaigns')}
+          className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
+            activeQueueTab === 'campaigns'
+              ? 'bg-amber-600 text-white font-black shadow-lg border border-amber-500'
+              : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+          }`}
+        >
+          <Megaphone className="w-4 h-4 text-amber-300 shrink-0" />
+          <span>Campaigns</span>
         </button>
 
       </div>
@@ -1539,6 +1553,10 @@ export default function AdminDashboard({ onDataUpdated }) {
             </form>
           </div>
         </div>
+      )}
+
+      {activeQueueTab === 'campaigns' && (
+        <CampaignsAdmin />
       )}
 
     </div>

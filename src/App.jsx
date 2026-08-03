@@ -7,6 +7,8 @@ import NGODirectory from './components/NGODirectory';
 import VolunteerDirectory from './components/VolunteerDirectory';
 import NearestMedicals from './components/NearestMedicals';
 import FreeHostingGuide from './components/FreeHostingGuide';
+import TransportDirectory from './components/TransportDirectory';
+import CampaignsList from './components/CampaignsList';
 import VictimRequestForm from './components/VictimRequestForm';
 import AdminDashboard from './components/AdminDashboard';
 import LoginModal from './components/LoginModal';
@@ -15,13 +17,14 @@ import EmergencyServices from './components/EmergencyServices';
 import PublicRequestsList from './components/PublicRequestsList';
 import MobileBottomDock from './components/MobileBottomDock';
 import DeveloperModal from './components/DeveloperModal';
+import GuestHome from './components/GuestHome';
 import { storageService } from './services/storageService';
 import { authService } from './services/authService';
 import { i18nService, LANGUAGES } from './services/i18nService';
 import { RefreshCw, Lock, Key, Mail, ShieldCheck, AlertTriangle, Eye, EyeOff, LogOut, MapPin, Code, Github, Instagram } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState(authService.getCurrentUser().role === 'GUEST' ? 'public_requests' : 'dashboard');
+  const [activeTab, setActiveTab] = useState(authService.getCurrentUser().role === 'GUEST' ? 'home' : 'dashboard');
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isDevModalOpen, setIsDevModalOpen] = useState(false);
@@ -32,6 +35,7 @@ export default function App() {
   const [victimRequests, setVictimRequests] = useState([]);
   const [ngos, setNgos] = useState([]);
   const [volunteers, setVolunteers] = useState([]);
+  const [campaigns, setCampaigns] = useState([]);
   const [pendingCount, setPendingCount] = useState(0);
   const [isLoadingData, setIsLoadingData] = useState(true);
 
@@ -50,12 +54,23 @@ export default function App() {
                          window.location.hash === '#/raphul-admin' || 
                          window.location.hash === '#raphul-admin';
     setIsAdminPath(isSecretPath);
+
+    if (!isSecretPath) {
+      const hash = window.location.hash.replace('#', '');
+      const validTabs = ['home', 'dashboard', 'map', 'emergency', 'public_requests', 'ngos', 'transport', 'campaigns'];
+      if (validTabs.includes(hash)) {
+        setActiveTab(hash);
+      } else if (!hash && authService.getCurrentUser().role === 'GUEST') {
+        setActiveTab('home');
+      }
+    }
   };
 
   const loadData = () => {
     setVictimRequests(storageService.getVictimRequests());
     setNgos(storageService.getNGOs());
     setVolunteers(storageService.getVolunteers());
+    setCampaigns(storageService.getCampaigns());
 
     const pendingReqs = storageService.getPendingVictimRequests().length;
     const pendingLogs = storageService.getPendingDeliveryLogs().length;
@@ -84,7 +99,7 @@ export default function App() {
       const user = authService.getCurrentUser();
       setCurrentAuth(user);
       if (user.role === 'GUEST') {
-        setActiveTab('public_requests');
+        setActiveTab('home');
       }
     };
     const handleLangChanged = () => setLangState(i18nService.getLanguage());
@@ -268,27 +283,10 @@ export default function App() {
   // PUBLIC WEBSITE VIEW
   const handleTabChange = (tabName) => {
     setActiveTab(tabName);
+    window.location.hash = tabName;
     setTimeout(() => {
-      if (tabName === 'ngos') {
-        const ngoEl = document.getElementById('ngo-cards-list-container') || document.getElementById('ngo-directory-container');
-        if (ngoEl) {
-          const yOffset = -90; // Offset for sticky header
-          const y = ngoEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
-          window.scrollTo({ top: y, behavior: 'smooth' });
-        }
-      } else if (tabName === 'emergency') {
-        const emergencyEl = document.getElementById('emergency-filters-section');
-        if (emergencyEl) {
-          const yOffset = -90; // Offset for sticky header
-          const y = emergencyEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
-          window.scrollTo({ top: y, behavior: 'smooth' });
-        }
-      } else if (mainContentRef.current) {
-        const yOffset = -80; // Offset for sticky header
-        const y = mainContentRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
-        window.scrollTo({ top: y, behavior: 'smooth' });
-      }
-    }, 80);
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }, 10);
   };
 
   return (
@@ -312,6 +310,9 @@ export default function App() {
       {/* Main Container */}
       <main className={`flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 ${currentAuth.role !== 'GUEST' ? 'py-2 space-y-3' : 'py-6 space-y-6'}`}>
         
+        
+
+
         {/* Official ASDMA Emergency Helplines Notice (Only shown for Guest citizens) */}
         {currentAuth.role === 'GUEST' && <ASDMAHelplines />}
 
@@ -355,6 +356,15 @@ export default function App() {
           <EmergencyServices />
         )}
 
+        {activeTab === 'home' && (
+          <GuestHome 
+            victimRequests={victimRequests} 
+            ngos={ngos}
+            volunteers={volunteers}
+            setActiveTab={handleTabChange}
+          />
+        )}
+
         {activeTab === 'public_requests' && (
           <PublicRequestsList victimRequests={victimRequests} deliveryLogs={storageService.getDeliveryLogs()} isLoading={isLoadingData} />
         )}
@@ -370,6 +380,21 @@ export default function App() {
               setIsLoginModalOpen(true);
             }}
           />
+        )}
+
+        {activeTab === 'transport' && (
+          <TransportDirectory 
+            volunteers={volunteers} 
+            openLoginModal={(mode = 'REGISTER', regRole = 'VOLUNTEER') => {
+              setLoginModalMode(mode);
+              setLoginModalRegRole(regRole);
+              setIsLoginModalOpen(true);
+            }}
+          />
+        )}
+
+        {activeTab === 'campaigns' && (
+          <CampaignsList campaigns={campaigns} />
         )}
 
       </main>

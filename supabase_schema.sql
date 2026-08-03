@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS delivery_logs CASCADE;
 DROP TABLE IF EXISTS victim_requests CASCADE;
 DROP TABLE IF EXISTS ngos CASCADE;
 DROP TABLE IF EXISTS volunteers CASCADE;
+DROP TABLE IF EXISTS campaigns CASCADE;
 
 -- 1. Create Victim SOS Requests Table
 CREATE TABLE victim_requests (
@@ -102,6 +103,18 @@ CREATE TABLE helpline_numbers (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 6. Create Campaigns Table
+CREATE TABLE campaigns (
+    id TEXT PRIMARY KEY,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    title TEXT NOT NULL,
+    description TEXT,
+    location TEXT,
+    date TEXT,
+    status TEXT DEFAULT 'Active',
+    image_url TEXT
+);
+
 -- Seed initial Helpline Numbers
 INSERT INTO helpline_numbers (id, label, phone_number, sort_order, created_at)
 VALUES 
@@ -117,6 +130,7 @@ ALTER TABLE ngos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE volunteers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE delivery_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE helpline_numbers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE campaigns ENABLE ROW LEVEL SECURITY;
 
 -- Safely allow the frontend (anon key) to freely insert, read, update, and delete
 CREATE POLICY "Allow public all on victim_requests" ON victim_requests FOR ALL TO anon USING (true) WITH CHECK (true);
@@ -124,4 +138,5 @@ CREATE POLICY "Allow public all on ngos" ON ngos FOR ALL TO anon USING (true) WI
 CREATE POLICY "Allow public all on volunteers" ON volunteers FOR ALL TO anon USING (true) WITH CHECK (true);
 CREATE POLICY "Allow public all on delivery_logs" ON delivery_logs FOR ALL TO anon USING (true) WITH CHECK (true);
 CREATE POLICY "Allow public all on helpline_numbers" ON helpline_numbers FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Allow public all on campaigns" ON campaigns FOR ALL TO anon USING (true) WITH CHECK (true);
 

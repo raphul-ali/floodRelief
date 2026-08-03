@@ -309,10 +309,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
           showPhone: regShowPhone
         }, regPassword);
 
-        // Auto-login newly registered & approved NGO
-        await authService.loginNgo(regEmail, regPassword);
-        if (onClose) onClose();
-        return;
+        setRegSuccess(true);
       } else {
         authService.registerVolunteer({
           name: regName,
@@ -595,10 +592,10 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
               </div>
             )}
 
-            {/* AWAITING ADMIN APPROVAL SUCCESS STATE */}
+            {/* SUCCESS STATES */}
             {regSuccess ? (
-              <div className="bg-slate-950 border border-amber-500/50 rounded-2xl p-5 space-y-4 text-slate-100 shadow-xl">
-                <div className="flex items-center gap-3">
+                <div className="bg-slate-950 border border-amber-500/50 rounded-2xl p-5 space-y-4 text-slate-100 shadow-xl animate-fadeIn">
+                  <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center shrink-0">
                     <ShieldCheck className="w-6 h-6" />
                   </div>
@@ -619,11 +616,11 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                   
                   <div className="p-3 bg-amber-950/40 border border-amber-500/30 rounded-xl space-y-1.5 text-amber-200">
                     <div className="flex items-center gap-2 font-bold text-amber-300">
-                      <Phone className="w-4 h-4 text-amber-400 animate-pulse shrink-0" />
-                      <span>Verification Phone Call Notice</span>
+                      <ShieldCheck className="w-4 h-4 text-amber-400 animate-pulse shrink-0" />
+                      <span>Approval Pending</span>
                     </div>
                     <p className="text-[11px] text-slate-300 leading-normal">
-                      You will receive a call from our verification team shortly on <strong className="text-amber-300 font-mono">+91 {regPhone}</strong> to verify your organization / volunteer details before your profile is activated.
+                      Your account is sent for approval. Try logging in after sometime.
                     </p>
                   </div>
                 </div>
