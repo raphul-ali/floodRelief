@@ -10,6 +10,9 @@ import resend
 import random
 from datetime import datetime, timedelta
 
+import time
+from fastapi.responses import JSONResponse
+
 app = FastAPI()
 
 # Enable CORS for local development (Vercel handles this in prod usually, but good practice)
@@ -21,9 +24,36 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# In-memory rate limiting store (Works per Vercel edge node instance)
+RATE_LIMIT_STORE = {}
+RATE_LIMIT_MAX_REQUESTS = 60 # Max requests per minute
+RATE_LIMIT_WINDOW = 60 # Seconds
+
 @app.middleware("http")
 async def security_audit_middleware(request: Request, call_next):
     if request.url.path.startswith("/api/"):
+        
+        # Rate Limiting Logic
+        ip = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+        if not ip and request.client:
+            ip = request.client.host
+            
+        current_time = time.time()
+        
+        if ip:
+            if ip not in RATE_LIMIT_STORE:
+                RATE_LIMIT_STORE[ip] = {"count": 1, "start_time": current_time}
+            else:
+                store = RATE_LIMIT_STORE[ip]
+                if current_time - store["start_time"] > RATE_LIMIT_WINDOW:
+                    # Reset window
+                    store["count"] = 1
+                    store["start_time"] = current_time
+                else:
+                    store["count"] += 1
+                    if store["count"] > RATE_LIMIT_MAX_REQUESTS:
+                        return JSONResponse(status_code=429, content={"detail": "Too many requests. Slow down."})
+                        
         
         # RBAC is now handled by FastAPI dependencies (Depends(get_current_user))
 
