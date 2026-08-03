@@ -5,13 +5,19 @@ export default function CampaignsList({ campaigns }) {
   const activeCampaigns = campaigns.filter(c => c.status === 'Active');
   
   return (
-    <div className="space-y-6 max-w-5xl mx-auto py-4">
-      <div className="text-center space-y-3 mb-8">
-        <div className="w-16 h-16 bg-blue-100 rounded-full mx-auto flex items-center justify-center">
-          <Megaphone className="w-8 h-8 text-blue-600" />
+    <div className="space-y-5">
+      {/* Section header card */}
+      <div className="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-7 space-y-2 sm:space-y-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="status-chip status-chip-info text-[10px] sm:text-xs py-0.5 sm:py-1">
+            <Megaphone className="w-3 h-3" />
+            Active Campaigns
+          </span>
         </div>
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Active Campaigns</h1>
-        <p className="text-slate-500 text-sm max-w-xl mx-auto">
+        <h2 className="text-lg sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
+          Relief Campaigns
+        </h2>
+        <p className="hidden sm:block text-sm text-slate-500 max-w-xl">
           Join or support ongoing relief campaigns organized by our trusted partners and government agencies.
         </p>
       </div>
@@ -57,11 +63,6 @@ export default function CampaignsList({ campaigns }) {
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-red-500 shrink-0" />
                     <span className="line-clamp-1">{c.location}</span>
-                    {c.map_link && (
-                      <a href={c.map_link} target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-800 ml-1">
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    )}
                   </div>
                 )}
                 {c.contact_person && (
@@ -72,17 +73,30 @@ export default function CampaignsList({ campaigns }) {
                 )}
               </div>
 
-              {c.whatsapp_number && (
-                <a
-                  href={`https://wa.me/${c.whatsapp_number.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi, I am reaching out regarding the ${c.title} campaign.`)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-4 w-full py-2.5 bg-green-50 hover:bg-green-100 border border-green-200 text-green-700 font-bold rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  <span>Contact on WhatsApp</span>
-                </a>
-              )}
+              <div className="mt-4 flex flex-col sm:flex-row gap-2">
+                {c.whatsapp_number && (
+                  <a
+                    href={`https://wa.me/${c.whatsapp_number.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi, I am reaching out regarding the ${c.title} campaign.`)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full py-2.5 bg-green-50 hover:bg-green-100 border border-green-200 text-green-700 font-bold rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>Contact</span>
+                  </a>
+                )}
+                {c.map_link && (
+                  <a
+                    href={c.map_link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full py-2.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 font-bold rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
+                  >
+                    <MapPin className="w-4 h-4" />
+                    <span>View Map</span>
+                  </a>
+                )}
+              </div>
             </div>
           ))}
         </div>

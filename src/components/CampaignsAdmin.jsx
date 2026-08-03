@@ -152,7 +152,16 @@ export default function CampaignsAdmin() {
                       {c.date && <span>{c.date}</span>}
                       {c.location && <span>{c.location}</span>}
                       {c.contact_person && <span>Contact: {c.contact_person}</span>}
-                      {c.whatsapp_number && <span>WA: {c.whatsapp_number}</span>}
+                      {c.whatsapp_number && (
+                        <a 
+                          href={`https://wa.me/${c.whatsapp_number.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi, I am reaching out regarding the ${c.title} campaign.`)}`} 
+                          target="_blank" 
+                          rel="noreferrer" 
+                          className="text-green-600 hover:text-green-700 underline"
+                        >
+                          Contact in WhatsApp
+                        </a>
+                      )}
                     </div>
                   </div>
                   <div className="flex gap-2 shrink-0">

@@ -110,7 +110,7 @@ export const storageService = {
 
   addCampaign: async (campaignData) => {
     const newItem = {
-      id: securityService.generateUUID(),
+      id: `camp-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       created_at: new Date().toISOString(),
       ...campaignData
     };
