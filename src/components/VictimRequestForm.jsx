@@ -419,27 +419,56 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
 
                 {/* Auto GPS Location */}
                 <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg space-y-2 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">GPS Location</span>
-                    {formData.latitude && (
-                      <span className="text-[10px] text-emerald-600 font-mono font-medium">
-                        {formData.latitude.toFixed(4)}, {formData.longitude.toFixed(4)}
-                      </span>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">GPS Location</span>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={attachGps}
+                          onChange={(e) => setAttachGps(e.target.checked)}
+                          className="w-3.5 h-3.5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                        />
+                        <span className="text-[10px] font-medium text-gray-600">Attach GPS</span>
+                      </label>
+                    </div>
+                    {attachGps && (
+                      <div className="space-y-2">
+                        <button
+                          type="button"
+                          onClick={handleDetectLocation}
+                          disabled={isLocating}
+                          className={`w-full py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
+                            formData.latitude
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : 'bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200'
+                          }`}
+                        >
+                          <Navigation className={`w-4 h-4 ${isLocating ? 'animate-spin' : ''}`} />
+                          <span>{isLocating ? 'Acquiring GPS...' : formData.latitude ? 'GPS Pinned (Click to Refetch)' : 'Tap to Detect GPS Location'}</span>
+                        </button>
+                        
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                          <input
+                            type="number"
+                            step="any"
+                            placeholder="Latitude"
+                            value={formData.latitude || ''}
+                            onChange={(e) => setFormData(prev => ({ ...prev, latitude: parseFloat(e.target.value) || null }))}
+                            className="w-full px-2 py-1.5 bg-white border border-gray-300 rounded-md text-gray-900 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20"
+                          />
+                          <input
+                            type="number"
+                            step="any"
+                            placeholder="Longitude"
+                            value={formData.longitude || ''}
+                            onChange={(e) => setFormData(prev => ({ ...prev, longitude: parseFloat(e.target.value) || null }))}
+                            className="w-full px-2 py-1.5 bg-white border border-gray-300 rounded-md text-gray-900 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20"
+                          />
+                        </div>
+                      </div>
                     )}
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleDetectLocation}
-                    disabled={isLocating}
-                    className={`w-full py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
-                      formData.latitude
-                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                        : 'bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200'
-                    }`}
-                  >
-                    <Navigation className={`w-4 h-4 ${isLocating ? 'animate-spin' : ''}`} />
-                    <span>{isLocating ? 'Acquiring GPS...' : formData.latitude ? 'GPS Pinned (Click to Refetch)' : 'Tap to Detect GPS Location'}</span>
-                  </button>
                 </div>
               </div>
             ) : (
@@ -524,8 +553,8 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                 </div>
 
                 {/* Landmark & GPS Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
-                  <div className="sm:col-span-2">
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
                     <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
                       {i18nService.t('exactSpotLandmark', 'Exact Spot / Rooftop / Dike Landmark')}
                     </label>
@@ -538,26 +567,61 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                     />
                   </div>
 
-                  <div className="sm:col-span-1">
-                    <button
-                      type="button"
-                      onClick={handleDetectLocation}
-                      disabled={isLocating}
-                      className={`w-full py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all min-h-[42px] shadow-sm ${
-                        formData.latitude
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100'
-                      }`}
-                    >
-                      <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
-                      <span>
-                        {isLocating
-                          ? 'Acquiring GPS...'
-                          : formData.latitude
-                            ? 'GPS Pinned'
-                            : 'Fetch Auto Geolocation'}
-                      </span>
-                    </button>
+                  <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg space-y-2 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">GPS Location</span>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={attachGps}
+                          onChange={(e) => setAttachGps(e.target.checked)}
+                          className="w-3.5 h-3.5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                        />
+                        <span className="text-[10px] font-medium text-gray-600">Attach GPS</span>
+                      </label>
+                    </div>
+                    {attachGps && (
+                      <div className="space-y-2">
+                        <button
+                          type="button"
+                          onClick={handleDetectLocation}
+                          disabled={isLocating}
+                          className={`w-full py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all min-h-[42px] shadow-sm ${
+                            formData.latitude
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : 'bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100'
+                          }`}
+                        >
+                          <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
+                          <span>
+                            {isLocating
+                              ? 'Acquiring GPS...'
+                              : formData.latitude
+                                ? 'GPS Pinned'
+                                : 'Fetch Auto Geolocation'}
+                          </span>
+                        </button>
+
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                          <input
+                            type="number"
+                            step="any"
+                            placeholder="Latitude"
+                            value={formData.latitude || ''}
+                            onChange={(e) => setFormData(prev => ({ ...prev, latitude: parseFloat(e.target.value) || null }))}
+                            className="w-full px-2 py-1.5 bg-white border border-gray-300 rounded-md text-gray-900 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20"
+                          />
+                          <input
+                            type="number"
+                            step="any"
+                            placeholder="Longitude"
+                            value={formData.longitude || ''}
+                            onChange={(e) => setFormData(prev => ({ ...prev, longitude: parseFloat(e.target.value) || null }))}
+                            className="w-full px-2 py-1.5 bg-white border border-gray-300 rounded-md text-gray-900 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20"
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
