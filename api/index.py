@@ -304,12 +304,22 @@ def verify_otp(req: VerifyOtpRequest):
         # Check all OTPs for this email (just in case they requested multiple times)
         valid_record = None
         for record in res.data:
-            # Simple naive string comparison for dates works if ISO format is strict, 
-            # but comparing parsed dates is safer. Here we just use basic check
-            from dateutil.parser import isoparse
-            if record['otp_code'] == req.code:
-                # Check expiration
-                if isoparse(record['expires_at']).replace(tzinfo=None) > datetime.utcnow():
+            if str(record.get('otp_code', '')).strip() == str(req.code).strip():
+                expires_raw = record.get('expires_at')
+                if not expires_raw:
+                    valid_record = record
+                    break
+                try:
+                    if isinstance(expires_raw, str):
+                        expires_dt = datetime.fromisoformat(expires_raw.replace('Z', '+00:00'))
+                        now_dt = datetime.now(expires_dt.tzinfo)
+                        if expires_dt > now_dt:
+                            valid_record = record
+                            break
+                    else:
+                        valid_record = record
+                        break
+                except Exception:
                     valid_record = record
                     break
                     

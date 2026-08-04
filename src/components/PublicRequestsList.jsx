@@ -337,7 +337,7 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
                       className="w-full py-2.5 px-4 rounded-xl text-xs font-bold tracking-wide uppercase gap-2"
                     >
                       <Activity className="w-4 h-4 shrink-0" />
-                      <span>See Progress &amp; Impact Tree</span>
+                      <span>View Updates</span>
                       <ArrowUpRight className="w-3.5 h-3.5 ml-auto shrink-0 opacity-70" />
                     </RippleButton>
                   </div>

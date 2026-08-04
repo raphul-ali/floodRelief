@@ -152,17 +152,17 @@ export default function App() {
   // SECRET /raphul-admin ROUTE VIEW
   if (isAdminPath) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 font-sans p-4 sm:p-8 space-y-6">
+      <div className="min-h-screen bg-slate-50 text-slate-900 font-sans p-4 sm:p-8 space-y-6">
         
         {/* Private Top Bar */}
-        <div className="max-w-7xl mx-auto flex items-center justify-between border-b border-red-900/40 pb-3 gap-2">
+        <div className="max-w-7xl mx-auto flex items-center justify-between border-b border-slate-200 pb-3 gap-2">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-2 bg-red-600 rounded-xl text-white shrink-0">
+            <div className="p-2 bg-blue-600 rounded-xl text-white shrink-0 shadow-md shadow-blue-600/20">
               <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
-              <h1 className="text-xs sm:text-lg font-black text-white leading-tight">CONTROL ROOM (/raphul-admin)</h1>
-              <p className="text-[10px] sm:text-xs text-red-300">Authorized Super Admin Access</p>
+              <h1 className="text-xs sm:text-lg font-black text-slate-900 leading-tight">CONTROL ROOM (/raphul-admin)</h1>
+              <p className="text-[10px] sm:text-xs text-slate-500 font-semibold">Authorized Super Admin Access</p>
             </div>
           </div>
 
@@ -173,7 +173,7 @@ export default function App() {
               window.location.pathname = '/';
               window.location.hash = '';
             }}
-            className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl text-[11px] sm:text-xs font-black border border-slate-800 shrink-0 min-h-[38px] flex items-center justify-center"
+            className="px-3.5 py-2 bg-white hover:bg-slate-100 text-slate-700 rounded-xl text-[11px] sm:text-xs font-bold border border-slate-200 shrink-0 min-h-[38px] flex items-center justify-center shadow-sm"
           >
             &larr; Public Site
           </a>
@@ -182,19 +182,19 @@ export default function App() {
         {/* If logged in as Super Admin */}
         {currentAuth.role === 'ADMIN' ? (
           <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
-            <div className="bg-red-950/70 border border-red-500/40 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-sm">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-                <span className="text-xs font-bold text-red-200">
-                  Super Admin: <strong className="text-amber-300 font-black">raphulali@gmail.com</strong>
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                <span className="text-xs font-bold text-slate-700">
+                  Super Admin Session: <strong className="text-blue-600 font-black">raphulali@gmail.com</strong>
                 </span>
               </div>
               <button
                 onClick={handleLogout}
-                className="px-3.5 py-1.5 bg-red-900 hover:bg-red-800 text-white rounded-xl text-xs font-black border border-red-500/40 shrink-0 min-h-[38px] flex items-center justify-center gap-1.5 cursor-pointer shadow-md active:scale-95 transition-all"
+                className="px-3.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold border border-red-200 shrink-0 min-h-[38px] flex items-center justify-center gap-1.5 cursor-pointer transition-all"
                 title="Logout of Admin session"
               >
-                <LogOut className="w-3.5 h-3.5 text-white" />
+                <LogOut className="w-3.5 h-3.5 text-red-600" />
                 <span>Logout</span>
               </button>
             </div>
@@ -203,28 +203,28 @@ export default function App() {
           </div>
         ) : (
           /* Secret Mobile-Optimized Admin Login Screen */
-          <div className="w-[94vw] max-w-md mx-auto mt-4 mb-24 sm:my-12 bg-slate-900 border border-red-900/60 rounded-3xl p-5 sm:p-8 shadow-2xl space-y-5">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-red-600 to-rose-700 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-red-950">
+          <div className="w-[94vw] max-w-md mx-auto mt-4 mb-24 sm:my-12 bg-white border border-slate-200 rounded-3xl p-5 sm:p-8 shadow-xl space-y-5">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-blue-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-blue-600/20">
               <Lock className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
             </div>
 
             <div className="text-center space-y-1">
-              <h2 className="text-lg sm:text-xl font-black text-white uppercase tracking-tight">Super Admin Portal</h2>
-              <p className="text-xs text-slate-400">
-                Authorized Login for <span className="text-amber-300 font-bold">Raphul Ali</span>
+              <h2 className="text-lg sm:text-xl font-black text-slate-900 uppercase tracking-tight">Super Admin Portal</h2>
+              <p className="text-xs text-slate-500">
+                Authorized Login for <span className="text-blue-600 font-bold">Raphul Ali</span>
               </p>
             </div>
 
             {adminLoginError && (
-              <div className="p-3 bg-red-950/80 border border-red-500/50 rounded-xl text-red-200 text-xs font-semibold flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-semibold flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
                 <span>{adminLoginError}</span>
               </div>
             )}
 
             <form onSubmit={handleSecretAdminLogin} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Super Admin Email
                 </label>
                 <div className="relative">
@@ -234,14 +234,14 @@ export default function App() {
                     value={adminEmail}
                     onChange={(e) => setAdminEmail(e.target.value)}
                     placeholder="raphulali@gmail.com"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-3 text-sm text-white focus:outline-none focus:border-red-500 min-h-[44px]"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3.5 py-3 text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 min-h-[44px]"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Super Admin Password
                 </label>
                 <div className="relative">
@@ -251,13 +251,13 @@ export default function App() {
                     value={adminPassword}
                     onChange={(e) => setAdminPassword(e.target.value)}
                     placeholder="Enter password"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-10 py-3 text-sm text-white focus:outline-none focus:border-red-500 min-h-[44px]"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-10 py-3 text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 min-h-[44px]"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowAdminPassword(!showAdminPassword)}
-                    className="absolute right-3 top-3 text-slate-400 hover:text-white p-1 rounded-lg focus:outline-none"
+                    className="absolute right-3 top-3 text-slate-400 hover:text-slate-700 p-1 rounded-lg focus:outline-none"
                     title={showAdminPassword ? "Hide password" : "Show password"}
                   >
                     {showAdminPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

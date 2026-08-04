@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, ShieldAlert, MessageSquare, Phone, CheckCircle2, XCircle, 
   Search, RefreshCw, Lock, Key, Clock, Package, HeartHandshake, UserCheck, AlertTriangle, ExternalLink, Bell, Edit2, Save, X,
-  User, Users, ChevronLeft, ChevronRight, Eye, EyeOff, Megaphone
+  User, Users, ChevronLeft, ChevronRight, Eye, EyeOff, Megaphone, Filter, MapPin, Building2, Check, Sparkles
 } from 'lucide-react';
 import { storageService, ASSAM_DISTRICTS } from '../services/storageService';
 import { isSupabaseConfigured } from '../services/supabaseClient';
@@ -10,16 +10,24 @@ import ExpandableNotes from './ExpandableNotes';
 import CampaignsAdmin from './CampaignsAdmin';
 
 export default function AdminDashboard({ onDataUpdated }) {
-  const [activeQueueTab, setActiveQueueTab] = useState('sos'); // 'sos' | 'deliveries' | 'ngos' | 'volunteers' | 'recovery' | 'users' | 'campaigns'
+  const [activeQueueTab, setActiveQueueTab] = useState('sos'); // 'overview' | 'sos' | 'deliveries' | 'ngos' | 'volunteers' | 'recovery' | 'users' | 'helplines' | 'campaigns'
   const [viewMode, setViewMode] = useState('PENDING'); // 'PENDING' | 'ALL_LIVE'
   
+  // Section Filter Chips States
+  const [sosChipFilter, setSosChipFilter] = useState('ALL'); // 'ALL' | 'PENDING' | 'BOAT' | 'SUPPLY' | 'PUBLISHED'
+  const [deliveryChipFilter, setDeliveryChipFilter] = useState('ALL'); // 'ALL' | 'PENDING' | 'VERIFIED'
+  const [ngoChipFilter, setNgoChipFilter] = useState('ALL'); // 'ALL' | 'PENDING' | 'NGO' | 'DONOR' | 'VERIFIED'
+  const [volChipFilter, setVolChipFilter] = useState('ALL'); // 'ALL' | 'PENDING' | 'BOAT' | 'TRANSPORT' | 'MEDICAL' | 'VERIFIED'
+  const [recoveryChipFilter, setRecoveryChipFilter] = useState('ALL'); // 'ALL' | 'PENDING' | 'PASSWORD' | 'EMAIL' | 'RESOLVED'
+  const [helplineChipFilter, setHelplineChipFilter] = useState('ALL'); // 'ALL' | 'CONTROL_ROOM' | 'TOLL_FREE'
+
+  // Data states
   const [pendingRequests, setPendingRequests] = useState([]);
   const [pendingDeliveries, setPendingDeliveries] = useState([]);
   const [pendingNgos, setPendingNgos] = useState([]);
   const [pendingVolunteers, setPendingVolunteers] = useState([]);
   const [pendingRecovery, setPendingRecovery] = useState([]);
 
-  // All live network records state
   const [allRequests, setAllRequests] = useState([]);
   const [allDeliveries, setAllDeliveries] = useState([]);
   const [allNgos, setAllNgos] = useState([]);
@@ -36,12 +44,34 @@ export default function AdminDashboard({ onDataUpdated }) {
   const [editHelplinePhone, setEditHelplinePhone] = useState('');
   const [editHelplineOrder, setEditHelplineOrder] = useState('');
 
+  // Pagination States for All Sections
+  const [sosCurrentPage, setSosCurrentPage] = useState(1);
+  const [sosItemsPerPage, setSosItemsPerPage] = useState(6);
+
+  const [deliveryCurrentPage, setDeliveryCurrentPage] = useState(1);
+  const [deliveryItemsPerPage, setDeliveryItemsPerPage] = useState(6);
+
+  const [ngoCurrentPage, setNgoCurrentPage] = useState(1);
+  const [ngoItemsPerPage, setNgoItemsPerPage] = useState(6);
+
+  const [volCurrentPage, setVolCurrentPage] = useState(1);
+  const [volItemsPerPage, setVolItemsPerPage] = useState(6);
+
+  const [recoveryCurrentPage, setRecoveryCurrentPage] = useState(1);
+  const [recoveryItemsPerPage, setRecoveryItemsPerPage] = useState(6);
+
   // User Directory Pagination & Filter State
   const [userCurrentPage, setUserCurrentPage] = useState(1);
-  const [userItemsPerPage, setUserItemsPerPage] = useState(5);
+  const [userItemsPerPage, setUserItemsPerPage] = useState(6);
   const [userRoleFilter, setUserRoleFilter] = useState('ALL'); // 'ALL' | 'NGO' | 'VOLUNTEER'
   const [userStatusFilter, setUserStatusFilter] = useState('ALL'); // 'ALL' | 'VERIFIED' | 'PENDING'
   const [visiblePasswords, setVisiblePasswords] = useState({});
+
+  const [selectedDistrict, setSelectedDistrict] = useState('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const [editingSosId, setEditingSosId] = useState(null);
+  const [editSosData, setEditSosData] = useState({});
 
   const togglePasswordVisibility = (userId) => {
     setVisiblePasswords(prev => ({
@@ -49,32 +79,34 @@ export default function AdminDashboard({ onDataUpdated }) {
       [userId]: !prev[userId]
     }));
   };
-  
-  const [selectedDistrict, setSelectedDistrict] = useState('ALL');
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const [editingSosId, setEditingSosId] = useState(null);
-  const [editSosData, setEditSosData] = useState({});
 
   const loadAdminData = () => {
-    setPendingRequests(storageService.getPendingVictimRequests());
-    setPendingDeliveries(storageService.getPendingDeliveryLogs());
-    setPendingNgos(storageService.getPendingNGOs());
-    setPendingVolunteers(storageService.getPendingVolunteers());
-    setPendingRecovery(storageService.getAccountRecoveryRequests(true));
+    setPendingRequests(storageService.getPendingVictimRequests() || []);
+    setPendingDeliveries(storageService.getPendingDeliveryLogs() || []);
+    setPendingNgos(storageService.getPendingNGOs() || []);
+    setPendingVolunteers(storageService.getPendingVolunteers() || []);
+    setPendingRecovery(storageService.getAccountRecoveryRequests(true) || []);
 
-    setAllRequests(storageService.getVictimRequests(true));
-    setAllDeliveries(storageService.getDeliveryLogs(true));
-    setAllNgos(storageService.getNGOs(true));
-    setAllVolunteers(storageService.getVolunteers(true));
-    setAllUsers(storageService.getAllUsers());
-    setHelplinesList(storageService.getHelplineNumbers());
+    setAllRequests(storageService.getVictimRequests(true) || []);
+    setAllDeliveries(storageService.getDeliveryLogs(true) || []);
+    setAllNgos(storageService.getNGOs(true) || []);
+    setAllVolunteers(storageService.getVolunteers(true) || []);
+    setAllUsers(storageService.getAllUsers() || []);
+    setHelplinesList(storageService.getHelplineNumbers() || []);
   };
 
+  useEffect(() => {
+    loadAdminData();
+    const handleDataChanged = () => loadAdminData();
+    window.addEventListener('flood_data_changed', handleDataChanged);
+    return () => window.removeEventListener('flood_data_changed', handleDataChanged);
+  }, []);
+
+  // Handlers
   const handleAddHelpline = async (e) => {
     e.preventDefault();
     if (!newHelplineLabel.trim() || !newHelplinePhone.trim()) {
-      alert("Please fill in both the Control Room name and Phone Number.");
+      alert("Please fill in both Control Room name and Phone Number.");
       return;
     }
     await storageService.addHelplineNumber({
@@ -117,13 +149,6 @@ export default function AdminDashboard({ onDataUpdated }) {
     }
   };
 
-  useEffect(() => {
-    loadAdminData();
-    const handleDataChanged = () => loadAdminData();
-    window.addEventListener('flood_data_changed', handleDataChanged);
-    return () => window.removeEventListener('flood_data_changed', handleDataChanged);
-  }, []);
-
   const handleApproveSos = (id) => {
     storageService.verifyVictimRequest(id, "Super Admin");
     loadAdminData();
@@ -151,17 +176,10 @@ export default function AdminDashboard({ onDataUpdated }) {
 
   const handleSaveSos = (e) => {
     e.preventDefault();
-    
-    // Recalculate total people
     const totalPeople = (parseInt(editSosData.malesCount) || 0) + 
                        (parseInt(editSosData.femalesCount) || 0) + 
                        (parseInt(editSosData.childrenCount) || 0);
-                       
-    const payload = {
-      ...editSosData,
-      peopleCount: totalPeople,
-    };
-    
+    const payload = { ...editSosData, peopleCount: totalPeople };
     storageService.editVictimRequest(editingSosId, payload);
     setEditingSosId(null);
     setEditSosData({});
@@ -229,89 +247,101 @@ export default function AdminDashboard({ onDataUpdated }) {
     if (!phone) return '#';
     const cleanPhone = phone.replace(/[^0-9]/g, '');
     const formatted = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
-
-    let text = `Hello ${name || 'User'}, this is Super Admin from Help Axom. Regarding your ${reqType === 'FORGOT_PASSWORD' ? 'Forgot Password' : 'Forgot Email'} request for your ${role} account:`;
+    let text = `Hello ${name || 'User'}, this is Super Admin from Help Axom regarding your ${reqType === 'FORGOT_PASSWORD' ? 'Password Reset' : 'Email Recovery'} request:`;
     if (matchedAccount) {
-      text += `\n\nRegistered Account Details:\n• Name: ${matchedAccount.name}\n• Email: ${matchedAccount.email}\n• Password: ${matchedAccount.password || 'Standard Password'}\n• Status: ${matchedAccount.verified ? 'Verified' : 'Pending Admin Verification'}`;
+      text += `\n\nRegistered Account:\n• Name: ${matchedAccount.name}\n• Email: ${matchedAccount.email}\n• Password: ${matchedAccount.password || 'Default'}`;
     } else {
-      text += `\n\nPlease confirm your registered name and contact details so we can assist you.`;
+      text += `\n\nPlease confirm your registered details so we can assist you.`;
     }
-
     return `https://wa.me/${formatted}?text=${encodeURIComponent(text)}`;
   };
 
-  // Pre-fill WhatsApp Verification Message
   const getWhatsAppVerifyUrl = (phone, name, reqId, type = "SOS") => {
     if (!phone) return '#';
     const cleanPhone = phone.replace(/[^0-9]/g, '');
     const formatted = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
-    
-    let text = "";
-    if (type === "SOS") {
-      text = encodeURIComponent(
-        `Hello ${name}, this is Super Admin verifying your emergency SOS request (${reqId}). Please send your exact location & geotagged photos/videos via WhatsApp to verify and publish to our live map.`
-      );
-    } else if (type === "DELIVERY") {
-      text = encodeURIComponent(
-        `Hello, this is Super Admin regarding your relief delivery log for request ${reqId}. Please share geotagged photo proof of the delivered items so we can approve your timeline log.`
-      );
-    } else {
-      text = encodeURIComponent(
-        `Hello ${name}, this is Super Admin verifying your registration (${reqId}). Please confirm your contact details.`
-      );
-    }
-
-    return `https://wa.me/${formatted}?text=${text}`;
+    let text = type === "SOS" 
+      ? `Hello ${name}, this is Super Admin verifying your emergency SOS request (${reqId}). Please reply with geotagged photo/location.`
+      : `Hello ${name}, this is Super Admin verifying your registration. Please confirm your details.`;
+    return `https://wa.me/${formatted}?text=${encodeURIComponent(text)}`;
   };
 
-  const pendingRecoveryCount = pendingRecovery.filter(r => r.status === 'PENDING').length;
-  const totalPendingCount = pendingRequests.length + pendingDeliveries.length + pendingNgos.length + pendingVolunteers.length + pendingRecoveryCount;
+  const pendingRecoveryCount = (pendingRecovery || []).filter(r => r && r.status === 'PENDING').length;
+  const totalPendingCount = (pendingRequests || []).length + (pendingDeliveries || []).length + (pendingNgos || []).length + (pendingVolunteers || []).length + pendingRecoveryCount;
 
-  // Active dataset depending on viewMode
-  const targetRequests = viewMode === 'ALL_LIVE' ? allRequests : pendingRequests;
-  const targetDeliveries = viewMode === 'ALL_LIVE' ? allDeliveries : pendingDeliveries;
-  const targetNgos = viewMode === 'ALL_LIVE' ? allNgos : pendingNgos;
-  const targetVolunteers = viewMode === 'ALL_LIVE' ? allVolunteers : pendingVolunteers;
+  const targetRequests = (viewMode === 'ALL_LIVE' ? allRequests : pendingRequests) || [];
+  const targetDeliveries = (viewMode === 'ALL_LIVE' ? allDeliveries : pendingDeliveries) || [];
+  const targetNgos = (viewMode === 'ALL_LIVE' ? allNgos : pendingNgos) || [];
+  const targetVolunteers = (viewMode === 'ALL_LIVE' ? allVolunteers : pendingVolunteers) || [];
 
-  // Filter SOS Requests
+  // Filtered Datasets
   const filteredSos = targetRequests.filter(req => {
     const matchesDistrict = selectedDistrict === 'ALL' || req.district === selectedDistrict;
     const matchesQuery = !searchQuery || 
       (req.name && req.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
       (req.id && req.id.toLowerCase().includes(searchQuery.toLowerCase())) || 
       (req.phone && req.phone.includes(searchQuery));
-    return matchesDistrict && matchesQuery;
+
+    let matchesChip = true;
+    if (sosChipFilter === 'PENDING') matchesChip = !req.verified;
+    else if (sosChipFilter === 'PUBLISHED') matchesChip = req.verified;
+    else if (sosChipFilter === 'BOAT') matchesChip = req.isUrgentRescue;
+    else if (sosChipFilter === 'SUPPLY') matchesChip = !req.isUrgentRescue;
+
+    return matchesDistrict && matchesQuery && matchesChip;
   });
 
-  // Filter Deliveries
   const filteredDeliveries = targetDeliveries.filter(log => {
     const matchesQuery = !searchQuery || 
       (log.deliveredBy && log.deliveredBy.toLowerCase().includes(searchQuery.toLowerCase())) || 
-      (log.itemsDelivered && log.itemsDelivered.toLowerCase().includes(searchQuery.toLowerCase())) || 
-      (log.logId && log.logId.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesQuery;
+      (log.itemsDelivered && log.itemsDelivered.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    let matchesChip = true;
+    if (deliveryChipFilter === 'PENDING') matchesChip = !log.verified;
+    else if (deliveryChipFilter === 'VERIFIED') matchesChip = log.verified;
+
+    return matchesQuery && matchesChip;
   });
 
-  // Filter NGOs
   const filteredNgos = targetNgos.filter(ngo => {
     const matchesQuery = !searchQuery || 
       (ngo.name && ngo.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
-      (ngo.phone && ngo.phone.includes(searchQuery)) || 
-      (ngo.contactPerson && ngo.contactPerson.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesQuery;
+      (ngo.phone && ngo.phone.includes(searchQuery));
+
+    let matchesChip = true;
+    if (ngoChipFilter === 'PENDING') matchesChip = !ngo.verified;
+    else if (ngoChipFilter === 'VERIFIED') matchesChip = ngo.verified;
+    else if (ngoChipFilter === 'DONOR') matchesChip = ngo.ngoType && ngo.ngoType.includes('Donor');
+    else if (ngoChipFilter === 'NGO') matchesChip = !ngo.ngoType || ngo.ngoType.includes('Registered NGO');
+
+    return matchesQuery && matchesChip;
   });
 
-  // Filter Volunteers
   const filteredVolunteers = targetVolunteers.filter(vol => {
     const matchesQuery = !searchQuery || 
       (vol.name && vol.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
-      (vol.phone && vol.phone.includes(searchQuery)) || 
-      (vol.roleType && vol.roleType.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesQuery;
+      (vol.phone && vol.phone.includes(searchQuery));
+
+    let matchesChip = true;
+    if (volChipFilter === 'PENDING') matchesChip = !vol.verified;
+    else if (volChipFilter === 'VERIFIED') matchesChip = vol.verified;
+    else if (volChipFilter === 'BOAT') matchesChip = vol.roleType && vol.roleType.toLowerCase().includes('boat');
+    else if (volChipFilter === 'TRANSPORT') matchesChip = vol.roleType && (vol.roleType.toLowerCase().includes('car') || vol.roleType.toLowerCase().includes('transport'));
+    else if (volChipFilter === 'MEDICAL') matchesChip = vol.roleType && vol.roleType.toLowerCase().includes('medical');
+
+    return matchesQuery && matchesChip;
   });
 
-  // Filter All Users
-  const filteredUsers = allUsers.filter(u => {
+  const filteredRecovery = (pendingRecovery || []).filter(r => {
+    let matchesChip = true;
+    if (recoveryChipFilter === 'PENDING') matchesChip = r.status === 'PENDING';
+    else if (recoveryChipFilter === 'RESOLVED') matchesChip = r.status === 'RESOLVED';
+    else if (recoveryChipFilter === 'PASSWORD') matchesChip = r.requestType === 'FORGOT_PASSWORD';
+    else if (recoveryChipFilter === 'EMAIL') matchesChip = r.requestType === 'FORGOT_EMAIL';
+    return matchesChip;
+  });
+
+  const filteredUsers = (allUsers || []).filter(u => {
     const matchesRole = userRoleFilter === 'ALL' || u.userType === userRoleFilter;
     const matchesStatus = userStatusFilter === 'ALL' || 
       (userStatusFilter === 'VERIFIED' && u.verified) || 
@@ -320,1267 +350,876 @@ export default function AdminDashboard({ onDataUpdated }) {
     const matchesQuery = !searchQuery || 
       (u.name && u.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
       (u.email && u.email.toLowerCase().includes(searchQuery.toLowerCase())) || 
-      (u.phone && u.phone.includes(searchQuery)) || 
-      (u.id && u.id.toLowerCase().includes(searchQuery.toLowerCase()));
+      (u.phone && u.phone.includes(searchQuery));
     return matchesRole && matchesStatus && matchesDistrict && matchesQuery;
   });
 
-  // User Pagination calculation
+  // Pagination Computations
+  const totalSosPages = Math.ceil(filteredSos.length / sosItemsPerPage) || 1;
+  const safeSosPage = Math.min(Math.max(1, sosCurrentPage), totalSosPages);
+  const paginatedSos = filteredSos.slice((safeSosPage - 1) * sosItemsPerPage, safeSosPage * sosItemsPerPage);
+
+  const totalDeliveryPages = Math.ceil(filteredDeliveries.length / deliveryItemsPerPage) || 1;
+  const safeDeliveryPage = Math.min(Math.max(1, deliveryCurrentPage), totalDeliveryPages);
+  const paginatedDeliveries = filteredDeliveries.slice((safeDeliveryPage - 1) * deliveryItemsPerPage, safeDeliveryPage * deliveryItemsPerPage);
+
+  const totalNgoPages = Math.ceil(filteredNgos.length / ngoItemsPerPage) || 1;
+  const safeNgoPage = Math.min(Math.max(1, ngoCurrentPage), totalNgoPages);
+  const paginatedNgos = filteredNgos.slice((safeNgoPage - 1) * ngoItemsPerPage, safeNgoPage * ngoItemsPerPage);
+
+  const totalVolPages = Math.ceil(filteredVolunteers.length / volItemsPerPage) || 1;
+  const safeVolPage = Math.min(Math.max(1, volCurrentPage), totalVolPages);
+  const paginatedVolunteers = filteredVolunteers.slice((safeVolPage - 1) * volItemsPerPage, safeVolPage * volItemsPerPage);
+
+  const totalRecoveryPages = Math.ceil(filteredRecovery.length / recoveryItemsPerPage) || 1;
+  const safeRecoveryPage = Math.min(Math.max(1, recoveryCurrentPage), totalRecoveryPages);
+  const paginatedRecovery = filteredRecovery.slice((safeRecoveryPage - 1) * recoveryItemsPerPage, safeRecoveryPage * recoveryItemsPerPage);
+
   const totalUserPages = Math.ceil(filteredUsers.length / userItemsPerPage) || 1;
   const safeUserCurrentPage = Math.min(Math.max(1, userCurrentPage), totalUserPages);
   const userStartIndex = (safeUserCurrentPage - 1) * userItemsPerPage;
   const paginatedUsers = filteredUsers.slice(userStartIndex, userStartIndex + userItemsPerPage);
 
   const sidebarNavItems = [
-    { id: 'overview', label: 'Dashboard Overview', icon: RefreshCw, count: null },
-    { id: 'sos', label: 'SOS Requests', icon: ShieldAlert, count: pendingRequests.length, badgeColor: 'bg-red-600 text-white' },
-    { id: 'deliveries', label: 'Relief Deliveries', icon: Package, count: pendingDeliveries.length, badgeColor: 'bg-blue-600 text-white' },
-    { id: 'ngos', label: 'NGO Partners', icon: HeartHandshake, count: pendingNgos.length, badgeColor: 'bg-emerald-600 text-white' },
-    { id: 'volunteers', label: 'Relief Helpers', icon: UserCheck, count: pendingVolunteers.length, badgeColor: 'bg-purple-600 text-white' },
-    { id: 'campaigns', label: 'Relief Campaigns', icon: Megaphone, count: null },
-    { id: 'recovery', label: 'Account Recovery', icon: Key, count: pendingRecoveryCount, badgeColor: 'bg-amber-500 text-slate-950' },
-    { id: 'users', label: 'User Directory', icon: Users, count: allUsers.length, badgeColor: 'bg-slate-100 text-slate-700 border border-slate-200' },
-    { id: 'helplines', label: 'Control Room Lines', icon: Phone, count: helplinesList.length, badgeColor: 'bg-slate-100 text-slate-700 border border-slate-200' },
+    { id: 'sos', label: 'SOS Requests', icon: ShieldAlert, count: (pendingRequests || []).length, color: 'text-red-600 bg-red-50' },
+    { id: 'deliveries', label: 'Relief Logs', icon: Package, count: (pendingDeliveries || []).length, color: 'text-amber-600 bg-amber-50' },
+    { id: 'ngos', label: 'NGO Partners', icon: HeartHandshake, count: (pendingNgos || []).length, color: 'text-blue-600 bg-blue-50' },
+    { id: 'volunteers', label: 'Relief Helpers', icon: UserCheck, count: (pendingVolunteers || []).length, color: 'text-purple-600 bg-purple-50' },
+    { id: 'campaigns', label: 'Campaigns', icon: Megaphone, count: null },
+    { id: 'recovery', label: 'Account Recovery', icon: Key, count: pendingRecoveryCount, color: 'text-cyan-600 bg-cyan-50' },
+    { id: 'users', label: 'User Directory', icon: Users, count: (allUsers || []).length, color: 'text-slate-600 bg-slate-100' },
+    { id: 'helplines', label: 'Control Rooms', icon: Phone, count: (helplinesList || []).length, color: 'text-slate-600 bg-slate-100' },
   ];
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-[85vh] bg-slate-50 border border-slate-200 rounded-3xl overflow-hidden shadow-xl text-slate-900">
+    <div className="flex flex-col lg:flex-row min-h-[85vh] bg-slate-100 border border-slate-200 rounded-3xl overflow-hidden shadow-xl text-slate-900 font-sans">
       
       {/* ── SIDEBAR NAVIGATION ────────────────────────────────────────── */}
-      <aside className="w-full lg:w-72 bg-white border-b lg:border-b-0 lg:border-r border-slate-200/80 p-4 sm:p-5 flex flex-col justify-between shrink-0">
-        <div className="space-y-6">
+      <aside className="w-full lg:w-64 bg-white border-b lg:border-b-0 lg:border-r border-slate-200 p-4 sm:p-5 flex flex-col justify-between shrink-0">
+        <div className="space-y-5">
           
-          {/* CMS Brand / Control Header */}
-          <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+          {/* Brand Header */}
+          <div className="flex items-center justify-between pb-4 border-b border-slate-100">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-red-50 border border-red-200 rounded-2xl flex items-center justify-center text-red-600 shrink-0 shadow-inner">
+              <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-md shadow-blue-600/20">
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
-                <div className="flex items-center gap-1.5">
-                  <h2 className="text-sm font-black tracking-wider uppercase text-slate-900">CMS ADMIN</h2>
+                <h2 className="text-sm font-black tracking-tight text-slate-900 uppercase">Super Admin</h2>
+                <div className="flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span className="text-[11px] font-semibold text-slate-500">CMS Control</span>
                 </div>
-                <p className="text-[11px] text-slate-500 font-medium">Control Center</p>
               </div>
             </div>
 
             <button 
               onClick={loadAdminData}
-              title="Refresh all records"
-              className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all active:scale-95 border border-slate-200"
+              title="Refresh Data"
+              className="p-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl border border-slate-200 transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Mode Switcher: Queue vs Full Directory */}
-          <div className="bg-slate-100 p-1.5 rounded-2xl border border-slate-200 flex items-center gap-1">
+          {/* Mode Switcher */}
+          <div className="bg-slate-100 p-1 rounded-xl border border-slate-200 flex items-center gap-1">
             <button
               onClick={() => setViewMode('PENDING')}
-              className={`flex-1 py-2 text-center rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+              className={`flex-1 py-1.5 text-center rounded-lg text-xs font-bold transition-all ${
                 viewMode === 'PENDING'
-                  ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                  : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 shadow-sm'
+                  ? 'bg-white text-slate-900 shadow-sm border border-slate-200'
+                  : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              <Bell className="w-3.5 h-3.5" />
-              <span>PENDING QUEUE ({totalPendingCount})</span>
+              Needs Action ({totalPendingCount})
             </button>
-
             <button
               onClick={() => setViewMode('ALL_LIVE')}
-              className={`px-3 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 min-h-[40px] ${
+              className={`flex-1 py-1.5 text-center rounded-lg text-xs font-bold transition-all ${
                 viewMode === 'ALL_LIVE'
-                  ? 'bg-emerald-600 text-white shadow-lg border border-emerald-400'
-                  : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 shadow-sm'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-500 hover:text-slate-800'
               }`}
             >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>ALL LIVE RECORDS ({allRequests.length} Requests | {allNgos.length} NGOs)</span>
+              All Directory
             </button>
           </div>
+
+          {/* Navigation Menu */}
+          <nav className="space-y-1">
+            <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">CMS Modules</p>
+            {sidebarNavItems.map(item => {
+              const IconComp = item.icon;
+              const isActive = activeQueueTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveQueueTab(item.id)}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
+                    isActive 
+                      ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm' 
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <IconComp className={`w-4 h-4 ${isActive ? 'text-blue-600' : 'text-slate-400'}`} />
+                    <span>{item.label}</span>
+                  </div>
+                  {item.count !== null && item.count > 0 && (
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${item.color}`}>
+                      {item.count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
         </div>
 
-        {/* Supabase Cloud Connection Status Indicator */}
-        <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-xs">
-          {isSupabaseConfigured ? (
-            <div className="flex items-center gap-2 text-emerald-300 font-bold bg-emerald-950/80 border border-emerald-500/40 px-3 py-2 rounded-xl w-full">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping shrink-0"></span>
-              <span>Supabase Cloud Database: <strong className="text-emerald-300">CONNECTED & LIVE</strong> (Global real-time sync active across all IPs & devices)</span>
-            </div>
-          ) : (
-            <div className="flex items-center justify-between gap-2 text-amber-300 font-bold bg-amber-500/10 border border-amber-500/30 px-3 py-2 rounded-xl w-full">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0"></span>
-                <span>Offline Local Storage Mode: Supabase Database Not Connected.</span>
-              </div>
-            </div>
-          )}
+        {/* Connectivity Footer */}
+        <div className="pt-4 border-t border-slate-100">
+          <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-medium text-slate-600">
+            <span className={`w-2 h-2 rounded-full ${isSupabaseConfigured ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
+            <span>{isSupabaseConfigured ? 'Supabase Sync Active' : 'Local Storage Mode'}</span>
+          </div>
         </div>
       </aside>
 
-      {/* Notification Queue Tabs */}
-      <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap pb-2 border-b border-slate-200 text-xs font-black">
+      {/* ── MAIN WORKSPACE ────────────────────────────────────────────── */}
+      <main className="flex-1 flex flex-col min-w-0 bg-slate-50 p-4 sm:p-6 space-y-5 overflow-x-hidden">
         
-        {/* Tab 1: SOS Requests */}
-        <button
-          onClick={() => setActiveQueueTab('sos')}
-          className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
-            activeQueueTab === 'sos'
-              ? 'bg-red-600 text-white font-black shadow-lg border border-red-400'
-              : 'bg-white text-slate-600 hover:bg-slate-800 border border-slate-200'
-          }`}
-        >
-          <ShieldAlert className="w-4 h-4 text-red-300 shrink-0" />
-          <span>{viewMode === 'ALL_LIVE' ? 'All SOS Requests' : 'Pending SOS Requests'}</span>
-          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-            targetRequests.length > 0 ? (viewMode === 'PENDING' ? 'bg-white text-red-600 animate-pulse' : 'bg-red-950 text-red-300 border border-red-800') : 'bg-slate-800 text-slate-500'
-          }`}>
-            {targetRequests.length}
-          </span>
-        </button>
-
-        {/* Tab 2: Delivery Logs */}
-        <button
-          onClick={() => setActiveQueueTab('deliveries')}
-          className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
-            activeQueueTab === 'deliveries'
-              ? 'bg-amber-500 text-slate-950 font-black shadow-lg border border-amber-400'
-              : 'bg-white text-slate-600 hover:bg-slate-800 border border-slate-200'
-          }`}
-        >
-          <Package className="w-4 h-4 text-amber-400 shrink-0" />
-          <span>{viewMode === 'ALL_LIVE' ? 'All Delivery Logs' : 'Pending Delivery Logs'}</span>
-          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-            targetDeliveries.length > 0 ? 'bg-amber-400 text-slate-950 font-black' : 'bg-slate-800 text-slate-500'
-          }`}>
-            {targetDeliveries.length}
-          </span>
-        </button>
-
-        {/* Tab 3: NGOs */}
-        <button
-          onClick={() => setActiveQueueTab('ngos')}
-          className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
-            activeQueueTab === 'ngos'
-              ? 'bg-blue-600 text-white font-black shadow-lg border border-blue-400'
-              : 'bg-white text-slate-600 hover:bg-slate-800 border border-slate-200'
-          }`}
-        >
-          <HeartHandshake className="w-4 h-4 text-blue-400 shrink-0" />
-          <span>{viewMode === 'ALL_LIVE' ? 'Registered NGOs' : 'Pending NGOs'}</span>
-          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-            targetNgos.length > 0 ? 'bg-blue-400 text-slate-950 font-black' : 'bg-slate-800 text-slate-500'
-          }`}>
-            {targetNgos.length}
-          </span>
-        </button>
-
-        {/* Tab 4: Volunteers */}
-        <button
-          onClick={() => setActiveQueueTab('volunteers')}
-          className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
-            activeQueueTab === 'volunteers'
-              ? 'bg-purple-600 text-white font-black shadow-lg border border-purple-400'
-              : 'bg-white text-slate-600 hover:bg-slate-800 border border-slate-200'
-          }`}
-        >
-          <UserCheck className="w-4 h-4 text-purple-400 shrink-0" />
-          <span>{viewMode === 'ALL_LIVE' ? 'All Volunteers' : 'Pending Volunteers'}</span>
-          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-            targetVolunteers.length > 0 ? 'bg-purple-400 text-slate-950 font-black' : 'bg-slate-800 text-slate-500'
-          }`}>
-            {targetVolunteers.length}
-          </span>
-        </button>
-
-        {/* Tab 5: Account Recovery Requests */}
-        <button
-          onClick={() => setActiveQueueTab('recovery')}
-          className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
-            activeQueueTab === 'recovery'
-              ? 'bg-cyan-600 text-slate-900 font-black shadow-lg border border-cyan-400'
-              : 'bg-white text-slate-600 hover:bg-slate-800 border border-slate-200'
-          }`}
-        >
-          <Key className="w-4 h-4 text-cyan-400 shrink-0" />
-          <span>Account Recovery</span>
-          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-            pendingRecoveryCount > 0 ? 'bg-cyan-400 text-slate-950 animate-pulse' : 'bg-slate-800 text-slate-500'
-          }`}>
-            {pendingRecoveryCount}
-          </span>
-        </button>
-
-        {/* Tab 6: User Directory with Pagination */}
-        <button
-          onClick={() => setActiveQueueTab('users')}
-          className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
-            activeQueueTab === 'users'
-              ? 'bg-emerald-600 text-white font-black shadow-lg border border-emerald-400'
-              : 'bg-white text-slate-600 hover:bg-slate-800 border border-slate-200'
-          }`}
-        >
-          <Users className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>User Directory</span>
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-            {allUsers.length}
-          </span>
-        </button>
-
-        {/* Tab 7: Control Room Helplines Management */}
-        <button
-          onClick={() => setActiveQueueTab('helplines')}
-          className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
-            activeQueueTab === 'helplines'
-              ? 'bg-red-600 text-white font-black shadow-lg border border-red-400'
-              : 'bg-white text-slate-600 hover:bg-slate-800 border border-slate-200'
-          }`}
-        >
-          <Phone className="w-4 h-4 text-red-400 shrink-0" />
-          <span>Govt Helplines</span>
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-red-500/20 text-red-300 border border-red-500/40">
-            {helplinesList.length}
-          </span>
-        </button>
-
-        {/* Tab 8: Campaigns */}
-        <button
-          onClick={() => setActiveQueueTab('campaigns')}
-          className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
-            activeQueueTab === 'campaigns'
-              ? 'bg-amber-600 text-white font-black shadow-lg border border-amber-500'
-              : 'bg-white text-slate-600 hover:bg-slate-800 border border-slate-200'
-          }`}
-        >
-          <Megaphone className="w-4 h-4 text-amber-300 shrink-0" />
-          <span>Campaigns</span>
-        </button>
-
-      </div>
-
-      {/* Global Filters */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200">
-        <div className="flex items-center gap-2 w-full sm:w-auto flex-1">
-          <Search className="w-4 h-4 text-slate-500 shrink-0" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search name, ID, phone, district..."
-            className="bg-transparent border-none text-xs text-slate-900 placeholder-slate-500 focus:outline-none w-full min-h-[36px]"
-          />
-        </div>
-        
-        <div className="flex gap-2 w-full sm:w-auto">
-          <select
-            value={selectedDistrict}
-            onChange={(e) => setSelectedDistrict(e.target.value)}
-            className="bg-slate-50 border border-slate-200 text-xs text-slate-200 rounded-lg px-3 py-2 focus:outline-none w-full sm:w-auto min-h-[36px]"
-          >
-            <option value="ALL">All Districts</option>
-            {ASSAM_DISTRICTS.map(d => (
-              <option key={d} value={d}>{d}</option>
-            ))}
-          </select>
-
-          <button
-            onClick={() => {
-              window.location.reload();
-            }}
-            className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-purple-400 rounded-lg border border-slate-300 transition-colors flex items-center justify-center min-h-[36px]"
-            title="Refresh Data"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-
-      {/* QUEUE 1: PENDING SOS REQUESTS */}
-      {activeQueueTab === 'sos' && (
-        <div className="space-y-4">
-
-          {filteredSos.length === 0 ? (
-            <div className="bg-white/60 border border-slate-200 rounded-2xl p-8 text-center space-y-2">
-              <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-bold text-slate-900">
-                {viewMode === 'ALL_LIVE' ? 'No SOS Requests Match Search' : 'No Pending SOS Requests'}
-              </h3>
-              <p className="text-xs text-slate-500">
-                {viewMode === 'ALL_LIVE' 
-                  ? 'Try adjusting district or search query filters.' 
-                  : 'All incoming distress signals have been verified & published live.'}
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredSos.map(req => (
-                <div key={req.id} className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 shadow-xl space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="px-2 py-0.5 text-[10px] font-black bg-red-600/30 text-red-300 border border-red-500/40 rounded-md">
-                          {req.isUrgentRescue ? 'BOAT RESCUE' : 'RELIEF SUPPLY'}
-                        </span>
-                        {req.verified ? (
-                          <span className="px-2 py-0.5 text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-md">
-                            PUBLISHED LIVE
-                          </span>
-                        ) : (
-                          <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md animate-pulse">
-                            PENDING VERIFICATION
-                          </span>
-                        )}
-                        <span className="text-xs font-mono text-slate-500">{req.id}</span>
-                      </div>
-                      <h3 className="text-base font-black text-slate-900 mt-1">{req.name}</h3>
-                      <p className="text-xs text-amber-300 font-bold">{req.district}: {req.locationName || req.villageName}</p>
-                    </div>
-                  </div>
-
-
-                  <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
-                    <p className="text-slate-600"><strong className="text-slate-900">Affected:</strong> {req.familiesCount > 0 ? `${req.familiesCount} Families` : `${req.peopleCount || 1} People`}</p>
-                    <p className="text-slate-600"><strong className="text-slate-900">Phone:</strong> {req.phone}</p>
-                    {req.details && <ExpandableNotes text={req.details} dark={true} className="mt-1" />}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="grid grid-cols-2 gap-2 pt-1">
-                    <a
-                      href={getWhatsAppVerifyUrl(req.phone, req.name, req.id, "SOS")}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-slate-900 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
-                    >
-                      <MessageSquare className="w-3.5 h-3.5" />
-                      <span>WhatsApp Geotag</span>
-                    </a>
-
-                    <a
-                      href={`tel:${(req.phone || '').replace(/[^0-9]/g, '')}`}
-                      className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-xl text-xs font-black flex items-center justify-center gap-1 border border-slate-300 min-h-[44px]"
-                    >
-                      <Phone className="w-3.5 h-3.5" />
-                      <span>Call Victim</span>
-                    </a>
-                    {!req.verified && (
-                      <button
-                        onClick={() => handleApproveSos(req.id)}
-                        className="col-span-2 py-2.5 px-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 shadow-md min-h-[44px]"
-                      >
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>✓ APPROVE & PUBLISH LIVE</span>
-                      </button>
-                    )}
-                    
-                    <button
-                      onClick={() => handleEditSos(req)}
-                      className="py-2 px-3 bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 min-h-[38px]"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" />
-                      <span>Edit</span>
-                    </button>
-
-                    <button
-                      onClick={() => handleRejectSos(req.id)}
-                      className="py-2 px-3 bg-red-950 hover:bg-red-900 text-red-300 border border-red-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 min-h-[38px]"
-                    >
-                      <XCircle className="w-3.5 h-3.5" />
-                      <span>{req.verified ? "Delete" : "Reject"}</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* QUEUE 2: DELIVERY LOGS */}
-      {activeQueueTab === 'deliveries' && (
-        <div className="space-y-4">
-          {filteredDeliveries.length === 0 ? (
-            <div className="bg-white/60 border border-slate-200 rounded-2xl p-8 text-center space-y-2">
-              <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-bold text-slate-900">
-                {viewMode === 'ALL_LIVE' ? 'No Delivery Logs Match Search' : 'No Pending Delivery Logs'}
-              </h3>
-              <p className="text-xs text-slate-500">
-                {viewMode === 'ALL_LIVE' ? 'Try adjusting your search terms.' : 'All relief dispatches have been audited and verified.'}
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredDeliveries.map(log => (
-                <div key={log.logId} className="bg-white border border-amber-500/40 rounded-2xl p-4 shadow-xl space-y-3">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md">
-                          DISPATCH LOG #{log.logId}
-                        </span>
-                        {log.verified ? (
-                          <span className="px-2 py-0.5 text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-md">
-                            VERIFIED DISPATCH
-                          </span>
-                        ) : (
-                          <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md animate-pulse">
-                            PENDING AUDIT
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="text-base font-black text-slate-900 mt-1">Delivered by: {log.deliveredBy}</h3>
-                      <p className="text-xs text-slate-600">Items: <strong className="text-amber-300">{log.itemsDelivered}</strong></p>
-                    </div>
-                  </div>
-
-                  <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
-                    <p className="text-slate-600"><strong className="text-slate-900">Volunteer Phone:</strong> {log.volunteerPhone}</p>
-                    {log.peopleImpacted && <p className="text-slate-600"><strong className="text-slate-900">People Impacted:</strong> {log.peopleImpacted}</p>}
-                    {log.deliveryNotes && <ExpandableNotes text={log.deliveryNotes} dark={true} className="mt-1" />}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <a
-                      href={getWhatsAppVerifyUrl(log.volunteerPhone, log.deliveredBy, log.requestId || log.logId, "DELIVERY")}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="py-2.5 px-3 bg-emerald-600 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
-                    >
-                      <MessageSquare className="w-3.5 h-3.5" />
-                      <span>Request Photo Proof</span>
-                    </a>
-
-                    {!log.verified ? (
-                      <button
-                        onClick={() => handleApproveDelivery(log.logId)}
-                        className="py-2.5 px-3 bg-emerald-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 shadow-md min-h-[44px]"
-                      >
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>Approve Log</span>
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleRejectDelivery(log.logId)}
-                        className="py-2.5 px-3 bg-red-950 text-red-300 border border-red-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 min-h-[44px]"
-                      >
-                        <XCircle className="w-4 h-4" />
-                        <span>Remove Log</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* QUEUE 3: NGOS DIRECTORY */}
-      {activeQueueTab === 'ngos' && (
-        <div className="space-y-4">
-          {filteredNgos.length === 0 ? (
-            <div className="bg-white/60 border border-slate-200 rounded-2xl p-8 text-center space-y-2">
-              <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-bold text-slate-900">
-                {viewMode === 'ALL_LIVE' ? 'No Registered NGOs Match Search' : 'No Pending NGO Registrations'}
-              </h3>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredNgos.map(ngo => (
-                <div key={ngo.id} className="bg-white border border-blue-500/40 rounded-2xl p-4 shadow-xl space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        {ngo.verified ? (
-                          <span className="px-2 py-0.5 text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-md">
-                            VERIFIED NGO
-                          </span>
-                        ) : (
-                          <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md animate-pulse">
-                            PENDING VERIFICATION
-                          </span>
-                        )}
-                        <span className="text-xs font-mono text-slate-500">{ngo.id}</span>
-                      </div>
-                      <h3 className="text-base font-black text-slate-900 mt-1">{ngo.name}</h3>
-                      <p className="text-xs text-slate-600">Contact: <strong>{ngo.contactPerson || 'Official NGO'}</strong> ({ngo.phone})</p>
-                      {ngo.email && <p className="text-xs text-amber-300 font-mono mt-0.5">{ngo.email}</p>}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    {!ngo.verified ? (
-                      <button
-                        onClick={() => handleApproveNgo(ngo.id)}
-                        className="py-2.5 px-3 bg-emerald-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 min-h-[44px]"
-                      >
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>Approve NGO</span>
-                      </button>
-                    ) : (
-                      <a
-                        href={`tel:${(ngo.phone || '').replace(/[^0-9]/g, '')}`}
-                        className="py-2.5 px-3 bg-slate-800 text-emerald-300 border border-slate-300 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
-                      >
-                        <Phone className="w-3.5 h-3.5" />
-                        <span>Call NGO</span>
-                      </a>
-                    )}
-
-                    <button
-                      onClick={() => handleRejectNgo(ngo.id)}
-                      className="py-2.5 px-3 bg-red-950 text-red-300 border border-red-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 min-h-[44px]"
-                    >
-                      <XCircle className="w-4 h-4" />
-                      <span>{ngo.verified ? "Revoke / Delete" : "Reject"}</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* QUEUE 4: VOLUNTEERS DIRECTORY */}
-      {activeQueueTab === 'volunteers' && (
-        <div className="space-y-4">
-          {filteredVolunteers.length === 0 ? (
-            <div className="bg-white/60 border border-slate-200 rounded-2xl p-8 text-center space-y-2">
-              <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-bold text-slate-900">
-                {viewMode === 'ALL_LIVE' ? 'No Volunteer Profiles Match Search' : 'No Pending Volunteer Profiles'}
-              </h3>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredVolunteers.map(vol => (
-                <div key={vol.id} className="bg-white border border-purple-500/40 rounded-2xl p-4 shadow-xl space-y-3">
-                  <div>
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      {vol.verified ? (
-                        <span className="px-2 py-0.5 text-[10px] font-black bg-purple-500/20 text-purple-300 border border-purple-500/40 rounded-md">
-                          ACTIVE VOLUNTEER
-                        </span>
-                      ) : (
-                        <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md animate-pulse">
-                          PENDING VERIFICATION
-                        </span>
-                      )}
-                      <span className="text-xs font-mono text-slate-500">{vol.id}</span>
-                    </div>
-                    <h3 className="text-base font-black text-slate-900 mt-1">{vol.name}</h3>
-                    <p className="text-xs text-purple-300 font-bold">{vol.roleType} - {vol.phone}</p>
-                    {vol.offerings && <p className="text-xs text-slate-600 mt-1">"{vol.offerings}"</p>}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    {!vol.verified ? (
-                      <button
-                        onClick={() => handleApproveVol(vol.id)}
-                        className="py-2.5 px-3 bg-emerald-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 min-h-[44px]"
-                      >
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>Approve Volunteer</span>
-                      </button>
-                    ) : (
-                      <a
-                        href={`tel:${(vol.phone || '').replace(/[^0-9]/g, '')}`}
-                        className="py-2.5 px-3 bg-slate-800 text-purple-300 border border-slate-300 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
-                      >
-                        <Phone className="w-3.5 h-3.5" />
-                        <span>Call Volunteer</span>
-                      </a>
-                    )}
-
-                    <button
-                      onClick={() => handleRejectVol(vol.id)}
-                      className="py-2.5 px-3 bg-red-950 text-red-300 border border-red-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 min-h-[44px]"
-                    >
-                      <XCircle className="w-4 h-4" />
-                      <span>{vol.verified ? "Remove Volunteer" : "Reject"}</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* QUEUE 5: ACCOUNT RECOVERY REQUESTS */}
-      {activeQueueTab === 'recovery' && (
-        <div className="space-y-4">
-          {/* Header & Info */}
-          <div className="flex items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200">
+        {/* Top Header Bar */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
             <div className="flex items-center gap-2">
-              <Key className="w-4 h-4 text-cyan-400 shrink-0" />
-              <span className="text-xs font-bold text-slate-200">Account Recovery Queue ({pendingRecovery.length} Total)</span>
+              <h1 className="text-lg font-black text-slate-900 capitalize">{activeQueueTab.replace('_', ' ')} Management</h1>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold uppercase tracking-wider">
+                <Sparkles className="w-3 h-3 text-blue-500" />
+                Live Control
+              </span>
             </div>
+            <p className="text-xs text-slate-500 mt-0.5">Manage, filter, verify, and publish relief data across districts.</p>
           </div>
 
-          {pendingRecovery.length === 0 ? (
-            <div className="bg-white/60 border border-slate-200 rounded-2xl p-8 text-center space-y-2">
-              <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-bold text-slate-900">No Account Recovery Requests</h3>
-              <p className="text-xs text-slate-500">All forgot password & forgot email requests have been processed.</p>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="relative flex-1 sm:w-64">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setSosCurrentPage(1); setNgoCurrentPage(1); setVolCurrentPage(1); }}
+                placeholder="Search name, phone, district..."
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500"
+              />
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {pendingRecovery
-                .filter(req => {
-                  if (!searchQuery) return true;
-                  const q = searchQuery.toLowerCase();
-                  return (
-                    (req.name && req.name.toLowerCase().includes(q)) ||
-                    (req.email && req.email.toLowerCase().includes(q)) ||
-                    (req.phone && req.phone.includes(q)) ||
-                    (req.id && req.id.toLowerCase().includes(q))
-                  );
-                })
-                .map(req => {
-                  const matchedAccount = storageService.findMatchingAccount(req.accountRole, req.email || req.phone || req.name);
-                  const isPasswordReq = req.requestType === 'FORGOT_PASSWORD';
 
-                  return (
-                    <div key={req.id} className={`bg-white border rounded-2xl p-4 shadow-xl space-y-3 ${req.status === 'RESOLVED' ? 'border-emerald-500/30 opacity-75' : isPasswordReq ? 'border-amber-500/40' : 'border-cyan-500/40'}`}>
-                      
-                      {/* Request Header Badges */}
-                      <div className="flex items-center justify-between gap-2">
+            <select
+              value={selectedDistrict}
+              onChange={(e) => { setSelectedDistrict(e.target.value); setSosCurrentPage(1); setNgoCurrentPage(1); setVolCurrentPage(1); }}
+              className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:border-blue-500"
+            >
+              <option value="ALL">All Districts ({ASSAM_DISTRICTS.length})</option>
+              {ASSAM_DISTRICTS.map(d => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* ══ MODULE 1: SOS REQUESTS ════════════════════════════════════ */}
+        {activeQueueTab === 'sos' && (
+          <div className="space-y-4">
+            
+            {/* SECTION CHIPS FILTER BAR */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+              <span className="text-xs font-bold text-slate-400 shrink-0 uppercase tracking-wider flex items-center gap-1">
+                <Filter className="w-3.5 h-3.5" /> Filter:
+              </span>
+
+              {[
+                { id: 'ALL', label: `All SOS (${targetRequests.length})` },
+                { id: 'PENDING', label: `⚠️ Pending Approval (${targetRequests.filter(r => !r.verified).length})` },
+                { id: 'BOAT', label: `🚤 Boat Rescue (${targetRequests.filter(r => r.isUrgentRescue).length})` },
+                { id: 'SUPPLY', label: `📦 Relief Supply (${targetRequests.filter(r => !r.isUrgentRescue).length})` },
+                { id: 'PUBLISHED', label: `✓ Published Live (${targetRequests.filter(r => r.verified).length})` },
+              ].map(chip => (
+                <button
+                  key={chip.id}
+                  onClick={() => { setSosChipFilter(chip.id); setSosCurrentPage(1); }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    sosChipFilter === chip.id
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
+
+            {/* SOS CARDS GRID */}
+            {filteredSos.length === 0 ? (
+              <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center space-y-2">
+                <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
+                <h3 className="text-base font-bold text-slate-900">No SOS Requests Found</h3>
+                <p className="text-xs text-slate-500">No requests match the selected chip or district filter.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {paginatedSos.map(req => (
+                    <div key={req.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all space-y-3">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className={`px-2.5 py-0.5 text-[10px] font-black rounded-md border ${
-                            isPasswordReq ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+                          <span className={`px-2.5 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider ${
+                            req.isUrgentRescue ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-blue-50 text-blue-700 border border-blue-200'
                           }`}>
-                            {isPasswordReq ? 'FORGOT PASSWORD' : 'FORGOT EMAIL'}
+                            {req.isUrgentRescue ? '🚤 Boat Rescue' : '📦 Supply Request'}
                           </span>
-                          <span className="px-2 py-0.5 text-[10px] font-bold bg-slate-800 text-slate-600 rounded-md border border-slate-300">
-                            {req.accountRole}
-                          </span>
-                          <span className="text-[11px] font-mono text-slate-500">{req.id}</span>
-                        </div>
 
-                        <span className={`px-2 py-0.5 text-[10px] font-black rounded-full ${
-                          req.status === 'RESOLVED' ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/30' : 'bg-amber-950 text-amber-300 border border-amber-500/30'
-                        }`}>
-                          {req.status}
-                        </span>
+                          <span className={`px-2.5 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider ${
+                            req.verified ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200 animate-pulse'
+                          }`}>
+                            {req.verified ? '✓ Live' : '⏳ Pending'}
+                          </span>
+                        </div>
+                        <span className="text-[11px] font-mono text-slate-400">ID: {req.id}</span>
                       </div>
 
-                      {/* Request Details */}
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1.5">
-                        <div className="flex items-center justify-between">
-                          <span className="text-slate-500 font-medium">Submitted Name:</span>
-                          <span className="text-slate-900 font-bold">{req.name || 'Not provided'}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-slate-500 font-medium">Contact Phone:</span>
-                          <span className="text-amber-300 font-mono font-bold">{req.phone || 'N/A'}</span>
-                        </div>
-                        {req.email && (
-                          <div className="flex items-center justify-between">
-                            <span className="text-slate-500 font-medium">Entered Email:</span>
-                            <span className="text-cyan-300 font-mono font-bold">{req.email}</span>
-                          </div>
-                        )}
-                        {req.details && (
-                          <div className="pt-1 border-t border-slate-200">
-                            <ExpandableNotes text={req.details} dark={true} label="User Verification Note:" />
-                          </div>
-                        )}
-                        <div className="text-[10px] text-slate-500 pt-1">
-                          Requested: {new Date(req.createdAt).toLocaleString()}
-                        </div>
+                      <div>
+                        <h3 className="text-base font-black text-slate-900 leading-tight">{req.name}</h3>
+                        <p className="text-xs font-semibold text-blue-600 mt-0.5 flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5 shrink-0" />
+                          <span>{req.district}: {req.locationName || req.villageName}</span>
+                        </p>
                       </div>
 
-                      {/* Matching System Account Lookup Result */}
-                      {matchedAccount ? (
-                        <div className="p-3 bg-cyan-950/40 border border-cyan-500/30 rounded-xl space-y-2">
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-cyan-300 font-black flex items-center gap-1">
-                              <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-                              <span>System Record Matched!</span>
-                            </span>
-                            <span className="text-[10px] font-bold text-slate-500">
-                              {matchedAccount.verified ? 'Verified' : 'Unverified'}
-                            </span>
-                          </div>
-                          <div className="text-xs space-y-1 text-slate-200 bg-slate-50 p-2 rounded-lg font-mono">
-                            <p><strong>Registered Email:</strong> <span className="text-cyan-300">{matchedAccount.email}</span></p>
-                            <p><strong>Password:</strong> <span className="text-amber-300">{matchedAccount.password || 'Standard Pass'}</span></p>
-                            <p><strong>Registered Name:</strong> {matchedAccount.name}</p>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              navigator.clipboard.writeText(`Email: ${matchedAccount.email} | Password: ${matchedAccount.password || 'Standard Password'}`);
-                              alert("Copied user credentials to clipboard!");
-                            }}
-                            className="w-full py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold rounded-lg transition-colors border border-slate-300 flex items-center justify-center gap-1"
-                          >
-                            <span>Copy Credentials</span>
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="p-2.5 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-center text-xs text-slate-500">
-                          No exact matching registered record found automatically. Use phone/email to verify with user.
-                        </div>
-                      )}
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
+                        <p className="text-slate-700"><strong className="text-slate-900">Impacted:</strong> {req.familiesCount > 0 ? `${req.familiesCount} Families` : `${req.peopleCount || 1} People`}</p>
+                        <p className="text-slate-700"><strong className="text-slate-900">Phone:</strong> {req.phone}</p>
+                        {req.details && <ExpandableNotes text={req.details} dark={false} className="mt-1" />}
+                      </div>
 
-                      {/* Admin Actions */}
-                      <div className="grid grid-cols-2 gap-2 pt-1">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
                         <a
-                          href={getWhatsAppRecoveryUrl(req.phone, req.name, req.requestType, req.accountRole, matchedAccount)}
+                          href={getWhatsAppVerifyUrl(req.phone, req.name, req.id, "SOS")}
                           target="_blank"
-                          rel="noopener noreferrer"
-                          className="py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-slate-900 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
+                          rel="noreferrer"
+                          className="px-2.5 py-2 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-colors"
                         >
                           <MessageSquare className="w-3.5 h-3.5" />
-                          <span>WhatsApp Details</span>
+                          <span>WhatsApp</span>
                         </a>
 
-                        {req.status === 'PENDING' ? (
+                        <a
+                          href={`tel:${(req.phone || '').replace(/[^0-9]/g, '')}`}
+                          className="px-2.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-colors"
+                        >
+                          <Phone className="w-3.5 h-3.5" />
+                          <span>Call</span>
+                        </a>
+
+                        <button
+                          onClick={() => handleEditSos(req)}
+                          className="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-colors"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                          <span>Edit</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleRejectSos(req.id)}
+                          className="px-2.5 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-colors"
+                        >
+                          <XCircle className="w-3.5 h-3.5" />
+                          <span>Delete</span>
+                        </button>
+
+                        {!req.verified && (
                           <button
-                            onClick={() => handleResolveRecovery(req.id)}
-                            className="py-2.5 px-3 bg-cyan-600 hover:bg-cyan-500 text-slate-900 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
+                            onClick={() => handleApproveSos(req.id)}
+                            className="col-span-2 sm:col-span-4 py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1 shadow-sm transition-colors"
                           >
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            <span>Mark Resolved</span>
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleDeleteRecovery(req.id)}
-                            className="py-2.5 px-3 bg-slate-800 hover:bg-red-950 text-slate-500 hover:text-red-300 rounded-xl text-xs font-bold flex items-center justify-center gap-1 border border-slate-300 min-h-[44px]"
-                          >
-                            <XCircle className="w-3.5 h-3.5" />
-                            <span>Delete</span>
+                            <CheckCircle2 className="w-4 h-4" />
+                            <span>Approve & Publish Live</span>
                           </button>
                         )}
                       </div>
-
                     </div>
-                  );
-                })}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* QUEUE 6: USER DIRECTORY WITH PAGINATION */}
-      {activeQueueTab === 'users' && (
-        <div className="space-y-4">
-          
-          {/* Header & Controls Bar */}
-          <div className="bg-white p-4 rounded-2xl border border-emerald-500/40 space-y-3 shadow-xl">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-emerald-400 shrink-0" />
-                <div>
-                  <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">ALL REGISTERED USER ACCOUNTS</h3>
-                  <p className="text-[11px] text-slate-500">Total {filteredUsers.length} users matching filters (Page {safeUserCurrentPage} of {totalUserPages})</p>
-                </div>
-              </div>
-
-              {/* Filters for User Table */}
-              <div className="flex flex-wrap items-center gap-2">
-                {/* Role Filter */}
-                <select
-                  value={userRoleFilter}
-                  onChange={(e) => { setUserRoleFilter(e.target.value); setUserCurrentPage(1); }}
-                  className="bg-slate-50 border border-slate-200 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none min-h-[38px]"
-                >
-                  <option value="ALL">All Roles ({allUsers.length})</option>
-                  <option value="NGO">NGOs ({allUsers.filter(u=>u.userType==='NGO').length})</option>
-                  <option value="VOLUNTEER">Volunteers ({allUsers.filter(u=>u.userType==='VOLUNTEER').length})</option>
-                </select>
-
-                {/* Status Filter */}
-                <select
-                  value={userStatusFilter}
-                  onChange={(e) => { setUserStatusFilter(e.target.value); setUserCurrentPage(1); }}
-                  className="bg-slate-50 border border-slate-200 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none min-h-[38px]"
-                >
-                  <option value="ALL">All Statuses</option>
-                  <option value="VERIFIED">Verified Only</option>
-                  <option value="PENDING">Pending Only</option>
-                </select>
-
-                {/* Items Per Page Selector */}
-                <div className="flex items-center gap-1 text-xs text-slate-500 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200">
-                  <span className="font-semibold">Show:</span>
-                  <select
-                    value={userItemsPerPage}
-                    onChange={(e) => { setUserItemsPerPage(Number(e.target.value)); setUserCurrentPage(1); }}
-                    className="bg-transparent text-emerald-300 font-bold focus:outline-none cursor-pointer"
-                  >
-                    <option value={5} className="bg-white text-white">5 per page</option>
-                    <option value={10} className="bg-white text-white">10 per page</option>
-                    <option value={20} className="bg-white text-white">20 per page</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* User Cards / List */}
-          {filteredUsers.length === 0 ? (
-            <div className="bg-white/60 border border-slate-200 rounded-2xl p-8 text-center space-y-2">
-              <Users className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-bold text-slate-900">No Registered Users Found</h3>
-              <p className="text-xs text-slate-500">No user accounts match your current filters or search term.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {paginatedUsers.map(usr => (
-                <div key={usr.id} className="bg-white border border-slate-200 hover:border-emerald-500/50 rounded-2xl p-4 shadow-xl space-y-3 transition-all">
-                  
-                  {/* Top Badge & Type */}
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <div className={`p-2 rounded-xl shrink-0 ${usr.userType === 'NGO' ? 'bg-blue-600/20 text-blue-400 border border-blue-500/40' : 'bg-purple-600/20 text-purple-400 border border-purple-500/40'}`}>
-                        <User className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className={`px-2 py-0.5 text-[10px] font-black rounded-md ${usr.userType === 'NGO' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40' : 'bg-purple-500/20 text-purple-300 border border-purple-500/40'}`}>
-                            {usr.userType}
-                          </span>
-                          {usr.verified ? (
-                            <span className="px-2 py-0.5 text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-md">
-                              VERIFIED
-                            </span>
-                          ) : (
-                            <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md animate-pulse">
-                              PENDING VERIFICATION
-                            </span>
-                          )}
-                        </div>
-                        <h4 className="text-base font-black text-slate-900 mt-1">{usr.name}</h4>
-                        <p className="text-xs font-mono text-slate-500">ID: {usr.id}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Account Details Box */}
-                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1.5">
-                    <div className="flex items-center justify-between text-slate-600">
-                      <span className="font-semibold text-slate-500">Email Address:</span>
-                      <span className="font-mono text-emerald-300 font-bold">{usr.email}</span>
-                    </div>
-
-                    {/* Password Credential Row (Viewable by Admin with Toggle) */}
-                    <div className="flex items-center justify-between text-slate-600 pt-1 border-t border-slate-900">
-                      <span className="font-semibold text-slate-500 flex items-center gap-1">
-                        <Lock className="w-3 h-3 text-amber-400" /> Password Credential:
-                      </span>
-                      <div className="flex items-center gap-1.5">
-                        <span className={`px-2 py-0.5 rounded font-mono text-[11px] font-bold border transition-all ${
-                          visiblePasswords[usr.id] 
-                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' 
-                            : 'bg-white text-slate-500 border-slate-200 tracking-widest'
-                        }`}>
-                          {visiblePasswords[usr.id] ? (usr.password || '••••••••') : '••••••••'}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => togglePasswordVisibility(usr.id)}
-                          className="p-1 text-slate-500 hover:text-amber-300 hover:bg-white rounded transition-colors"
-                          title={visiblePasswords[usr.id] ? "Hide Password" : "View Password"}
-                        >
-                          {visiblePasswords[usr.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5 text-amber-400" />}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between text-slate-600 pt-1 border-t border-slate-900">
-                      <span className="font-semibold text-slate-500">Phone Contact:</span>
-                      <span className="font-semibold text-slate-900">{usr.phone}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between text-slate-600 pt-1 border-t border-slate-900">
-                      <span className="font-semibold text-slate-500">District Zone:</span>
-                      <span className="font-semibold text-amber-300">{usr.district}</span>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="grid grid-cols-2 gap-2 pt-1">
-                    {!usr.verified ? (
-                      <button
-                        onClick={() => {
-                          if (usr.userType === 'NGO') handleApproveNgo(usr.id);
-                          else handleApproveVol(usr.id);
-                        }}
-                        className="py-2.5 px-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-1 min-h-[42px]"
-                      >
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>Approve Account</span>
-                      </button>
-                    ) : (
-                      <a
-                        href={`tel:${(usr.phone || '').replace(/[^0-9]/g, '')}`}
-                        className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-300 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[42px]"
-                      >
-                        <Phone className="w-3.5 h-3.5" />
-                        <span>Call User</span>
-                      </a>
-                    )}
-
-                    <button
-                      onClick={() => {
-                        if (usr.userType === 'NGO') handleRejectNgo(usr.id);
-                        else handleRejectVol(usr.id);
-                      }}
-                      className="py-2.5 px-3 bg-red-950 hover:bg-red-900 text-red-300 border border-red-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 min-h-[42px]"
-                    >
-                      <XCircle className="w-4 h-4" />
-                      <span>{usr.verified ? "Delete Account" : "Reject"}</span>
-                    </button>
-                  </div>
-
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Pagination Controls Bar */}
-          {filteredUsers.length > 0 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 text-xs font-bold">
-              <div className="text-slate-500">
-                Showing <strong className="text-slate-900">{userStartIndex + 1}</strong> to <strong className="text-slate-900">{Math.min(userStartIndex + userItemsPerPage, filteredUsers.length)}</strong> of <strong className="text-emerald-400">{filteredUsers.length}</strong> registered users
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  disabled={safeUserCurrentPage <= 1}
-                  onClick={() => setUserCurrentPage(prev => Math.max(1, prev - 1))}
-                  className="px-3 py-2 bg-slate-50 hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-slate-50 text-slate-900 border border-slate-200 rounded-xl flex items-center gap-1 transition-all min-h-[38px]"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  <span>Previous</span>
-                </button>
-
-                {/* Page Number Buttons */}
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: totalUserPages }, (_, i) => i + 1).map(page => (
-                    <button
-                      key={page}
-                      onClick={() => setUserCurrentPage(page)}
-                      className={`w-9 h-9 rounded-xl font-mono text-xs flex items-center justify-center transition-all ${
-                        safeUserCurrentPage === page
-                          ? 'bg-emerald-500 text-slate-950 font-black shadow-lg border border-emerald-400 scale-105'
-                          : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 shadow-sm'
-                      }`}
-                    >
-                      {page}
-                    </button>
                   ))}
                 </div>
 
-                <button
-                  disabled={safeUserCurrentPage >= totalUserPages}
-                  onClick={() => setUserCurrentPage(prev => Math.min(totalUserPages, prev + 1))}
-                  className="px-3 py-2 bg-slate-50 hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-slate-50 text-slate-900 border border-slate-200 rounded-xl flex items-center gap-1 transition-all min-h-[38px]"
-                >
-                  <span>Next</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
-
-        </div>
-      )}
-
-      {/* Tab Panel 7: Control Room Helplines Management */}
-      {activeQueueTab === 'helplines' && (
-        <div className="space-y-6">
-          
-          {/* Section Header */}
-          <div className="bg-white border border-slate-200 p-5 rounded-2xl space-y-2">
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <div className="flex items-center gap-2">
-                <Phone className="w-5 h-5 text-red-400" />
-                <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">
-                  Control Room &amp; Helpline Management
-                </h3>
-              </div>
-              <span className="text-xs font-mono bg-red-950 text-red-300 border border-red-800 px-3 py-1 rounded-full font-bold">
-                {helplinesList.length} Active Helplines
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              Add, update, or remove official emergency control room numbers. Changes sync live to all public user screens across Assam.
-            </p>
-          </div>
-
-          {/* Add New Helpline Form */}
-          <form onSubmit={handleAddHelpline} className="bg-white border border-slate-200 p-4 sm:p-5 rounded-2xl space-y-4">
-            <h4 className="text-sm font-black text-slate-900 uppercase tracking-wide flex items-center gap-2">
-              <Bell className="w-4 h-4 text-red-400" />
-              Add New Control Room / Helpline Number
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1">
-                  Control Room / District Label *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Sivasagar Control Room"
-                  value={newHelplineLabel}
-                  onChange={e => setNewHelplineLabel(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-slate-900 text-xs placeholder-slate-500 focus:outline-none focus:border-red-500 font-medium"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1">
-                  Phone / Helpline Number *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. 8471864355 or 1077"
-                  value={newHelplinePhone}
-                  onChange={e => setNewHelplinePhone(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-slate-900 text-xs placeholder-slate-500 focus:outline-none focus:border-red-500 font-mono font-medium"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1">
-                  Sort Order Position
-                </label>
-                <input
-                  type="number"
-                  placeholder={`Default (${helplinesList.length + 1})`}
-                  value={newHelplineOrder}
-                  onChange={e => setNewHelplineOrder(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-slate-900 text-xs placeholder-slate-500 focus:outline-none focus:border-red-500 font-mono"
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                className="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-slate-900 font-black rounded-xl text-xs flex items-center gap-2 shadow-lg transition-all min-h-[40px]"
-              >
-                <Phone className="w-4 h-4" />
-                <span>Add Helpline Number</span>
-              </button>
-            </div>
-          </form>
-
-          {/* List of Helplines */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider">
-              Current Live Helplines List
-            </h4>
-
-            {helplinesList.length === 0 ? (
-              <div className="bg-white border border-slate-200 p-8 rounded-2xl text-center space-y-2">
-                <Phone className="w-8 h-8 text-slate-600 mx-auto" />
-                <p className="text-sm font-bold text-slate-500">No Helpline Numbers Configured</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {helplinesList.map(item => {
-                  const isEditing = editingHelplineId === item.id;
-
-                  return (
-                    <div
-                      key={item.id}
-                      className="bg-white border border-slate-200 p-4 rounded-2xl flex flex-col justify-between gap-3"
+                {/* PAGINATION CONTROL BAR */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                  <span className="font-bold text-slate-700">
+                    Page {safeSosPage} of {totalSosPages} ({filteredSos.length} Total Requests)
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      disabled={safeSosPage <= 1}
+                      onClick={() => setSosCurrentPage(prev => Math.max(1, prev - 1))}
+                      className="px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 transition-colors"
                     >
-                      {isEditing ? (
-                        <form onSubmit={handleSaveEditHelpline} className="space-y-3">
-                          <div className="space-y-2">
-                            <div>
-                              <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Control Room Label</label>
-                              <input
-                                type="text"
-                                required
-                                value={editHelplineLabel}
-                                onChange={e => setEditHelplineLabel(e.target.value)}
-                                className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-xs font-bold"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Phone Number</label>
-                              <input
-                                type="text"
-                                required
-                                value={editHelplinePhone}
-                                onChange={e => setEditHelplinePhone(e.target.value)}
-                                className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-xs font-mono font-bold"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Sort Order</label>
-                              <input
-                                type="number"
-                                value={editHelplineOrder}
-                                onChange={e => setEditHelplineOrder(e.target.value)}
-                                className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-xs font-mono"
-                              />
-                            </div>
-                          </div>
+                      <ChevronLeft className="w-4 h-4" /> Previous
+                    </button>
+                    <button
+                      disabled={safeSosPage >= totalSosPages}
+                      onClick={() => setSosCurrentPage(prev => Math.min(totalSosPages, prev + 1))}
+                      className="px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 transition-colors"
+                    >
+                      Next <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
 
-                          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
-                            <button
-                              type="button"
-                              onClick={() => setEditingHelplineId(null)}
-                              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-600 rounded-lg text-xs font-bold"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              type="submit"
-                              className="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-lg text-xs font-black flex items-center gap-1"
-                            >
-                              <Save className="w-3.5 h-3.5" /> Save
-                            </button>
-                          </div>
-                        </form>
-                      ) : (
-                        <>
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex items-center gap-3">
-                              <span className="w-7 h-7 rounded-xl bg-red-950 text-red-400 border border-red-800 font-mono text-xs font-black flex items-center justify-center shrink-0">
-                                #{item.sort_order ?? 0}
-                              </span>
-                              <div>
-                                <h5 className="text-sm font-black text-slate-900 leading-snug">
-                                  {item.label}
-                                </h5>
-                                <p className="text-xs font-mono font-bold text-red-400 mt-0.5">
-                                  {item.phone_number}
-                                </p>
-                              </div>
-                            </div>
-
-                            <a
-                              href={`tel:${(item.phone_number || '').replace(/[^0-9]/g, '')}`}
-                              className="p-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-300 rounded-xl shrink-0 transition-colors"
-                              title="Test Call"
-                            >
-                              <Phone className="w-4 h-4" />
-                            </a>
-                          </div>
-
-                          <div className="flex items-center justify-between pt-3 border-t border-slate-200 text-xs">
-                            <span className="text-[10px] font-mono text-slate-500">
-                              ID: {item.id ? item.id.substring(0, 8) : 'seed'}…
-                            </span>
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => handleStartEditHelpline(item)}
-                                className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-600 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors"
-                              >
-                                <Edit2 className="w-3 h-3 text-amber-400" /> Edit
-                              </button>
-                              <button
-                                onClick={() => handleDeleteHelpline(item.id, item.label)}
-                                className="px-2.5 py-1 bg-red-950 hover:bg-red-900 text-red-300 border border-red-800 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors"
-                              >
-                                <X className="w-3 h-3" /> Delete
-                              </button>
-                            </div>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  );
-                })}
               </div>
             )}
           </div>
+        )}
 
-        </div>
-      )}
-
-      {/* Edit Request Modal */}
-      {editingSosId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-slate-50/85 backdrop-blur-lg overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-white border-2 border-amber-500/40 shadow-2xl rounded-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col">
-            <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b shrink-0 bg-gradient-to-r from-amber-950 via-slate-950 to-slate-950 border-amber-800">
-              <h3 className="text-sm sm:text-lg font-black text-slate-900 uppercase flex items-center gap-2">
-                <Edit2 className="w-5 h-5 text-amber-400" />
-                Edit SOS Request: {editSosData.id}
-              </h3>
-              <button onClick={() => setEditingSosId(null)} className="p-2 text-slate-500 hover:text-slate-900 rounded-lg hover:bg-slate-800 transition-colors">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+        {/* ══ MODULE 2: RELIEF DELIVERIES ═══════════════════════════════ */}
+        {activeQueueTab === 'deliveries' && (
+          <div className="space-y-4">
             
-            <form onSubmit={handleSaveSos} className="p-6 space-y-4 overflow-y-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Victim Name</label>
-                  <input type="text" required value={editSosData.name || ''} onChange={e => setEditSosData({...editSosData, name: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Phone Number</label>
-                  <input type="tel" required value={editSosData.phone || ''} onChange={e => setEditSosData({...editSosData, phone: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Village / Area</label>
-                  <input type="text" required value={editSosData.villageName || ''} onChange={e => setEditSosData({...editSosData, villageName: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">District</label>
-                  <select value={editSosData.district || ''} onChange={e => setEditSosData({...editSosData, district: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm">
-                    {ASSAM_DISTRICTS.map(d => <option key={d} value={d}>{d}</option>)}
-                  </select>
-                </div>
-                
-                {/* Demographics row */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Males Count</label>
-                  <input type="number" min="0" value={editSosData.malesCount} onChange={e => setEditSosData({...editSosData, malesCount: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Females Count</label>
-                  <input type="number" min="0" value={editSosData.femalesCount} onChange={e => setEditSosData({...editSosData, femalesCount: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Children Count</label>
-                  <input type="number" min="0" value={editSosData.childrenCount} onChange={e => setEditSosData({...editSosData, childrenCount: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Families Count</label>
-                  <input type="number" min="0" value={editSosData.familiesCount} onChange={e => setEditSosData({...editSosData, familiesCount: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm" />
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1.5">Request Details</label>
-                <textarea rows="3" value={editSosData.details || ''} onChange={e => setEditSosData({...editSosData, details: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm"></textarea>
-              </div>
+            {/* SECTION CHIPS FILTER BAR */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+              <span className="text-xs font-bold text-slate-400 shrink-0 uppercase tracking-wider flex items-center gap-1">
+                <Filter className="w-3.5 h-3.5" /> Filter:
+              </span>
+              {[
+                { id: 'ALL', label: `All Deliveries (${targetDeliveries.length})` },
+                { id: 'PENDING', label: `⏳ Pending Verification (${targetDeliveries.filter(d => !d.verified).length})` },
+                { id: 'VERIFIED', label: `✓ Verified Logs (${targetDeliveries.filter(d => d.verified).length})` },
+              ].map(chip => (
+                <button
+                  key={chip.id}
+                  onClick={() => { setDeliveryChipFilter(chip.id); setDeliveryCurrentPage(1); }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    deliveryChipFilter === chip.id
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
 
-              <div className="pt-4 border-t border-slate-200 flex justify-end gap-3">
-                <button type="button" onClick={() => setEditingSosId(null)} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-900 rounded-xl text-sm font-bold">
-                  Cancel
-                </button>
-                <button type="submit" className="px-6 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-sm font-black flex items-center gap-2">
-                  <Save className="w-4 h-4" /> Save Changes
-                </button>
+            {/* DELIVERY CARDS */}
+            {filteredDeliveries.length === 0 ? (
+              <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center space-y-2">
+                <Package className="w-10 h-10 text-slate-300 mx-auto" />
+                <h3 className="text-base font-bold text-slate-900">No Delivery Logs Found</h3>
+                <p className="text-xs text-slate-500">No delivery logs match the selected filter.</p>
               </div>
-            </form>
+            ) : (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {paginatedDeliveries.map(log => (
+                    <div key={log.logId || log.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className={`px-2.5 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider ${
+                          log.verified ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
+                        }`}>
+                          {log.verified ? '✓ Verified' : '⏳ Pending Proof'}
+                        </span>
+                        <span className="text-[11px] font-mono text-slate-400">Log #{log.logId || log.id}</span>
+                      </div>
+
+                      <div>
+                        <h3 className="text-base font-bold text-slate-900">{log.deliveredBy || log.recipientName}</h3>
+                        <p className="text-xs text-slate-500">Items: {log.itemsDelivered}</p>
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                        {!log.verified && (
+                          <button
+                            onClick={() => handleApproveDelivery(log.logId || log.id)}
+                            className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-colors"
+                          >
+                            Approve Log
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleRejectDelivery(log.logId || log.id)}
+                          className="py-2 px-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl text-xs font-bold transition-colors"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* PAGINATION BAR */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-700">Page {safeDeliveryPage} of {totalDeliveryPages} ({filteredDeliveries.length} Logs)</span>
+                  <div className="flex gap-2">
+                    <button disabled={safeDeliveryPage <= 1} onClick={() => setDeliveryCurrentPage(p => Math.max(1, p - 1))} className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl font-bold disabled:opacity-50">Previous</button>
+                    <button disabled={safeDeliveryPage >= totalDeliveryPages} onClick={() => setDeliveryCurrentPage(p => Math.min(totalDeliveryPages, p + 1))} className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl font-bold disabled:opacity-50">Next</button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        )}
 
-      {activeQueueTab === 'campaigns' && (
-        <CampaignsAdmin />
-      )}
+        {/* ══ MODULE 3: NGOS & ORGANIZATIONS ═══════════════════════════ */}
+        {activeQueueTab === 'ngos' && (
+          <div className="space-y-4">
+            
+            {/* SECTION CHIPS FILTER BAR */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+              <span className="text-xs font-bold text-slate-400 shrink-0 uppercase tracking-wider flex items-center gap-1">
+                <Filter className="w-3.5 h-3.5" /> Filter:
+              </span>
+              {[
+                { id: 'ALL', label: `All Partners (${targetNgos.length})` },
+                { id: 'PENDING', label: `⏳ Pending Approval (${targetNgos.filter(n => !n.verified).length})` },
+                { id: 'NGO', label: `🏢 Registered NGOs (${targetNgos.filter(n => !n.ngoType || n.ngoType.includes('Registered NGO')).length})` },
+                { id: 'DONOR', label: `🍲 Food Donors (${targetNgos.filter(n => n.ngoType && n.ngoType.includes('Donor')).length})` },
+                { id: 'VERIFIED', label: `✓ Verified Partners (${targetNgos.filter(n => n.verified).length})` },
+              ].map(chip => (
+                <button
+                  key={chip.id}
+                  onClick={() => { setNgoChipFilter(chip.id); setNgoCurrentPage(1); }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    ngoChipFilter === chip.id
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
 
+            {/* NGO CARDS */}
+            {filteredNgos.length === 0 ? (
+              <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center space-y-2">
+                <Building2 className="w-10 h-10 text-slate-300 mx-auto" />
+                <h3 className="text-base font-bold text-slate-900">No NGOs Found</h3>
+                <p className="text-xs text-slate-500">No registered NGOs match the filter criteria.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {paginatedNgos.map(ngo => (
+                    <div key={ngo.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className={`px-2.5 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider ${
+                          ngo.verified ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
+                        }`}>
+                          {ngo.verified ? '✓ Verified NGO' : '⏳ Pending Verification'}
+                        </span>
+                        <span className="text-xs text-slate-500">{ngo.ngoType || 'NGO'}</span>
+                      </div>
+
+                      <div>
+                        <h3 className="text-base font-black text-slate-900">{ngo.name}</h3>
+                        <p className="text-xs text-slate-500 mt-0.5">Contact: {ngo.contactPerson || 'N/A'} • {ngo.phone}</p>
+                        <p className="text-xs text-slate-500">Email: {ngo.email || 'N/A'}</p>
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                        {!ngo.verified && (
+                          <button
+                            onClick={() => handleApproveNgo(ngo.id)}
+                            className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-colors"
+                          >
+                            Approve NGO
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleRejectNgo(ngo.id)}
+                          className="py-2 px-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl text-xs font-bold transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* PAGINATION BAR */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-700">Page {safeNgoPage} of {totalNgoPages} ({filteredNgos.length} Partners)</span>
+                  <div className="flex gap-2">
+                    <button disabled={safeNgoPage <= 1} onClick={() => setNgoCurrentPage(p => Math.max(1, p - 1))} className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl font-bold disabled:opacity-50">Previous</button>
+                    <button disabled={safeNgoPage >= totalNgoPages} onClick={() => setNgoCurrentPage(p => Math.min(totalNgoPages, p + 1))} className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl font-bold disabled:opacity-50">Next</button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ══ MODULE 4: RELIEF VOLUNTEERS ═══════════════════════════════ */}
+        {activeQueueTab === 'volunteers' && (
+          <div className="space-y-4">
+            
+            {/* SECTION CHIPS FILTER BAR */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+              <span className="text-xs font-bold text-slate-400 shrink-0 uppercase tracking-wider flex items-center gap-1">
+                <Filter className="w-3.5 h-3.5" /> Filter:
+              </span>
+              {[
+                { id: 'ALL', label: `All Helpers (${targetVolunteers.length})` },
+                { id: 'PENDING', label: `⏳ Pending Roster (${targetVolunteers.filter(v => !v.verified).length})` },
+                { id: 'BOAT', label: `🚤 Boat Service (${targetVolunteers.filter(v => v.roleType && v.roleType.toLowerCase().includes('boat')).length})` },
+                { id: 'TRANSPORT', label: `🚙 4x4 / Transport (${targetVolunteers.filter(v => v.roleType && (v.roleType.toLowerCase().includes('car') || v.roleType.toLowerCase().includes('transport'))).length})` },
+                { id: 'MEDICAL', label: `🩺 Medical (${targetVolunteers.filter(v => v.roleType && v.roleType.toLowerCase().includes('medical')).length})` },
+                { id: 'VERIFIED', label: `✓ Verified (${targetVolunteers.filter(v => v.verified).length})` },
+              ].map(chip => (
+                <button
+                  key={chip.id}
+                  onClick={() => { setVolChipFilter(chip.id); setVolCurrentPage(1); }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    volChipFilter === chip.id
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
+
+            {/* VOLUNTEER CARDS */}
+            {filteredVolunteers.length === 0 ? (
+              <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center space-y-2">
+                <UserCheck className="w-10 h-10 text-slate-300 mx-auto" />
+                <h3 className="text-base font-bold text-slate-900">No Volunteers Found</h3>
+                <p className="text-xs text-slate-500">No relief volunteers match the filter criteria.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {paginatedVolunteers.map(vol => (
+                    <div key={vol.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className={`px-2.5 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider ${
+                          vol.verified ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
+                        }`}>
+                          {vol.verified ? '✓ Verified Helper' : '⏳ Pending Roster'}
+                        </span>
+                        <span className="text-xs font-bold text-purple-600">{vol.roleType || 'Volunteer'}</span>
+                      </div>
+
+                      <div>
+                        <h3 className="text-base font-black text-slate-900">{vol.name}</h3>
+                        <p className="text-xs text-slate-500 mt-0.5">District: {vol.district || 'N/A'} • Phone: {vol.phone}</p>
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                        {!vol.verified && (
+                          <button
+                            onClick={() => handleApproveVol(vol.id)}
+                            className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-colors"
+                          >
+                            Approve Helper
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleRejectVol(vol.id)}
+                          className="py-2 px-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl text-xs font-bold transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* PAGINATION BAR */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-700">Page {safeVolPage} of {totalVolPages} ({filteredVolunteers.length} Volunteers)</span>
+                  <div className="flex gap-2">
+                    <button disabled={safeVolPage <= 1} onClick={() => setVolCurrentPage(p => Math.max(1, p - 1))} className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl font-bold disabled:opacity-50">Previous</button>
+                    <button disabled={safeVolPage >= totalVolPages} onClick={() => setVolCurrentPage(p => Math.min(totalVolPages, p + 1))} className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl font-bold disabled:opacity-50">Next</button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ══ MODULE 5: ACCOUNT RECOVERY ════════════════════════════════ */}
+        {activeQueueTab === 'recovery' && (
+          <div className="space-y-4">
+            
+            {/* SECTION CHIPS FILTER BAR */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+              <span className="text-xs font-bold text-slate-400 shrink-0 uppercase tracking-wider flex items-center gap-1">
+                <Filter className="w-3.5 h-3.5" /> Filter:
+              </span>
+              {[
+                { id: 'ALL', label: `All Recoveries (${(pendingRecovery || []).length})` },
+                { id: 'PENDING', label: `⏳ Pending Action (${(pendingRecovery || []).filter(r => r.status === 'PENDING').length})` },
+                { id: 'PASSWORD', label: `🔑 Password Reset (${(pendingRecovery || []).filter(r => r.requestType === 'FORGOT_PASSWORD').length})` },
+                { id: 'EMAIL', label: `✉️ Email Recovery (${(pendingRecovery || []).filter(r => r.requestType === 'FORGOT_EMAIL').length})` },
+                { id: 'RESOLVED', label: `✓ Resolved (${(pendingRecovery || []).filter(r => r.status === 'RESOLVED').length})` },
+              ].map(chip => (
+                <button
+                  key={chip.id}
+                  onClick={() => { setRecoveryChipFilter(chip.id); setRecoveryCurrentPage(1); }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    recoveryChipFilter === chip.id
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
+
+            {/* RECOVERY CARDS */}
+            {filteredRecovery.length === 0 ? (
+              <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center space-y-2">
+                <Key className="w-10 h-10 text-slate-300 mx-auto" />
+                <h3 className="text-base font-bold text-slate-900">No Account Recovery Requests</h3>
+                <p className="text-xs text-slate-500">No pending recovery requests match the selected filter.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {paginatedRecovery.map(req => {
+                    const matchedAccount = storageService.findMatchedAccount(req.accountRole, req.email, req.name, req.phone);
+                    return (
+                      <div key={req.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className={`px-2.5 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider ${
+                            req.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border border-amber-200 animate-pulse' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          }`}>
+                            {req.status === 'PENDING' ? '⏳ Action Required' : '✓ Resolved'}
+                          </span>
+                          <span className="text-xs font-bold text-cyan-600">{req.requestType === 'FORGOT_PASSWORD' ? 'Password Reset' : 'Email Lookup'}</span>
+                        </div>
+
+                        <div>
+                          <h3 className="text-base font-black text-slate-900">{req.name || 'User'} ({req.accountRole})</h3>
+                          <p className="text-xs text-slate-500">Registered Email: {req.email || 'N/A'} • Phone: {req.phone}</p>
+                          {matchedAccount && (
+                            <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900 font-medium">
+                              Matched Record: {matchedAccount.name} ({matchedAccount.email})
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                          <a
+                            href={getWhatsAppRecoveryUrl(req.phone, req.name, req.requestType, req.accountRole, matchedAccount)}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex-1 py-2 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-colors"
+                          >
+                            <MessageSquare className="w-3.5 h-3.5" />
+                            <span>WhatsApp Recovery Info</span>
+                          </a>
+
+                          {req.status === 'PENDING' && (
+                            <button
+                              onClick={() => handleResolveRecovery(req.id)}
+                              className="py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-colors"
+                            >
+                              Mark Resolved
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* PAGINATION BAR */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-700">Page {safeRecoveryPage} of {totalRecoveryPages} ({filteredRecovery.length} Recovery Requests)</span>
+                  <div className="flex gap-2">
+                    <button disabled={safeRecoveryPage <= 1} onClick={() => setRecoveryCurrentPage(p => Math.max(1, p - 1))} className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl font-bold disabled:opacity-50">Previous</button>
+                    <button disabled={safeRecoveryPage >= totalRecoveryPages} onClick={() => setRecoveryCurrentPage(p => Math.min(totalRecoveryPages, p + 1))} className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl font-bold disabled:opacity-50">Next</button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ══ MODULE 6: USER DIRECTORY ══════════════════════════════════ */}
+        {activeQueueTab === 'users' && (
+          <div className="space-y-4">
+            
+            {/* SECTION CHIPS FILTER BAR */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+              <span className="text-xs font-bold text-slate-400 shrink-0 uppercase tracking-wider flex items-center gap-1">
+                <Filter className="w-3.5 h-3.5" /> Filter:
+              </span>
+              {[
+                { id: 'ALL', label: `All Accounts (${(allUsers || []).length})` },
+                { id: 'NGO', label: `🏢 NGO Accounts (${(allUsers || []).filter(u => u.userType === 'NGO').length})` },
+                { id: 'VOLUNTEER', label: `🤝 Volunteer Accounts (${(allUsers || []).filter(u => u.userType === 'VOLUNTEER').length})` },
+                { id: 'VERIFIED', label: `✓ Verified (${(allUsers || []).filter(u => u.verified).length})` },
+                { id: 'PENDING', label: `⏳ Pending (${(allUsers || []).filter(u => !u.verified).length})` },
+              ].map(chip => (
+                <button
+                  key={chip.id}
+                  onClick={() => {
+                    setUserCurrentPage(1);
+                    if (chip.id === 'ALL') { setUserRoleFilter('ALL'); setUserStatusFilter('ALL'); }
+                    else if (chip.id === 'NGO' || chip.id === 'VOLUNTEER') { setUserRoleFilter(chip.id); }
+                    else if (chip.id === 'VERIFIED' || chip.id === 'PENDING') { setUserStatusFilter(chip.id); }
+                  }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                    (userRoleFilter === chip.id || userStatusFilter === chip.id || (chip.id === 'ALL' && userRoleFilter === 'ALL' && userStatusFilter === 'ALL'))
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
+
+            {/* USER TABLE */}
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider">
+                    <tr>
+                      <th className="px-4 py-3">Account Name</th>
+                      <th className="px-4 py-3">Type</th>
+                      <th className="px-4 py-3">Email</th>
+                      <th className="px-4 py-3">Phone</th>
+                      <th className="px-4 py-3">District</th>
+                      <th className="px-4 py-3">Password</th>
+                      <th className="px-4 py-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {paginatedUsers.map(u => (
+                      <tr key={u.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-4 py-3 font-bold text-slate-900">{u.name}</td>
+                        <td className="px-4 py-3">
+                          <span className={`px-2 py-0.5 rounded-md font-bold text-[10px] ${
+                            u.userType === 'NGO' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-purple-50 text-purple-700 border border-purple-200'
+                          }`}>
+                            {u.userType}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-slate-600">{u.email || 'N/A'}</td>
+                        <td className="px-4 py-3 font-mono text-slate-600">{u.phone}</td>
+                        <td className="px-4 py-3 text-slate-600">{u.district || 'N/A'}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-1.5 font-mono">
+                            <span>{visiblePasswords[u.id] ? (u.password || 'N/A') : '••••••••'}</span>
+                            <button
+                              onClick={() => togglePasswordVisibility(u.id)}
+                              className="text-slate-400 hover:text-slate-700"
+                            >
+                              {visiblePasswords[u.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                            </button>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
+                            u.verified ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
+                          }`}>
+                            {u.verified ? '✓ Verified' : '⏳ Pending'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* PAGINATION FOOTER */}
+              <div className="px-4 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
+                <span className="text-slate-500 font-medium">
+                  Page {safeUserCurrentPage} of {totalUserPages} ({filteredUsers.length} Users)
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    disabled={safeUserCurrentPage <= 1}
+                    onClick={() => setUserCurrentPage(prev => Math.max(1, prev - 1))}
+                    className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    disabled={safeUserCurrentPage >= totalUserPages}
+                    onClick={() => setUserCurrentPage(prev => Math.min(totalUserPages, prev + 1))}
+                    className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ══ MODULE 7: GOVT HELPLINES ═════════════════════════════════ */}
+        {activeQueueTab === 'helplines' && (
+          <div className="space-y-5">
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
+              <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                <Phone className="w-4 h-4 text-blue-600" />
+                Add New Control Room Helpline
+              </h3>
+              <form onSubmit={handleAddHelpline} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <input
+                  type="text"
+                  placeholder="Control Room / Label (e.g. Jorhat Control Room)"
+                  value={newHelplineLabel}
+                  onChange={(e) => setNewHelplineLabel(e.target.value)}
+                  className="bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-500"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Phone Number (e.g. 0376-2300124)"
+                  value={newHelplinePhone}
+                  onChange={(e) => setNewHelplinePhone(e.target.value)}
+                  className="bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-500"
+                  required
+                />
+                <button
+                  type="submit"
+                  className="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-colors shadow-sm"
+                >
+                  + Add Helpline
+                </button>
+              </form>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {helplinesList.map(h => (
+                <div key={h.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+                  <div>
+                    <h4 className="font-bold text-slate-900 text-sm">{h.label}</h4>
+                    <p className="text-xs font-mono text-blue-600 mt-0.5">{h.phone_number}</p>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteHelpline(h.id, h.label)}
+                    className="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl border border-red-200 transition-colors"
+                    title="Delete Helpline"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ══ MODULE 8: CAMPAIGNS ══════════════════════════════════════ */}
+        {activeQueueTab === 'campaigns' && (
+          <CampaignsAdmin />
+        )}
+
+      </main>
     </div>
   );
 }

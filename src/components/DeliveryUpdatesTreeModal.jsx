@@ -23,7 +23,7 @@ export default function DeliveryUpdatesTreeModal({ request, deliveryLogs = [], o
             </div>
             <div>
               <h3 className="text-base sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                {isRescue ? "Emergency Rescue & Impact Tree" : "Relief Delivery & Impact Tree"}
+                {isRescue ? "Rescue Progress & Updates" : "Relief Progress & Updates"}
               </h3>
               <p className="text-xs text-slate-600 font-semibold">
                 {request.district}: {request.villageName || request.locationName}

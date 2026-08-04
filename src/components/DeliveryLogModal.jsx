@@ -52,8 +52,6 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
 
     try {
       setIsSubmitting(true);
-
-      // If authenticated NGO, pass isAutoVerified = true for trusted auto-verification!
       const isAutoVerified = isNgoAuthenticated;
 
       storageService.submitDeliveryLog({
@@ -74,7 +72,7 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
       if (isAutoVerified) {
         setSuccessMsg('Verified NGO Dispatch Logged! Your delivery has been auto-verified and published directly to the live request timeline.');
       } else {
-        setSuccessMsg('Relief delivery log submitted! The Admin Verification Team will connect with you via WhatsApp for photo verification before publishing to the live timeline.');
+        setSuccessMsg('Relief delivery log submitted! The Admin Verification Team will connect with you via WhatsApp for photo verification before publishing.');
       }
 
       setTimeout(() => {
@@ -88,65 +86,65 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-slate-900 border border-amber-500/40 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5 text-slate-100 relative">
+    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto font-sans">
+      <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 text-slate-900 relative my-auto">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Header */}
-        <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
-          <div className={`p-3 rounded-xl border ${isRescue ? 'bg-red-500/20 text-red-400 border-red-500/30' : 'bg-amber-500/20 text-amber-400 border-amber-500/30'}`}>
+        <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+          <div className={`p-3 rounded-2xl border ${isRescue ? 'bg-red-50 text-red-600 border-red-200' : 'bg-blue-50 text-blue-600 border-blue-200'}`}>
             <Package className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-lg font-black text-white flex items-center gap-2">
-              {isRescue ? 'Update Rescue Status' : 'Update Delivery Status'}
+            <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+              {isRescue ? 'Post Rescue Update' : 'Post Relief Update'}
             </h3>
-            <p className="text-xs text-slate-400">
-              Update {isRescue ? 'rescue' : 'supply delivery'} status for <span className="text-amber-300 font-bold">{request.name}</span> ({request.id})
+            <p className="text-xs text-slate-500 font-medium">
+              Target: <strong className="text-slate-900">{request.name}</strong> ({request.id})
             </p>
           </div>
         </div>
 
-        {/* Info Box */}
+        {/* Info Banner */}
         {isNgoAuthenticated ? (
-          <div className="bg-emerald-950/80 border border-emerald-500/40 rounded-xl p-3.5 text-xs text-emerald-200 flex items-start gap-3">
-            <Sparkles className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 text-xs text-emerald-900 flex items-start gap-3">
+            <Sparkles className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
             <div>
-              <p className="font-black text-emerald-300">Verified NGO Trusted Source Active</p>
-              <p className="text-emerald-100 mt-0.5">
-                Logged in as <strong className="underline">{currentUser.user.name}</strong>. Your relief delivery will be <strong className="text-amber-300 font-black">auto-approved & published directly</strong> to the live timeline!
+              <p className="font-bold text-emerald-800">Verified NGO Direct Dispatch</p>
+              <p className="text-emerald-700 mt-0.5">
+                Logged in as <strong className="underline">{currentUser.user.name}</strong>. Your relief updates will be <strong className="font-bold">auto-published directly</strong> to the impact tree.
               </p>
             </div>
           </div>
         ) : (
-          <div className="bg-slate-950/70 border border-blue-500/30 rounded-xl p-3.5 text-xs text-slate-300 flex items-start gap-3">
-            <ShieldCheck className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
+          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3.5 text-xs text-blue-900 flex items-start gap-3">
+            <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
             <div>
-              <p className="font-bold text-blue-200">Manual Admin Verification Workflow</p>
-              <p className="text-slate-400 mt-0.5">
-                Guest submissions are reviewed by the Admin Control Room via WhatsApp photo check before publishing. <strong className="text-amber-300">Log in as a verified NGO for instant auto-publishing!</strong>
+              <p className="font-bold text-blue-800">Manual Admin Verification Active</p>
+              <p className="text-blue-700 mt-0.5">
+                Public submissions are reviewed by the Admin Control Room before publishing.
               </p>
             </div>
           </div>
         )}
 
         {error && (
-          <div className="p-3 bg-red-950/80 border border-red-500/40 rounded-xl text-red-200 text-xs font-semibold flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-semibold flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         {successMsg && (
-          <div className="p-4 bg-emerald-950/90 border border-emerald-500/40 rounded-xl text-emerald-200 text-xs font-bold flex items-center gap-2 animate-pulse">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+          <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-bold flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
             <span>{successMsg}</span>
           </div>
         )}
@@ -154,9 +152,9 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
         {!successMsg && (
           <form onSubmit={handleSubmit} className="space-y-4">
             
-            {/* Delivered By */}
+            {/* NGO Name */}
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1">
+              <label className="block text-xs font-bold text-slate-700 mb-1">
                 NGO / Volunteer Organization Name *
               </label>
               <input
@@ -164,37 +162,36 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
                 value={deliveredBy}
                 onChange={(e) => setDeliveredBy(e.target.value)}
                 placeholder="e.g. Red Cross Assam / Brahmaputra Relief Team"
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
                 required
               />
             </div>
 
             {/* Volunteer Phone */}
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1 flex items-center justify-between">
+              <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
                 <span>Volunteer Contact / WhatsApp Number *</span>
-                <span className="text-[10px] text-amber-400 font-semibold">(For dispatch log audit)</span>
+                <span className="text-[10px] text-slate-500 font-semibold">(For verification audit)</span>
               </label>
               <div className="relative">
-                <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
                 <input
                   type="tel"
                   value={volunteerPhone}
                   onChange={(e) => setVolunteerPhone(e.target.value)}
                   placeholder="+91 98640 00000"
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
                   required
                 />
               </div>
             </div>
 
-            {/* Conditional Fields based on Request Type */}
+            {/* Conditional Fields */}
             {isRescue ? (
-              <div className="grid grid-cols-2 gap-4">
-                {/* Rescued Count */}
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
-                    Number of People Rescued *
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    People Rescued *
                   </label>
                   <input
                     type="number"
@@ -202,46 +199,43 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
                     value={rescuedCount}
                     onChange={(e) => setRescuedCount(e.target.value)}
                     placeholder="e.g. 5"
-                    className="w-full bg-slate-950 border border-red-500/40 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500"
                     required={isRescue}
                   />
                 </div>
-                {/* Remaining Count */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
-                    People Still Remaining *
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    People Remaining *
                   </label>
                   <input
                     type="number"
                     min="0"
                     value={remainingCount}
                     onChange={(e) => setRemainingCount(e.target.value)}
-                    placeholder="e.g. 2"
-                    className="w-full bg-slate-950 border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
+                    placeholder="e.g. 0"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500"
                     required={isRescue}
                   />
                 </div>
               </div>
             ) : (
               <>
-                {/* Items Delivered */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
                     Relief Supplies Delivered *
                   </label>
                   <textarea
                     value={itemsDelivered}
                     onChange={(e) => setItemsDelivered(e.target.value)}
-                    placeholder="e.g. 30 Water Jars (20L), 100 Cooked Food Packets, 1 Paramedic First Aid Kit"
+                    placeholder="e.g. 30 Water Jars (20L), 100 Cooked Food Packets"
                     rows={2}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-900 focus:outline-none focus:border-blue-500"
                     required={!isRescue}
                   />
                 </div>
 
-                {/* People Impacted */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
                     People Impacted / Beneficiaries
                   </label>
                   <input
@@ -249,57 +243,57 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
                     value={peopleImpacted}
                     onChange={(e) => setPeopleImpacted(e.target.value)}
                     placeholder={`e.g. ${request.peopleCount || 50} People / 20 Families`}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500"
                   />
                 </div>
               </>
             )}
 
-            {/* Delivery Notes */}
+            {/* Notes */}
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1">
-                {isRescue ? 'Rescue Notes & Description (Optional)' : 'Delivery Notes & Location Description'}
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                {isRescue ? 'Rescue Notes (Optional)' : 'Delivery Notes & Description'}
               </label>
               <textarea
                 value={deliveryNotes}
                 onChange={(e) => setDeliveryNotes(e.target.value)}
-                placeholder={isRescue ? "e.g. Rescued 5 individuals by motorboat, 2 more stranded on higher ground, sending backup." : "e.g. Handed over directly to school shelter manager. Water level dropped by 1 ft."}
+                placeholder={isRescue ? "e.g. Rescued 5 individuals by motorboat." : "e.g. Handed over directly to relief camp."}
                 rows={2}
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-900 focus:outline-none focus:border-blue-500"
               />
             </div>
 
-            {/* Updated Request Status */}
+            {/* Request Status */}
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1">
-                Recommend Updated Request Status
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Recommend Request Status Update
               </label>
               <select
                 value={statusUpdate}
                 onChange={(e) => setStatusUpdate(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500 font-medium"
               >
-                <option value="In Progress">In Progress (Partially Fulfilled - More supplies/rescue needed)</option>
-                <option value="Rescued">Rescued / Fully Resolved (All needs met)</option>
+                <option value="In Progress">In Progress (Partially Fulfilled)</option>
+                <option value="Rescued">Rescued / Fully Resolved</option>
               </select>
             </div>
 
-            {/* Submit Button */}
-            <div className="pt-2 flex items-center justify-end gap-3 border-t border-slate-800">
+            {/* Submit */}
+            <div className="pt-2 flex items-center justify-end gap-3 border-t border-slate-100">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white rounded-xl bg-slate-800"
+                className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-5 py-2.5 text-xs font-black text-slate-950 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 rounded-xl shadow-lg flex items-center gap-2 active:scale-95 transition-all"
+                className="px-5 py-2.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm flex items-center gap-2 transition-colors"
               >
                 <Send className="w-4 h-4" />
-                <span>{isNgoAuthenticated ? 'PUBLISH INSTANT RELIEF LOG' : 'SUBMIT FOR ADMIN VERIFICATION'}</span>
+                <span>{isNgoAuthenticated ? 'POST INSTANT UPDATE' : 'POST UPDATE'}</span>
               </button>
             </div>
 
