@@ -308,7 +308,7 @@ export default function App() {
       />
 
       {/* Main Container */}
-      <main className={`flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 ${currentAuth.role !== 'GUEST' ? 'py-2 space-y-3' : 'py-6 space-y-6'}`}>
+      <main className={`flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-2 space-y-3`}>
         
         
 
@@ -433,63 +433,44 @@ export default function App() {
 
       {/* Footer — minimal (Only on homepage) */}
       {activeTab === 'home' && (
-        <footer className="bg-[#111827] border-t border-[#1f2937] pb-36 sm:pb-0">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-4">
+        <footer className="bg-[#111827] border-t border-[#1f2937] pb-24 sm:pb-0">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
   
-            {/* Language selector */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs text-[#6b7280] font-medium mr-1">Language:</span>
-              {LANGUAGES.map(l => (
-                <button
-                  key={l.code}
-                  onClick={() => i18nService.setLanguage(l.code)}
-                  className={`text-xs font-semibold px-3 py-1 rounded-full border transition-all cursor-pointer ${
-                    i18nService.getLanguage() === l.code
-                      ? 'bg-blue-600 border-blue-600 text-white'
-                      : 'border-[#374151] text-[#6b7280] hover:text-[#d1d5db] hover:border-[#6b7280]'
-                  }`}
-                >
-                  {l.code === 'en' ? 'English' : l.native}
-                </button>
-              ))}
-            </div>
-  
-            <div className="border-t border-[#1f2937] pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-  
-              {/* Brand */}
-              <div className="flex items-center gap-2.5">
-                <img src="/helpaxom_badge.png" alt="HELP AXOM" className="w-7 h-7 object-contain opacity-80" />
-                <span className="text-sm font-black text-white/70 tracking-tight uppercase">HELP AXOM</span>
-              </div>
-  
-              {/* Copyright */}
-              <p className="text-xs text-[#4b5563] order-last sm:order-none">
-                © 2026 HELP AXOM · Independent Community Network · Assam
+            {/* Brand & Copyright */}
+            <div className="flex items-center gap-3">
+              <img src="/helpaxom_badge.png" alt="HELP AXOM" className="w-5 h-5 object-contain opacity-80" />
+              <p className="text-[10px] text-[#6b7280]">
+                © 2026 HELP AXOM · Independent Community Network
               </p>
-  
-              {/* Social links */}
-              <div className="flex items-center gap-4 text-xs">
-                <a
-                  href="https://github.com/raphul-ali"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#6b7280] hover:text-[#d1d5db] transition-colors flex items-center gap-1.5 font-medium"
-                >
+            </div>
+
+            {/* Language & Socials */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1.5">
+                {LANGUAGES.map(l => (
+                  <button
+                    key={l.code}
+                    onClick={() => i18nService.setLanguage(l.code)}
+                    className={`text-[10px] font-semibold px-2 py-0.5 rounded border transition-all cursor-pointer ${
+                      i18nService.getLanguage() === l.code
+                        ? 'bg-blue-600 border-blue-600 text-white'
+                        : 'border-[#374151] text-[#6b7280] hover:text-[#d1d5db]'
+                    }`}
+                  >
+                    {l.code === 'en' ? 'EN' : l.native}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-3 border-l border-[#374151] pl-4">
+                <a href="https://github.com/raphul-ali" target="_blank" rel="noopener noreferrer" className="text-[#6b7280] hover:text-white transition-colors">
                   <Github className="w-3.5 h-3.5" />
-                  GitHub
                 </a>
-                <a
-                  href="https://www.instagram.com/r_aphul/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#6b7280] hover:text-[#d1d5db] transition-colors flex items-center gap-1.5 font-medium"
-                >
+                <a href="https://www.instagram.com/r_aphul/" target="_blank" rel="noopener noreferrer" className="text-[#6b7280] hover:text-white transition-colors">
                   <Instagram className="w-3.5 h-3.5" />
-                  Instagram
                 </a>
               </div>
-  
             </div>
+
           </div>
         </footer>
       )}

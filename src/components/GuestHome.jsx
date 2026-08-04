@@ -1,5 +1,6 @@
 import React from 'react';
-import { LifeBuoy, HeartHandshake, Megaphone, Anchor, Car } from 'lucide-react';
+import { LifeBuoy, HeartHandshake, Megaphone, Anchor, Car, ArrowRight, ShieldCheck, Activity } from 'lucide-react';
+
 export default function GuestHome({ 
   victimRequests, 
   ngos, 
@@ -9,104 +10,105 @@ export default function GuestHome({
 
   const requestsCount = victimRequests.length;
   const ngoVolCount = ngos.length + volunteers.length;
-  
-  // Volunteers can register offering these services, so we parse their offerings field
   const boatCount = volunteers.filter(v => v.offerings && v.offerings.toLowerCase().includes('boat')).length;
   const carCount = volunteers.filter(v => v.offerings && v.offerings.toLowerCase().includes('car')).length;
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto py-8 px-4">
-      <div className="text-center space-y-3 mb-10">
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Assam Flood Relief Network</h1>
-        <p className="text-slate-500 text-sm max-w-xl mx-auto">
-          Fast and direct access to essential services and resources. Select an option below to find or provide help.
+    <div className="w-full pb-4 animate-in fade-in duration-300">
+      
+      {/* Compact Header */}
+      <div className="pb-4 mb-4 border-b border-slate-200">
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            Assam Flood Relief Portal
+          </h1>
+          <div className="flex items-center gap-1.5 bg-emerald-50 px-2 py-1 rounded border border-emerald-100">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Live</span>
+          </div>
+        </div>
+        <p className="text-slate-600 text-xs sm:text-sm max-w-xl leading-tight">
+          Request immediate rescue operations or discover verified relief resources across all districts.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Requests */}
+      {/* Uniform Grid Layout */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        {/* Button 1: Relief Requests */}
         <button 
           onClick={() => setActiveTab('public_requests')}
-          className="bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl p-5 flex items-center justify-between transition-colors shadow-sm text-left group"
+          className="group bg-white border border-slate-200 hover:border-red-300 rounded-xl p-5 text-left shadow-sm hover:shadow-md transition-all active:scale-[0.99] flex flex-col justify-between min-h-[160px]"
         >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center group-hover:bg-red-100 transition-colors">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center shrink-0">
               <LifeBuoy className="w-6 h-6" />
             </div>
-            <div>
-              <h3 className="text-lg font-bold text-slate-900">Relief Requests</h3>
-              <p className="text-xs font-medium text-slate-500">Live rescue & relief</p>
+            <div className="flex items-center gap-1.5 bg-red-50 px-2 py-1 rounded border border-red-100">
+               <Activity className="w-3 h-3 text-red-500 animate-pulse" />
+               <span className="text-red-700 font-bold text-xs">{requestsCount}</span>
             </div>
           </div>
-          <div className="bg-red-50 px-3 py-1.5 rounded-lg text-red-700 font-bold text-sm">
-            {requestsCount}
+          <div>
+            <h3 className="text-lg font-bold text-slate-900 mb-1 leading-tight">Emergency Requests</h3>
+            <p className="text-xs text-slate-500 line-clamp-2">View live SOS requests and coordinate rescues.</p>
           </div>
         </button>
 
-        {/* NGOs / Volunteers */}
+        {/* Button 2: NGOs & Helpers */}
         <button 
           onClick={() => setActiveTab('ngos')}
-          className="bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl p-5 flex items-center justify-between transition-colors shadow-sm text-left group"
+          className="group bg-white border border-slate-200 hover:border-emerald-300 rounded-xl p-5 text-left shadow-sm hover:shadow-md transition-all active:scale-[0.99] flex flex-col justify-between min-h-[160px]"
         >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shrink-0">
               <HeartHandshake className="w-6 h-6" />
             </div>
-            <div>
-              <h3 className="text-lg font-bold text-slate-900">Ngos and helpers</h3>
-              <p className="text-xs font-medium text-slate-500">Verified helpers</p>
+            <div className="flex items-center gap-1.5 bg-emerald-50 px-2 py-1 rounded border border-emerald-100">
+               <ShieldCheck className="w-3 h-3 text-emerald-500" />
+               <span className="text-emerald-700 font-bold text-xs">{ngoVolCount}</span>
             </div>
           </div>
-          <div className="bg-emerald-50 px-3 py-1.5 rounded-lg text-emerald-700 font-bold text-sm">
-            {ngoVolCount}
+          <div>
+            <h3 className="text-lg font-bold text-slate-900 mb-1 leading-tight">Verified Helpers</h3>
+            <p className="text-xs text-slate-500 line-clamp-2">Connect with NGOs and registered volunteers.</p>
           </div>
         </button>
 
-        {/* Campaigns */}
-        <button 
-          onClick={() => setActiveTab('campaigns')}
-          className="bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl p-5 flex items-center justify-between transition-colors shadow-sm text-left group"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-              <Megaphone className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-slate-900">Campaigns</h3>
-              <p className="text-xs font-medium text-slate-500">Relief & Support</p>
-            </div>
-          </div>
-          <div className="text-slate-300 group-hover:text-blue-600 font-bold transition-colors">
-            &rarr;
-          </div>
-        </button>
-
-        {/* Transport (Boat/Car) */}
+        {/* Button 3: Transport */}
         <button 
           onClick={() => setActiveTab('transport')}
-          className="bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl p-5 flex items-center justify-between transition-colors shadow-sm text-left group"
+          className="group bg-white border border-slate-200 hover:border-amber-300 rounded-xl p-5 text-left shadow-sm hover:shadow-md transition-all active:scale-[0.99] flex flex-col justify-between min-h-[160px]"
         >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center group-hover:bg-amber-100 transition-colors flex-col gap-1">
-              <div className="flex items-center justify-center w-full h-full pb-1">
-                <Anchor className="w-4 h-4 absolute -translate-x-1.5 translate-y-1" />
-                <Car className="w-4 h-4 absolute translate-x-2.5 -translate-y-1" />
-              </div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center relative shrink-0">
+               <Anchor className="w-4 h-4 absolute -translate-x-1.5 translate-y-1" />
+               <Car className="w-4 h-4 absolute translate-x-2 -translate-y-1" />
             </div>
-            <div>
-              <h3 className="text-lg font-bold text-slate-900">Transport Help</h3>
-              <p className="text-xs font-medium text-slate-500">Boats & Cars</p>
+            <div className="flex items-center gap-1.5">
+               <span className="text-xs font-medium bg-amber-50 text-amber-700 px-2 py-1 rounded border border-amber-100">{boatCount} Boats</span>
             </div>
           </div>
-          <div className="flex gap-2">
-            <div className="bg-amber-50 px-2 py-1 rounded-lg flex flex-col items-center justify-center min-w-[2rem]">
-              <span className="text-[9px] font-bold text-amber-700/60 uppercase tracking-wider">Boat</span>
-              <span className="text-amber-700 font-bold text-xs">{boatCount}</span>
+          <div>
+            <h3 className="text-lg font-bold text-slate-900 mb-1 leading-tight">Transport & Logistics</h3>
+            <p className="text-xs text-slate-500 line-clamp-2">Find boats and vehicles for supply runs.</p>
+          </div>
+        </button>
+
+        {/* Button 4: Campaigns */}
+        <button 
+          onClick={() => setActiveTab('campaigns')}
+          className="group bg-white border border-slate-200 hover:border-blue-300 rounded-xl p-5 text-left shadow-sm hover:shadow-md transition-all active:scale-[0.99] flex flex-col justify-between min-h-[160px]"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0">
+              <Megaphone className="w-6 h-6" />
             </div>
-            <div className="bg-amber-50 px-2 py-1 rounded-lg flex flex-col items-center justify-center min-w-[2rem]">
-              <span className="text-[9px] font-bold text-amber-700/60 uppercase tracking-wider">Car</span>
-              <span className="text-amber-700 font-bold text-xs">{carCount}</span>
-            </div>
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-500 transition-colors" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-slate-900 mb-1 leading-tight">Relief Campaigns</h3>
+            <p className="text-xs text-slate-500 line-clamp-2">Contribute to organized relief drives.</p>
           </div>
         </button>
 
