@@ -4,6 +4,7 @@ import { storageService } from '../services/storageService';
 import { authService } from '../services/authService';
 import DistrictSelect from './DistrictSelect';
 import { i18nService } from '../services/i18nService';
+import RippleButton from './ui/RippleButton';
 
 export const parseNeedsTags = (needs) => {
   if (!needs) return [];
@@ -200,49 +201,52 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
               </p>
             </div>
           </div>
-          <button
+          <RippleButton
+            darkRipple
             onClick={onClose}
-            className="p-2 text-gray-500 hover:text-gray-800 rounded-lg hover:bg-white/50 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-200/60 transition-all duration-200 active:scale-95 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
           >
             <X className="w-5 h-5" />
-          </button>
+          </RippleButton>
         </div>
 
         {/* Form Type Switcher Bar */}
         <div className="bg-gray-50 border-b border-gray-200 p-2 flex items-center gap-2">
-          <button
+          <RippleButton
             type="button"
+            darkRipple={!formData.isUrgentRescue}
             onClick={() => setFormData(prev => ({
               ...prev,
               isUrgentRescue: true,
               needs: ['Emergency Motorboat Rescue & Life Evacuation']
             }))}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
+            className={`flex-1 py-2.5 px-3.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer ${
               formData.isUrgentRescue
-                ? 'bg-red-600 text-white shadow-sm'
-                : 'bg-white text-gray-500 hover:text-gray-700 border border-gray-200 hover:border-gray-300'
+                ? 'bg-red-600 text-white shadow-md shadow-red-600/30 hover:bg-red-700 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]'
+                : 'bg-white text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-300 hover:shadow-sm hover:-translate-y-0.5 active:scale-[0.98]'
             }`}
           >
             <Siren className="w-4 h-4" />
             <span>{i18nService.t('emergencyBoatRescue', 'EMERGENCY BOAT RESCUE')}</span>
-          </button>
+          </RippleButton>
 
-          <button
+          <RippleButton
             type="button"
+            darkRipple={formData.isUrgentRescue}
             onClick={() => setFormData(prev => ({
               ...prev,
               isUrgentRescue: false,
               needs: ['Cooked Meals & Food Packets', 'Clean Drinking Water Jars']
             }))}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
+            className={`flex-1 py-2.5 px-3.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer ${
               !formData.isUrgentRescue
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'bg-white text-gray-500 hover:text-gray-700 border border-gray-200 hover:border-gray-300'
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]'
+                : 'bg-white text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-300 hover:shadow-sm hover:-translate-y-0.5 active:scale-[0.98]'
             }`}
           >
             <Package className="w-4 h-4" />
             <span>{i18nService.t('foodMaterialRelief', 'FOOD & MATERIAL RELIEF')}</span>
-          </button>
+          </RippleButton>
         </div>
 
         {/* Error / Rate Limit Alert Banner */}
@@ -286,12 +290,13 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
               </div>
             </div>
 
-            <button
+            <RippleButton
+              darkRipple
               onClick={onClose}
-              className="w-full py-3 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-xl text-xs sm:text-sm transition-colors min-h-[44px] border border-gray-300 shadow-sm"
+              className="w-full py-3.5 bg-white hover:bg-gray-50 text-gray-700 font-bold rounded-xl text-xs sm:text-sm transition-all duration-200 min-h-[48px] border border-gray-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer"
             >
               Return to Portal
-            </button>
+            </RippleButton>
           </div>
         ) : (
           /* Form Content */
@@ -351,47 +356,50 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                     <span className="text-[10px] text-gray-400 font-medium">Boat vs. Road Transport</span>
                   </label>
                   <div className="grid grid-cols-3 gap-2">
-                    <button
+                    <RippleButton
                       type="button"
+                      darkRipple={formData.groundCondition !== 'SUBMERGED'}
                       onClick={() => setFormData(prev => ({ ...prev, groundCondition: 'SUBMERGED' }))}
-                      className={`p-2 rounded-lg border text-center text-xs font-semibold transition-all flex flex-col items-center justify-center gap-1 ${
+                      className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all duration-200 flex flex-col items-center justify-center gap-1 hover:shadow-md hover:-translate-y-0.5 active:scale-95 cursor-pointer ${
                         formData.groundCondition === 'SUBMERGED'
-                          ? 'bg-blue-50 border-blue-200 text-blue-700 ring-1 ring-blue-500/30'
-                          : 'bg-white border-gray-200 text-gray-500 hover:text-gray-700'
+                          ? 'bg-blue-50 border-blue-300 text-blue-800 shadow-sm ring-2 ring-blue-500/20'
+                          : 'bg-white border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300'
                       }`}
                     >
                       <Waves className={`w-4 h-4 ${formData.groundCondition === 'SUBMERGED' ? 'text-blue-600' : 'text-gray-400'}`} />
                       <span>Submerged</span>
-                      <span className={`text-[9px] font-normal ${formData.groundCondition === 'SUBMERGED' ? 'text-blue-500' : 'text-gray-400'}`}>Boat Only</span>
-                    </button>
+                      <span className={`text-[9px] font-medium ${formData.groundCondition === 'SUBMERGED' ? 'text-blue-600' : 'text-gray-400'}`}>Boat Only</span>
+                    </RippleButton>
 
-                    <button
+                    <RippleButton
                       type="button"
+                      darkRipple={formData.groundCondition !== 'RECEDING'}
                       onClick={() => setFormData(prev => ({ ...prev, groundCondition: 'RECEDING' }))}
-                      className={`p-2 rounded-lg border text-center text-xs font-semibold transition-all flex flex-col items-center justify-center gap-1 ${
+                      className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all duration-200 flex flex-col items-center justify-center gap-1 hover:shadow-md hover:-translate-y-0.5 active:scale-95 cursor-pointer ${
                         formData.groundCondition === 'RECEDING'
-                          ? 'bg-amber-50 border-amber-200 text-amber-700 ring-1 ring-amber-500/30'
-                          : 'bg-white border-gray-200 text-gray-500 hover:text-gray-700'
+                          ? 'bg-amber-50 border-amber-300 text-amber-800 shadow-sm ring-2 ring-amber-500/20'
+                          : 'bg-white border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300'
                       }`}
                     >
                       <Droplets className={`w-4 h-4 ${formData.groundCondition === 'RECEDING' ? 'text-amber-600' : 'text-gray-400'}`} />
                       <span>Water Receding</span>
-                      <span className={`text-[9px] font-normal ${formData.groundCondition === 'RECEDING' ? 'text-amber-500' : 'text-gray-400'}`}>Heavy Mud</span>
-                    </button>
+                      <span className={`text-[9px] font-medium ${formData.groundCondition === 'RECEDING' ? 'text-amber-600' : 'text-gray-400'}`}>Heavy Mud</span>
+                    </RippleButton>
 
-                    <button
+                    <RippleButton
                       type="button"
+                      darkRipple={formData.groundCondition !== 'DRY_LAND'}
                       onClick={() => setFormData(prev => ({ ...prev, groundCondition: 'DRY_LAND' }))}
-                      className={`p-2 rounded-lg border text-center text-xs font-semibold transition-all flex flex-col items-center justify-center gap-1 ${
+                      className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all duration-200 flex flex-col items-center justify-center gap-1 hover:shadow-md hover:-translate-y-0.5 active:scale-95 cursor-pointer ${
                         formData.groundCondition === 'DRY_LAND'
-                          ? 'bg-emerald-50 border-emerald-200 text-emerald-700 ring-1 ring-emerald-500/30'
-                          : 'bg-white border-gray-200 text-gray-500 hover:text-gray-700'
+                          ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-sm ring-2 ring-emerald-500/20'
+                          : 'bg-white border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300'
                       }`}
                     >
                       <Compass className={`w-4 h-4 ${formData.groundCondition === 'DRY_LAND' ? 'text-emerald-600' : 'text-gray-400'}`} />
                       <span>Dry Land</span>
-                      <span className={`text-[9px] font-normal ${formData.groundCondition === 'DRY_LAND' ? 'text-emerald-500' : 'text-gray-400'}`}>Road Accessible</span>
-                    </button>
+                      <span className={`text-[9px] font-medium ${formData.groundCondition === 'DRY_LAND' ? 'text-emerald-600' : 'text-gray-400'}`}>Road Accessible</span>
+                    </RippleButton>
                   </div>
 
                   {/* Dynamic Ground Condition Description */}
@@ -434,19 +442,20 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                     </div>
                     {attachGps && (
                       <div className="space-y-2">
-                        <button
+                        <RippleButton
                           type="button"
+                          darkRipple={!formData.latitude}
                           onClick={handleDetectLocation}
                           disabled={isLocating}
-                          className={`w-full py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
+                          className={`w-full py-3 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] min-h-[44px] cursor-pointer ${
                             formData.latitude
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : 'bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-emerald-500/10'
+                              : 'bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 shadow-blue-500/10'
                           }`}
                         >
                           <Navigation className={`w-4 h-4 ${isLocating ? 'animate-spin' : ''}`} />
                           <span>{isLocating ? 'Acquiring GPS...' : formData.latitude ? 'GPS Pinned (Click to Refetch)' : 'Tap to Detect GPS Location'}</span>
-                        </button>
+                        </RippleButton>
                         
                         <div className="grid grid-cols-2 gap-2 mt-2">
                           <input
@@ -582,14 +591,15 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                     </div>
                     {attachGps && (
                       <div className="space-y-2">
-                        <button
+                        <RippleButton
                           type="button"
+                          darkRipple={!formData.latitude}
                           onClick={handleDetectLocation}
                           disabled={isLocating}
-                          className={`w-full py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all min-h-[42px] shadow-sm ${
+                          className={`w-full py-3 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] min-h-[44px] cursor-pointer ${
                             formData.latitude
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : 'bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-emerald-500/10'
+                              : 'bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 shadow-blue-500/10'
                           }`}
                         >
                           <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
@@ -600,7 +610,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                                 ? 'GPS Pinned'
                                 : 'Fetch Auto Geolocation'}
                           </span>
-                        </button>
+                        </RippleButton>
 
                         <div className="grid grid-cols-2 gap-2 mt-2">
                           <input
@@ -632,47 +642,50 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                     <span className="text-[10px] text-gray-400 font-medium">Boat vs. Road Transport</span>
                   </label>
                   <div className="grid grid-cols-3 gap-2">
-                    <button
+                    <RippleButton
                       type="button"
+                      darkRipple={formData.groundCondition !== 'SUBMERGED'}
                       onClick={() => setFormData(prev => ({ ...prev, groundCondition: 'SUBMERGED' }))}
-                      className={`p-2 rounded-lg border text-center text-xs font-semibold transition-all flex flex-col items-center justify-center gap-1 ${
+                      className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all duration-200 flex flex-col items-center justify-center gap-1 hover:shadow-md hover:-translate-y-0.5 active:scale-95 cursor-pointer ${
                         formData.groundCondition === 'SUBMERGED'
-                          ? 'bg-blue-50 border-blue-200 text-blue-700 ring-1 ring-blue-500/30'
-                          : 'bg-white border-gray-200 text-gray-500 hover:text-gray-700'
+                          ? 'bg-blue-50 border-blue-300 text-blue-800 shadow-sm ring-2 ring-blue-500/20'
+                          : 'bg-white border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300'
                       }`}
                     >
                       <Waves className={`w-4 h-4 ${formData.groundCondition === 'SUBMERGED' ? 'text-blue-600' : 'text-gray-400'}`} />
                       <span>Submerged</span>
-                      <span className={`text-[9px] font-normal ${formData.groundCondition === 'SUBMERGED' ? 'text-blue-500' : 'text-gray-400'}`}>Boat Only</span>
-                    </button>
+                      <span className={`text-[9px] font-medium ${formData.groundCondition === 'SUBMERGED' ? 'text-blue-600' : 'text-gray-400'}`}>Boat Only</span>
+                    </RippleButton>
 
-                    <button
+                    <RippleButton
                       type="button"
+                      darkRipple={formData.groundCondition !== 'RECEDING'}
                       onClick={() => setFormData(prev => ({ ...prev, groundCondition: 'RECEDING' }))}
-                      className={`p-2 rounded-lg border text-center text-xs font-semibold transition-all flex flex-col items-center justify-center gap-1 ${
+                      className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all duration-200 flex flex-col items-center justify-center gap-1 hover:shadow-md hover:-translate-y-0.5 active:scale-95 cursor-pointer ${
                         formData.groundCondition === 'RECEDING'
-                          ? 'bg-amber-50 border-amber-200 text-amber-700 ring-1 ring-amber-500/30'
-                          : 'bg-white border-gray-200 text-gray-500 hover:text-gray-700'
+                          ? 'bg-amber-50 border-amber-300 text-amber-800 shadow-sm ring-2 ring-amber-500/20'
+                          : 'bg-white border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300'
                       }`}
                     >
                       <Droplets className={`w-4 h-4 ${formData.groundCondition === 'RECEDING' ? 'text-amber-600' : 'text-gray-400'}`} />
                       <span>Water Receding</span>
-                      <span className={`text-[9px] font-normal ${formData.groundCondition === 'RECEDING' ? 'text-amber-500' : 'text-gray-400'}`}>Heavy Mud</span>
-                    </button>
+                      <span className={`text-[9px] font-medium ${formData.groundCondition === 'RECEDING' ? 'text-amber-600' : 'text-gray-400'}`}>Heavy Mud</span>
+                    </RippleButton>
 
-                    <button
+                    <RippleButton
                       type="button"
+                      darkRipple={formData.groundCondition !== 'DRY_LAND'}
                       onClick={() => setFormData(prev => ({ ...prev, groundCondition: 'DRY_LAND' }))}
-                      className={`p-2 rounded-lg border text-center text-xs font-semibold transition-all flex flex-col items-center justify-center gap-1 ${
+                      className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all duration-200 flex flex-col items-center justify-center gap-1 hover:shadow-md hover:-translate-y-0.5 active:scale-95 cursor-pointer ${
                         formData.groundCondition === 'DRY_LAND'
-                          ? 'bg-emerald-50 border-emerald-200 text-emerald-700 ring-1 ring-emerald-500/30'
-                          : 'bg-white border-gray-200 text-gray-500 hover:text-gray-700'
+                          ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-sm ring-2 ring-emerald-500/20'
+                          : 'bg-white border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300'
                       }`}
                     >
                       <Compass className={`w-4 h-4 ${formData.groundCondition === 'DRY_LAND' ? 'text-emerald-600' : 'text-gray-400'}`} />
                       <span>Dry Land</span>
-                      <span className={`text-[9px] font-normal ${formData.groundCondition === 'DRY_LAND' ? 'text-emerald-500' : 'text-gray-400'}`}>Road Accessible</span>
-                    </button>
+                      <span className={`text-[9px] font-medium ${formData.groundCondition === 'DRY_LAND' ? 'text-emerald-600' : 'text-gray-400'}`}>Road Accessible</span>
+                    </RippleButton>
                   </div>
 
                   {/* Dynamic Ground Condition Description */}
@@ -704,47 +717,50 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                     <span>Request Urgency *</span>
                   </label>
                   <div className="grid grid-cols-3 gap-2">
-                    <button
+                    <RippleButton
                       type="button"
+                      darkRipple={formData.urgency !== 'HIGH'}
                       onClick={() => setFormData(prev => ({ ...prev, urgency: 'HIGH' }))}
-                      className={`p-2 rounded-lg border text-center text-xs font-semibold transition-all flex flex-col items-center justify-center gap-1 ${
+                      className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all duration-200 flex flex-col items-center justify-center gap-1 hover:shadow-md hover:-translate-y-0.5 active:scale-95 cursor-pointer ${
                         formData.urgency === 'HIGH'
-                          ? 'bg-red-50 border-red-200 text-red-700 ring-1 ring-red-500/30'
-                          : 'bg-white border-gray-200 text-gray-500 hover:text-gray-700'
+                          ? 'bg-red-50 border-red-300 text-red-800 shadow-sm ring-2 ring-red-500/20'
+                          : 'bg-white border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300'
                       }`}
                     >
                       <AlertOctagon className={`w-4 h-4 ${formData.urgency === 'HIGH' ? 'text-red-600' : 'text-gray-400'}`} />
                       <span>High</span>
-                      <span className={`text-[9px] font-normal ${formData.urgency === 'HIGH' ? 'text-red-600' : 'text-gray-400'}`}>Need it ASAP</span>
-                    </button>
+                      <span className={`text-[9px] font-medium ${formData.urgency === 'HIGH' ? 'text-red-600' : 'text-gray-400'}`}>Need it ASAP</span>
+                    </RippleButton>
 
-                    <button
+                    <RippleButton
                       type="button"
+                      darkRipple={formData.urgency !== 'MEDIUM'}
                       onClick={() => setFormData(prev => ({ ...prev, urgency: 'MEDIUM' }))}
-                      className={`p-2 rounded-lg border text-center text-xs font-semibold transition-all flex flex-col items-center justify-center gap-1 ${
+                      className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all duration-200 flex flex-col items-center justify-center gap-1 hover:shadow-md hover:-translate-y-0.5 active:scale-95 cursor-pointer ${
                         formData.urgency === 'MEDIUM'
-                          ? 'bg-amber-50 border-amber-200 text-amber-700 ring-1 ring-amber-500/30'
-                          : 'bg-white border-gray-200 text-gray-500 hover:text-gray-700'
+                          ? 'bg-amber-50 border-amber-300 text-amber-800 shadow-sm ring-2 ring-amber-500/20'
+                          : 'bg-white border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300'
                       }`}
                     >
                       <AlertTriangle className={`w-4 h-4 ${formData.urgency === 'MEDIUM' ? 'text-amber-600' : 'text-gray-400'}`} />
                       <span>Medium</span>
-                      <span className={`text-[9px] font-normal ${formData.urgency === 'MEDIUM' ? 'text-amber-600' : 'text-gray-400'}`}>Within 24 hrs</span>
-                    </button>
+                      <span className={`text-[9px] font-medium ${formData.urgency === 'MEDIUM' ? 'text-amber-600' : 'text-gray-400'}`}>Within 24 hrs</span>
+                    </RippleButton>
 
-                    <button
+                    <RippleButton
                       type="button"
+                      darkRipple={formData.urgency !== 'LOW'}
                       onClick={() => setFormData(prev => ({ ...prev, urgency: 'LOW' }))}
-                      className={`p-2 rounded-lg border text-center text-xs font-semibold transition-all flex flex-col items-center justify-center gap-1 ${
+                      className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all duration-200 flex flex-col items-center justify-center gap-1 hover:shadow-md hover:-translate-y-0.5 active:scale-95 cursor-pointer ${
                         formData.urgency === 'LOW'
-                          ? 'bg-blue-50 border-blue-200 text-blue-700 ring-1 ring-blue-500/30'
-                          : 'bg-white border-gray-200 text-gray-500 hover:text-gray-700'
+                          ? 'bg-blue-50 border-blue-300 text-blue-800 shadow-sm ring-2 ring-blue-500/20'
+                          : 'bg-white border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300'
                       }`}
                     >
                       <CheckCircle className={`w-4 h-4 ${formData.urgency === 'LOW' ? 'text-blue-600' : 'text-gray-400'}`} />
                       <span>Low</span>
-                      <span className={`text-[9px] font-normal ${formData.urgency === 'LOW' ? 'text-blue-600' : 'text-gray-400'}`}>Whenever possible</span>
-                    </button>
+                      <span className={`text-[9px] font-medium ${formData.urgency === 'LOW' ? 'text-blue-600' : 'text-gray-400'}`}>Whenever possible</span>
+                    </RippleButton>
                   </div>
                 </div>
 
@@ -813,13 +829,13 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
 
             {/* Submit Button */}
             <div className="pt-2 pb-12 sm:pb-4 mb-6 sm:mb-2">
-              <button
+              <RippleButton
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full py-3.5 rounded-xl font-bold text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer min-h-[48px] shadow-sm disabled:opacity-60 disabled:cursor-not-allowed ${
+                className={`w-full py-4 rounded-xl font-extrabold text-sm uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-2.5 cursor-pointer min-h-[52px] shadow-md hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none ${
                   formData.isUrgentRescue
-                    ? 'bg-red-600 hover:bg-red-700 text-white border border-red-700'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-700'
+                    ? 'bg-red-600 hover:bg-red-700 text-white border border-red-500/40 shadow-red-600/30'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500/40 shadow-blue-600/30'
                 }`}
               >
                 {isSubmitting ? (
@@ -830,7 +846,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                     <span>{formData.isUrgentRescue ? 'SUBMIT EMERGENCY RESCUE' : i18nService.t('publishRequest', 'SUBMIT RELIEF REQUEST')}</span>
                   </>
                 )}
-              </button>
+              </RippleButton>
             </div>
 
           </form>

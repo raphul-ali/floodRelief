@@ -1,10 +1,12 @@
 import React from 'react';
-import { LifeBuoy, HeartHandshake, Megaphone, Anchor, Car, ArrowRight, ShieldCheck, Activity } from 'lucide-react';
+import { LifeBuoy, HeartHandshake, Megaphone, Anchor, Car, ArrowRight, ShieldCheck, Activity, Flag } from 'lucide-react';
+import { storageService } from '../services/storageService';
 
 export default function GuestHome({ 
-  victimRequests, 
-  ngos, 
-  volunteers, 
+  victimRequests = [], 
+  ngos = [], 
+  volunteers = [], 
+  campaigns,
   setActiveTab 
 }) {
 
@@ -12,6 +14,9 @@ export default function GuestHome({
   const ngoVolCount = ngos.length + volunteers.length;
   const boatCount = volunteers.filter(v => v.offerings && v.offerings.toLowerCase().includes('boat')).length;
   const carCount = volunteers.filter(v => v.offerings && v.offerings.toLowerCase().includes('car')).length;
+  const campaignCount = (campaigns && Array.isArray(campaigns)) 
+    ? campaigns.length 
+    : (storageService.getCampaigns()?.length || 0);
 
   return (
     <div className="w-full pb-4 animate-in fade-in duration-300">
@@ -22,7 +27,7 @@ export default function GuestHome({
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Assam Flood Relief Portal
           </h1>
-          <div className="flex items-center gap-1.5 bg-emerald-50 px-2 py-1 rounded border border-emerald-100">
+          <div className="flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Live</span>
           </div>
@@ -44,7 +49,7 @@ export default function GuestHome({
             <div className="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center shrink-0">
               <LifeBuoy className="w-6 h-6" />
             </div>
-            <div className="flex items-center gap-1.5 bg-red-50 px-2 py-1 rounded border border-red-100">
+            <div className="flex items-center gap-1.5 bg-red-50 px-2.5 py-1 rounded-full border border-red-100">
                <Activity className="w-3 h-3 text-red-500 animate-pulse" />
                <span className="text-red-700 font-bold text-xs">{requestsCount}</span>
             </div>
@@ -64,7 +69,7 @@ export default function GuestHome({
             <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shrink-0">
               <HeartHandshake className="w-6 h-6" />
             </div>
-            <div className="flex items-center gap-1.5 bg-emerald-50 px-2 py-1 rounded border border-emerald-100">
+            <div className="flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
                <ShieldCheck className="w-3 h-3 text-emerald-500" />
                <span className="text-emerald-700 font-bold text-xs">{ngoVolCount}</span>
             </div>
@@ -85,8 +90,8 @@ export default function GuestHome({
                <Anchor className="w-4 h-4 absolute -translate-x-1.5 translate-y-1" />
                <Car className="w-4 h-4 absolute translate-x-2 -translate-y-1" />
             </div>
-            <div className="flex items-center gap-1.5">
-               <span className="text-xs font-medium bg-amber-50 text-amber-700 px-2 py-1 rounded border border-amber-100">{boatCount} Boats</span>
+            <div className="flex items-center gap-1.5 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-100">
+               <span className="text-xs font-medium text-amber-700">{boatCount} Boats</span>
             </div>
           </div>
           <div>
@@ -104,7 +109,10 @@ export default function GuestHome({
             <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0">
               <Megaphone className="w-6 h-6" />
             </div>
-            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-500 transition-colors" />
+            <div className="flex items-center gap-1.5 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">
+               <Flag className="w-3 h-3 text-blue-500" />
+               <span className="text-blue-700 font-bold text-xs">{campaignCount}</span>
+            </div>
           </div>
           <div>
             <h3 className="text-lg font-bold text-slate-900 mb-1 leading-tight">Relief Campaigns</h3>

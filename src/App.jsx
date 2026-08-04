@@ -361,6 +361,7 @@ export default function App() {
             victimRequests={victimRequests} 
             ngos={ngos}
             volunteers={volunteers}
+            campaigns={campaigns}
             setActiveTab={handleTabChange}
           />
         )}

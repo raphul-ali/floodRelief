@@ -230,17 +230,17 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
               {(ngo.showPhone !== false || isAuthorizedPartner) ? (
                 <>
                   <a href={`tel:${ngo.phone?.replace(/[^0-9]/g, '')}`}
-                    className="ripple-btn btn-base btn-emerald flex-1 py-2.5 px-3 rounded-xl text-xs font-bold gap-1.5 min-h-[42px]">
+                    className="ripple-btn btn-base btn-emerald flex-1 py-2.5 px-3 rounded-full text-xs font-bold gap-1.5 min-h-[42px]">
                     <Phone className="w-4 h-4" /><span>Call NGO</span>
                   </a>
                   <a href={getWhatsAppLink(ngo.whatsapp || ngo.phone, `Hello ${ngo.name}, we need flood relief support.`)}
                     target="_blank" rel="noopener noreferrer"
-                    className="ripple-btn ripple-dark btn-base btn-glass flex-1 py-2.5 px-3 rounded-xl text-xs font-bold gap-1.5 min-h-[42px]">
+                    className="ripple-btn ripple-dark btn-base btn-glass flex-1 py-2.5 px-3 rounded-full text-xs font-bold gap-1.5 min-h-[42px]">
                     <MessageSquare className="w-4 h-4 text-emerald-600" /><span>WhatsApp</span>
                   </a>
                 </>
               ) : (
-                <div className="flex-1 py-2.5 px-3 bg-slate-50 border border-slate-200 text-slate-400 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 min-h-[42px] italic">
+                <div className="flex-1 py-2.5 px-3 bg-slate-50 border border-slate-200 text-slate-400 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 min-h-[42px] italic">
                   <Phone className="w-4 h-4 opacity-40" />
                   <span>NGO Partners Only</span>
                 </div>
@@ -282,17 +282,17 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
               {vol.showPhone === true ? (
                 <>
                   <a href={`tel:${vol.phone?.replace(/[^0-9]/g, '')}`}
-                    className="ripple-btn btn-base btn-indigo flex-1 py-2.5 px-3 rounded-xl text-xs font-bold gap-1.5 min-h-[42px]">
+                    className="ripple-btn btn-base btn-indigo flex-1 py-2.5 px-3 rounded-full text-xs font-bold gap-1.5 min-h-[42px]">
                     <Phone className="w-4 h-4" /><span>Call Volunteer</span>
                   </a>
                   <a href={getWhatsAppLink(vol.whatsapp || vol.phone, `Hello ${vol.name}, we need flood relief boat/car support.`)}
                     target="_blank" rel="noopener noreferrer"
-                    className="ripple-btn ripple-dark btn-base btn-glass flex-1 py-2.5 px-3 rounded-xl text-xs font-bold gap-1.5 min-h-[42px]">
+                    className="ripple-btn ripple-dark btn-base btn-glass flex-1 py-2.5 px-3 rounded-full text-xs font-bold gap-1.5 min-h-[42px]">
                     <MessageSquare className="w-4 h-4 text-emerald-600" /><span>WhatsApp</span>
                   </a>
                 </>
               ) : (
-                <div className="flex-1 py-2.5 px-3 bg-slate-50 border border-slate-200 text-slate-400 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 min-h-[42px] italic">
+                <div className="flex-1 py-2.5 px-3 bg-slate-50 border border-slate-200 text-slate-400 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 min-h-[42px] italic">
                   <Phone className="w-4 h-4 opacity-40" /><span>Number Hidden</span>
                 </div>
               )}

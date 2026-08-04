@@ -244,59 +244,70 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
               return (
                 <div
                   key={req.id}
-                  className={`card-surface ${accentClass} ${cardBg} rounded-2xl flex flex-col`}
+                  className="bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group hover:-translate-y-1"
                 >
-                  {/* Card header row */}
-                  <div className="flex items-center justify-between gap-2 px-4 pt-4 pb-3 border-b border-slate-100 flex-wrap">
-                    <div className="flex items-center gap-2">
-                      {getStatusChip(req, isUrgent, isInProgress)}
-                      {getUrgencyChip(req.urgency)}
+                  {/* Paper Header / Title Row */}
+                  <div className="p-4 border-b border-slate-100 flex items-start gap-3 bg-slate-50/60">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 border ${
+                      isResolved
+                        ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
+                        : isInProgress
+                        ? 'bg-amber-100 text-amber-700 border-amber-200'
+                        : isUrgent
+                        ? 'bg-red-100 text-red-700 border-red-200'
+                        : 'bg-blue-100 text-blue-700 border-blue-200'
+                    }`}>
+                      {isResolved ? <ShieldCheck className="w-5 h-5" /> : isUrgent ? <AlertTriangle className="w-5 h-5" /> : <Package className="w-5 h-5" />}
                     </div>
-                    <span className="text-[11px] font-mono text-slate-400">
-                      {new Date(req.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
-                    </span>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-1 flex-wrap">
+                        <h3 className="text-base font-black text-slate-900 leading-snug group-hover:text-blue-600 transition-colors truncate">
+                          {req.familiesCount > 0
+                            ? `${req.familiesCount} Families Need Help`
+                            : peopleTotal > 0
+                            ? `${peopleTotal} People Need Help`
+                            : 'Relief Help Needed'}
+                        </h3>
+                        <span className="text-[10px] font-mono font-semibold text-slate-400">
+                          {new Date(req.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                        {getStatusChip(req, isUrgent, isInProgress)}
+                        {getUrgencyChip(req.urgency)}
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Card body */}
-                  <div className="flex-1 px-4 py-3 space-y-2.5">
-                    <h3 className="text-base font-black text-slate-900 leading-snug">
-                      {req.familiesCount > 0
-                        ? `${req.familiesCount} Families Need Help`
-                        : peopleTotal > 0
-                        ? `${peopleTotal} People Need Help`
-                        : 'Relief Help Needed'}
-                      <span className="text-slate-500 font-semibold text-sm ml-1.5">
-                        · {req.district}
-                      </span>
-                    </h3>
-
-                    <p className="text-xs text-slate-600 font-medium flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                  {/* Paper Content Area */}
+                  <div className="flex-1 p-4 space-y-3">
+                    {/* Location & District */}
+                    <div className="flex items-center gap-2 text-xs font-semibold text-slate-700 bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
+                      <MapPin className="w-4 h-4 text-red-500 shrink-0" />
                       <span className="truncate">{req.locationName || req.villageName}</span>
-                      {req.pinCode && (
-                        <span className="ml-1 font-mono text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 shrink-0">
-                          {req.pinCode}
-                        </span>
-                      )}
-                    </p>
+                      <span className="ml-auto font-mono text-[10px] text-slate-600 bg-white px-2.5 py-0.5 rounded-full border border-slate-200 shrink-0 font-bold">
+                        {req.district}
+                      </span>
+                    </div>
 
                     {/* Ground Condition Pill */}
                     {req.groundCondition && (
                       <div className="flex items-center gap-1 flex-wrap">
                         {req.groundCondition === 'SUBMERGED' && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-black bg-cyan-50 text-cyan-800 border border-cyan-300 px-2 py-0.5 rounded-full">
+                          <span className="inline-flex items-center gap-1.5 text-[10px] font-black bg-cyan-50 text-cyan-800 border border-cyan-300 px-3 py-1 rounded-full">
                             <Waves className="w-3 h-3 text-cyan-600 shrink-0" />
                             <span>Submerged (Boat Access Only)</span>
                           </span>
                         )}
                         {req.groundCondition === 'RECEDING' && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-black bg-amber-50 text-amber-800 border border-amber-300 px-2 py-0.5 rounded-full">
+                          <span className="inline-flex items-center gap-1.5 text-[10px] font-black bg-amber-50 text-amber-800 border border-amber-300 px-3 py-1 rounded-full">
                             <Droplets className="w-3 h-3 text-amber-600 shrink-0" />
                             <span>Water Receding (Heavy Mud)</span>
                           </span>
                         )}
                         {req.groundCondition === 'DRY_LAND' && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-black bg-emerald-50 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded-full">
+                          <span className="inline-flex items-center gap-1.5 text-[10px] font-black bg-emerald-50 text-emerald-800 border border-emerald-300 px-3 py-1 rounded-full">
                             <Compass className="w-3 h-3 text-emerald-600 shrink-0" />
                             <span>Dry Land (Road Accessible)</span>
                           </span>
@@ -310,7 +321,7 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
                       return tags.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
                           {tags.map((tag, i) => (
-                            <span key={i} className="px-2.5 py-1 text-[11px] font-bold bg-slate-100 text-slate-700 rounded-full border border-slate-200">
+                            <span key={i} className="px-3 py-1 text-[11px] font-bold bg-slate-100 text-slate-700 rounded-full border border-slate-200/80">
                               {tag}
                             </span>
                           ))}
@@ -319,26 +330,26 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
                     })()}
 
                     {req.details && (
-                      <ExpandableNotes text={req.details} />
+                      <div className="p-3 bg-slate-50/80 rounded-2xl border border-slate-100 text-xs">
+                        <ExpandableNotes text={req.details} />
+                      </div>
                     )}
                   </div>
 
-                  {/* Card footer */}
-                  <div className="px-4 pb-4 pt-3 border-t border-slate-100 space-y-2.5">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs font-mono font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
-                        +91 ×××× {req.phone ? req.phone.slice(-4) : 'XXXX'}
-                      </span>
-                    </div>
+                  {/* Paper Actions Bar */}
+                  <div className="px-4 py-3 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between gap-3 mt-auto">
+                    <span className="text-xs font-mono font-bold text-slate-600 bg-white px-3 py-1 rounded-full border border-slate-200">
+                      +91 ×××× {req.phone ? req.phone.slice(-4) : 'XXXX'}
+                    </span>
 
                     <RippleButton
                       variant="emerald"
                       onClick={() => setActiveTreeRequest(req)}
-                      className="w-full py-2.5 px-4 rounded-xl text-xs font-bold tracking-wide uppercase gap-2"
+                      className="py-2 px-4 rounded-full text-xs font-black tracking-wider uppercase gap-2 hover:shadow-md active:scale-95 transition-all shadow-sm"
                     >
-                      <Activity className="w-4 h-4 shrink-0" />
+                      <Activity className="w-3.5 h-3.5 shrink-0" />
                       <span>View Updates</span>
-                      <ArrowUpRight className="w-3.5 h-3.5 ml-auto shrink-0 opacity-70" />
+                      <ArrowUpRight className="w-3.5 h-3.5 opacity-80 shrink-0" />
                     </RippleButton>
                   </div>
                 </div>
@@ -354,7 +365,7 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
                 darkRipple
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(p => p - 1)}
-                className="p-2.5 rounded-xl disabled:opacity-30 min-h-[40px] min-w-[40px]"
+                className="p-2.5 rounded-xl disabled:opacity-30 min-h-[40px] min-w-[40px] hover:-translate-y-0.5 hover:shadow-md active:scale-95 transition-all duration-200"
               >
                 <ChevronLeft className="w-5 h-5 text-slate-700" />
               </RippleButton>
@@ -368,7 +379,7 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
                 darkRipple
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage(p => p + 1)}
-                className="p-2.5 rounded-xl disabled:opacity-30 min-h-[40px] min-w-[40px]"
+                className="p-2.5 rounded-xl disabled:opacity-30 min-h-[40px] min-w-[40px] hover:-translate-y-0.5 hover:shadow-md active:scale-95 transition-all duration-200"
               >
                 <ChevronRight className="w-5 h-5 text-slate-700" />
               </RippleButton>

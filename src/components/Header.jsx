@@ -89,13 +89,13 @@ export default function Header({
             <div className="hidden sm:flex items-center gap-2 mr-2">
               <button
                 onClick={openSupplyModal}
-                className="ripple-btn h-9 px-4 rounded-lg text-[13px] font-semibold bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 transition-all cursor-pointer"
+                className="ripple-btn ripple-dark h-9 px-4 rounded-xl text-[13px] font-bold bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95"
               >
                 {i18nService.t('reliefForm', 'Request Relief')}
               </button>
               <button
                 onClick={openRescueModal}
-                className="ripple-btn h-9 px-4 rounded-lg text-[13px] font-semibold bg-red-600 hover:bg-red-700 text-white border border-red-500/30 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                className="ripple-btn h-9 px-4 rounded-xl text-[13px] font-bold bg-red-600 hover:bg-red-700 text-white border border-red-500/40 transition-all duration-200 cursor-pointer flex items-center gap-1.5 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95"
               >
                 <ShieldAlert className="w-3.5 h-3.5" />
                 {i18nService.t('requestRescue', 'SOS Rescue')}

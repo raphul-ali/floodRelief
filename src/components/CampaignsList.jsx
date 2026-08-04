@@ -79,7 +79,7 @@ export default function CampaignsList({ campaigns }) {
                     href={`https://wa.me/${c.whatsapp_number.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi, I am reaching out regarding the ${c.title} campaign.`)}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full py-2.5 bg-green-50 hover:bg-green-100 border border-green-200 text-green-700 font-bold rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
+                    className="w-full py-2.5 bg-green-50 hover:bg-green-100 border border-green-200 text-green-700 font-bold rounded-full text-sm transition-colors flex items-center justify-center gap-2"
                   >
                     <MessageCircle className="w-4 h-4" />
                     <span>Contact</span>
@@ -90,7 +90,7 @@ export default function CampaignsList({ campaigns }) {
                     href={c.map_link}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full py-2.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 font-bold rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
+                    className="w-full py-2.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 font-bold rounded-full text-sm transition-colors flex items-center justify-center gap-2"
                   >
                     <MapPin className="w-4 h-4" />
                     <span>View Map</span>

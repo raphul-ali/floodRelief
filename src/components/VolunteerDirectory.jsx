@@ -174,7 +174,7 @@ export default function VolunteerDirectory({ volunteers = [] }) {
             <div className="pt-3 border-t border-slate-800 flex items-center gap-2">
               <a
                 href={`tel:${vol.phone}`}
-                className="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-md transition-colors"
+                className="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full text-xs font-bold flex items-center justify-center gap-1.5 shadow-md transition-colors"
               >
                 <Phone className="w-4 h-4" />
                 <span>Call Helper</span>
@@ -185,7 +185,7 @@ export default function VolunteerDirectory({ volunteers = [] }) {
                   href={getWhatsAppLink(vol.whatsapp || vol.phone, `Hello ${vol.name}, reaching out regarding Assam flood relief.`)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="py-2.5 px-3.5 bg-emerald-950 border border-emerald-700 text-emerald-400 hover:bg-emerald-900 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
+                  className="py-2.5 px-3.5 bg-emerald-950 border border-emerald-700 text-emerald-400 hover:bg-emerald-900 rounded-full text-xs font-bold flex items-center gap-1.5 transition-colors"
                   title="Chat on WhatsApp"
                 >
                   <MessageSquare className="w-4 h-4" />
@@ -197,7 +197,7 @@ export default function VolunteerDirectory({ volunteers = [] }) {
                   href={vol.socialLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="py-2.5 px-3.5 bg-purple-950 border border-purple-700 text-purple-300 hover:bg-purple-900 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
+                  className="py-2.5 px-3.5 bg-purple-950 border border-purple-700 text-purple-300 hover:bg-purple-900 rounded-full text-xs font-bold flex items-center gap-1.5 transition-colors"
                   title="View Social Profile"
                 >
                   <Instagram className="w-4 h-4" />

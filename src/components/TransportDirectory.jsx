@@ -106,7 +106,7 @@ export default function TransportDirectory({ volunteers, openLoginModal }) {
               <div className="mt-5 pt-4 border-t border-slate-100">
                 <a
                   href={`tel:${vol.phone}`}
-                  className="w-full py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold rounded-full text-sm transition-colors flex items-center justify-center gap-2"
                 >
                   <Phone className="w-4 h-4" />
                   <span>Call {vol.phone}</span>
