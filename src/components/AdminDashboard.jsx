@@ -651,11 +651,11 @@ export default function AdminDashboard({ onDataUpdated }) {
                 </div>
 
                 {/* PAGINATION CONTROL BAR */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-start sm:justify-between gap-3 text-xs mb-36 sm:mb-6 pb-10 sm:pb-4">
                   <span className="font-bold text-slate-700">
                     Page {safeSosPage} of {totalSosPages} ({filteredSos.length} Total Requests)
                   </span>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-start sm:justify-center gap-2 w-full sm:w-auto pr-36 sm:pr-0">
                     <button
                       disabled={safeSosPage <= 1}
                       onClick={() => setSosCurrentPage(prev => Math.max(1, prev - 1))}
@@ -753,9 +753,9 @@ export default function AdminDashboard({ onDataUpdated }) {
                 </div>
 
                 {/* PAGINATION BAR */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex items-center justify-between text-xs">
+                <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-start sm:justify-between gap-3 text-xs mb-36 sm:mb-6 pb-10 sm:pb-4">
                   <span className="font-bold text-slate-700">Page {safeDeliveryPage} of {totalDeliveryPages} ({filteredDeliveries.length} Logs)</span>
-                  <div className="flex gap-2">
+                  <div className="flex items-center justify-start sm:justify-center gap-2 w-full sm:w-auto pr-36 sm:pr-0">
                     <button disabled={safeDeliveryPage <= 1} onClick={() => setDeliveryCurrentPage(p => Math.max(1, p - 1))} className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl font-bold disabled:opacity-50">Previous</button>
                     <button disabled={safeDeliveryPage >= totalDeliveryPages} onClick={() => setDeliveryCurrentPage(p => Math.min(totalDeliveryPages, p + 1))} className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl font-bold disabled:opacity-50">Next</button>
                   </div>
@@ -843,9 +843,9 @@ export default function AdminDashboard({ onDataUpdated }) {
                 </div>
 
                 {/* PAGINATION BAR */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex items-center justify-between text-xs">
+                <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-start sm:justify-between gap-3 text-xs mb-36 sm:mb-6 pb-10 sm:pb-4">
                   <span className="font-bold text-slate-700">Page {safeNgoPage} of {totalNgoPages} ({filteredNgos.length} Partners)</span>
-                  <div className="flex gap-2">
+                  <div className="flex items-center justify-start sm:justify-center gap-2 w-full sm:w-auto pr-36 sm:pr-0">
                     <button disabled={safeNgoPage <= 1} onClick={() => setNgoCurrentPage(p => Math.max(1, p - 1))} className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl font-bold disabled:opacity-50">Previous</button>
                     <button disabled={safeNgoPage >= totalNgoPages} onClick={() => setNgoCurrentPage(p => Math.min(totalNgoPages, p + 1))} className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl font-bold disabled:opacity-50">Next</button>
                   </div>
@@ -933,9 +933,9 @@ export default function AdminDashboard({ onDataUpdated }) {
                 </div>
 
                 {/* PAGINATION BAR */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex items-center justify-between text-xs">
+                <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-start sm:justify-between gap-3 text-xs mb-36 sm:mb-6 pb-10 sm:pb-4">
                   <span className="font-bold text-slate-700">Page {safeVolPage} of {totalVolPages} ({filteredVolunteers.length} Volunteers)</span>
-                  <div className="flex gap-2">
+                  <div className="flex items-center justify-start sm:justify-center gap-2 w-full sm:w-auto pr-36 sm:pr-0">
                     <button disabled={safeVolPage <= 1} onClick={() => setVolCurrentPage(p => Math.max(1, p - 1))} className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl font-bold disabled:opacity-50">Previous</button>
                     <button disabled={safeVolPage >= totalVolPages} onClick={() => setVolCurrentPage(p => Math.min(totalVolPages, p + 1))} className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl font-bold disabled:opacity-50">Next</button>
                   </div>
@@ -1034,9 +1034,9 @@ export default function AdminDashboard({ onDataUpdated }) {
                 </div>
 
                 {/* PAGINATION BAR */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex items-center justify-between text-xs">
+                <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-start sm:justify-between gap-3 text-xs mb-36 sm:mb-6 pb-10 sm:pb-4">
                   <span className="font-bold text-slate-700">Page {safeRecoveryPage} of {totalRecoveryPages} ({filteredRecovery.length} Recovery Requests)</span>
-                  <div className="flex gap-2">
+                  <div className="flex items-center justify-start sm:justify-center gap-2 w-full sm:w-auto pr-36 sm:pr-0">
                     <button disabled={safeRecoveryPage <= 1} onClick={() => setRecoveryCurrentPage(p => Math.max(1, p - 1))} className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl font-bold disabled:opacity-50">Previous</button>
                     <button disabled={safeRecoveryPage >= totalRecoveryPages} onClick={() => setRecoveryCurrentPage(p => Math.min(totalRecoveryPages, p + 1))} className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl font-bold disabled:opacity-50">Next</button>
                   </div>
@@ -1135,11 +1135,11 @@ export default function AdminDashboard({ onDataUpdated }) {
               </div>
 
               {/* PAGINATION FOOTER */}
-              <div className="px-4 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
+              <div className="px-4 py-3 border-t border-slate-200 bg-slate-50 flex flex-col sm:flex-row items-start sm:items-center justify-start sm:justify-between gap-3 text-xs mb-36 sm:mb-6 pb-10 sm:pb-4">
                 <span className="text-slate-500 font-medium">
                   Page {safeUserCurrentPage} of {totalUserPages} ({filteredUsers.length} Users)
                 </span>
-                <div className="flex gap-2">
+                <div className="flex items-center justify-start sm:justify-center gap-2 w-full sm:w-auto pr-36 sm:pr-0">
                   <button
                     disabled={safeUserCurrentPage <= 1}
                     onClick={() => setUserCurrentPage(prev => Math.max(1, prev - 1))}

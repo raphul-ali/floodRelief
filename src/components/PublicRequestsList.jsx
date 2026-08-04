@@ -359,7 +359,7 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-start sm:justify-center gap-2.5 sm:gap-3 pt-6 pb-24 sm:pb-6 pl-4 sm:pl-0 pr-28 sm:pr-0">
+            <div className="flex items-center justify-start sm:justify-center gap-2.5 sm:gap-3 pt-6 pb-36 sm:pb-6 pl-4 sm:pl-0 pr-44 sm:pr-0 mb-12 sm:mb-0">
               <RippleButton
                 variant="glass"
                 darkRipple

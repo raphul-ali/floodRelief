@@ -558,7 +558,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                               : (req.peopleCount > 0 ? `${req.peopleCount} People Need Relief` : 'Relief Request')}
                           </h4>
                           <p className="text-xs font-semibold text-slate-500 mt-0.5">
-                            Contact: <strong className="text-slate-900">{req.name}</strong> • ID: <span className="font-mono text-slate-500">{req.id}</span>
+                            Contact: <strong className="text-slate-900">{req.name}</strong>
                           </p>
                         </div>
 
@@ -660,7 +660,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
               </div>
 
               {/* PAGINATION CONTROL BAR */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+              <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-start sm:justify-between gap-3 text-xs mb-36 sm:mb-6 pb-10 sm:pb-4">
                 <div className="flex items-center gap-3">
                   <span className="font-bold text-slate-700">
                     Page {safeReqPage} of {totalReqPages} ({filteredRequests.length} Total Cases)
@@ -679,7 +679,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-start sm:justify-center gap-2 w-full sm:w-auto pr-36 sm:pr-0">
                   <button
                     disabled={safeReqPage <= 1}
                     onClick={() => setReqCurrentPage(prev => Math.max(1, prev - 1))}
@@ -766,7 +766,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
               </div>
 
               {/* VOLUNTEERS PAGINATION CONTROL BAR */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+              <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-start sm:justify-between gap-3 text-xs mb-36 sm:mb-6 pb-10 sm:pb-4">
                 <div className="flex items-center gap-3">
                   <span className="font-bold text-slate-700">
                     Page {safeVolPage} of {totalVolPages} ({filteredVolunteers.length} Total Volunteers)
@@ -784,7 +784,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-start sm:justify-center gap-2 w-full sm:w-auto pr-36 sm:pr-0">
                   <button
                     disabled={safeVolPage <= 1}
                     onClick={() => setVolCurrentPage(prev => Math.max(1, prev - 1))}
@@ -833,8 +833,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                   const isAccepted = req.status === 'ACCEPTED';
                   return (
                     <div key={req.id} className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
-                      <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
-                        <span className="text-xs font-mono text-slate-400">{req.id}</span>
+                      <div className="flex items-center justify-end gap-2 border-b border-slate-100 pb-2">
                         <span className={`px-2.5 py-0.5 text-[10px] font-bold rounded-full ${isAccepted ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>
                           {isAccepted ? '✓ UNLOCKED & ACCEPTED' : '⏳ PENDING RESPONSE'}
                         </span>
@@ -896,11 +895,11 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
               </div>
 
               {/* COLLABS PAGINATION BAR */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+              <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-start sm:justify-between gap-3 text-xs mb-36 sm:mb-6 pb-10 sm:pb-4">
                 <span className="font-bold text-slate-700">
                   Page {safeCollabPage} of {totalCollabPages} ({collabRequests.length} Total Requests)
                 </span>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-start sm:justify-center gap-2 w-full sm:w-auto pr-36 sm:pr-0">
                   <button
                     disabled={safeCollabPage <= 1}
                     onClick={() => setCollabCurrentPage(prev => Math.max(1, prev - 1))}
