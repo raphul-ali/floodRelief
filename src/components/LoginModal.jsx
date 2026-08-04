@@ -348,20 +348,20 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
   };
 
   return (
-    <div className="fixed inset-0 z-[70] bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="bg-[#111827] border border-[#1f2937] rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[88vh] animate-slide-up">
+    <div className="fixed inset-0 z-[70] bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div className="bg-white border border-gray-200 rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md shadow-[0_8px_32px_rgba(0,0,0,0.08),0_1px_4px_rgba(0,0,0,0.04)] flex flex-col max-h-[92vh] sm:max-h-[88vh] animate-slide-up">
 
         {/* ── Modal header ─────────────────────────────────────────── */}
-        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-[#1f2937] shrink-0">
+        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-gray-100 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#3b82f6] rounded-xl flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 bg-blue-600 rounded-xl shadow-sm shadow-blue-600/20 flex items-center justify-center shrink-0">
               <ShieldCheck className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h2 className="text-[15px] font-black text-white leading-none">
+              <h2 className="text-base font-semibold text-gray-900 leading-none">
                 {activeMode === 'REGISTER' ? 'Create Account' : 'Partner Login'}
               </h2>
-              <p className="text-[11px] text-[#6b7280] mt-0.5">
+              <p className="text-xs text-gray-500 mt-0.5">
                 {activeMode === 'REGISTER'
                   ? 'Join as NGO or Relief Helper'
                   : 'Access the partner portal'}
@@ -370,7 +370,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-[#1f2937] hover:bg-[#374151] flex items-center justify-center text-[#9ca3af] hover:text-white transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full bg-gray-50 hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-700 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -380,20 +380,20 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
         <div className="flex gap-0 px-5 pt-4 shrink-0">
           <button
             onClick={() => { setActiveMode('NGO_LOGIN'); setLoginError(''); }}
-            className={`flex-1 py-2.5 text-sm font-semibold rounded-l-xl border transition-all cursor-pointer ${
+            className={`flex-1 py-3 text-sm font-medium transition-all cursor-pointer ${
               activeMode !== 'REGISTER'
-                ? 'bg-[#3b82f6] border-[#3b82f6] text-white'
-                : 'bg-[#1f2937] border-[#374151] text-[#9ca3af] hover:text-white'
+                ? 'border-b-2 border-blue-600 text-blue-600 bg-transparent -mb-px'
+                : 'border-b-2 border-transparent text-gray-400 hover:text-gray-700 bg-transparent -mb-px'
             }`}
           >
             Login
           </button>
           <button
             onClick={() => { setActiveMode('REGISTER'); setRegError(''); setOtpStep(false); }}
-            className={`flex-1 py-2.5 text-sm font-semibold rounded-r-xl border transition-all cursor-pointer ${
+            className={`flex-1 py-3 text-sm font-medium transition-all cursor-pointer ${
               activeMode === 'REGISTER'
-                ? 'bg-[#3b82f6] border-[#3b82f6] text-white'
-                : 'bg-[#1f2937] border-[#374151] text-[#9ca3af] hover:text-white'
+                ? 'border-b-2 border-blue-600 text-blue-600 bg-transparent -mb-px'
+                : 'border-b-2 border-transparent text-gray-400 hover:text-gray-700 bg-transparent -mb-px'
             }`}
           >
             Register
@@ -409,23 +409,23 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
 
             {/* Role selector */}
             <div>
-              <p className="text-[12px] text-[#9ca3af] font-medium mb-2">Sign in as:</p>
+              <p className="text-[12px] text-gray-500 font-medium mb-2">Sign in as:</p>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => { setActiveMode('NGO_LOGIN'); setLoginError(''); }}
                   className={`flex items-center gap-2.5 p-3 rounded-xl border transition-all cursor-pointer text-left ${
                     activeMode === 'NGO_LOGIN'
-                      ? 'bg-[#1e3a5f] border-[#3b82f6] text-white'
-                      : 'bg-[#1f2937] border-[#374151] text-[#9ca3af] hover:border-[#4b5563]'
+                      ? 'bg-blue-50 border-2 border-blue-500 text-gray-900 shadow-sm shadow-blue-500/10'
+                      : 'border border-gray-200 bg-white text-gray-500 hover:border-blue-300 hover:bg-blue-50/30 hover:shadow-sm'
                   }`}
                 >
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${activeMode === 'NGO_LOGIN' ? 'bg-[#3b82f6]' : 'bg-[#374151]'}`}>
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${activeMode === 'NGO_LOGIN' ? 'bg-blue-600 shadow-sm shadow-blue-600/20' : 'bg-gray-300'}`}>
                     <HeartHandshake className="w-4 h-4 text-white" />
                   </div>
                   <div>
                     <p className="text-[12px] font-bold leading-none">NGO Partner</p>
-                    <p className="text-[10px] text-[#9ca3af] mt-0.5">Organization</p>
+                    <p className="text-[10px] text-gray-500 mt-0.5">Organization</p>
                   </div>
                 </button>
                 <button
@@ -433,16 +433,16 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                   onClick={() => { setActiveMode('VOLUNTEER_LOGIN'); setLoginError(''); }}
                   className={`flex items-center gap-2.5 p-3 rounded-xl border transition-all cursor-pointer text-left ${
                     activeMode === 'VOLUNTEER_LOGIN'
-                      ? 'bg-[#1e3a5f] border-[#3b82f6] text-white'
-                      : 'bg-[#1f2937] border-[#374151] text-[#9ca3af] hover:border-[#4b5563]'
+                      ? 'bg-blue-50 border-2 border-blue-500 text-gray-900 shadow-sm shadow-blue-500/10'
+                      : 'border border-gray-200 bg-white text-gray-500 hover:border-blue-300 hover:bg-blue-50/30 hover:shadow-sm'
                   }`}
                 >
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${activeMode === 'VOLUNTEER_LOGIN' ? 'bg-[#3b82f6]' : 'bg-[#374151]'}`}>
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${activeMode === 'VOLUNTEER_LOGIN' ? 'bg-blue-600 shadow-sm shadow-blue-600/20' : 'bg-gray-300'}`}>
                     <UserCheck className="w-4 h-4 text-white" />
                   </div>
                   <div>
                     <p className="text-[12px] font-bold leading-none">Relief Helper</p>
-                    <p className="text-[10px] text-[#9ca3af] mt-0.5">Boat, Car, Medical</p>
+                    <p className="text-[10px] text-gray-500 mt-0.5">Boat, Car, Medical</p>
                   </div>
                 </button>
               </div>
@@ -461,13 +461,13 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
               <div>
                 <label className="block text-[12px] font-semibold text-[#d1d5db] mb-1.5">Email</label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-[#6b7280] absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Mail className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={activeMode === 'NGO_LOGIN' ? 'ngo@organization.org' : 'helper@email.com'}
-                    className="w-full bg-[#1f2937] border border-[#374151] rounded-xl pl-9 pr-4 py-3 text-sm text-white placeholder-[#6b7280] focus:outline-none focus:border-[#3b82f6] transition-colors min-h-[46px]"
+                    className="w-full bg-white border border-gray-300 rounded-xl shadow-sm pl-9 pr-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-colors min-h-[46px]"
                     required
                   />
                 </div>
@@ -476,19 +476,19 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
               <div>
                 <label className="block text-[12px] font-semibold text-[#d1d5db] mb-1.5">Password</label>
                 <div className="relative">
-                  <Key className="w-4 h-4 text-[#6b7280] absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Key className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="w-full bg-[#1f2937] border border-[#374151] rounded-xl pl-9 pr-10 py-3 text-sm text-white placeholder-[#6b7280] focus:outline-none focus:border-[#3b82f6] transition-colors min-h-[46px]"
+                    className="w-full bg-white border border-gray-300 rounded-xl shadow-sm pl-9 pr-10 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-colors min-h-[46px]"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b7280] hover:text-white transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -502,7 +502,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                       setRecError(''); setRecSuccess(false);
                       setActiveMode('FORGOT_PASSWORD');
                     }}
-                    className="text-[#3b82f6] hover:text-blue-400 font-medium"
+                    className="text-[#3b82f6] hover:text-blue-600 font-medium"
                   >
                     Forgot password?
                   </button>
@@ -513,7 +513,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                       setRecError(''); setRecSuccess(false);
                       setActiveMode('FORGOT_EMAIL');
                     }}
-                    className="text-[#6b7280] hover:text-[#d1d5db] font-medium"
+                    className="text-gray-500 hover:text-[#d1d5db] font-medium"
                   >
                     Forgot email?
                   </button>
@@ -523,7 +523,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
               <button
                 type="submit"
                 disabled={isLoggingIn}
-                className="w-full py-3 bg-[#3b82f6] hover:bg-[#2563eb] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-xl text-sm transition-colors flex items-center justify-center gap-2 min-h-[48px] mt-2 cursor-pointer"
+                className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl text-sm shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/25 active:shadow-sm active:scale-[0.99] transition-colors flex items-center justify-center gap-2 min-h-[48px] mt-2 cursor-pointer"
               >
                 {isLoggingIn ? (
                   <>
@@ -539,11 +539,11 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
               </button>
             </form>
 
-            <p className="text-center text-[12px] text-[#6b7280]">
+            <p className="text-center text-xs text-gray-500">
               Don't have an account?{' '}
               <button
                 onClick={() => { setActiveMode('REGISTER'); setRegError(''); setOtpStep(false); }}
-                className="text-[#3b82f6] hover:text-blue-400 font-semibold cursor-pointer"
+                className="text-[#3b82f6] hover:text-blue-600 font-semibold cursor-pointer"
               >
                 Create one
               </button>
@@ -557,23 +557,23 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
 
             {/* Role picker cards */}
             <div>
-              <p className="text-[12px] text-[#9ca3af] font-medium mb-2">Register as:</p>
+              <p className="text-[12px] text-gray-500 font-medium mb-2">Register as:</p>
               <div className="grid grid-cols-2 gap-2.5">
                 <button
                   type="button"
                   onClick={() => { setRegRole('NGO'); setRegShowPhone(regNgoType.includes('Registered NGO')); }}
                   className={`flex flex-col items-start gap-2 p-3.5 rounded-xl border transition-all cursor-pointer text-left ${
                     regRole === 'NGO'
-                      ? 'bg-[#1e3a5f] border-[#3b82f6]'
-                      : 'bg-[#1f2937] border-[#374151] hover:border-[#4b5563]'
+                      ? 'bg-blue-50 border-2 border-blue-500 shadow-sm shadow-blue-500/10'
+                      : 'bg-white border border-gray-200 hover:border-blue-300 hover:shadow-sm'
                   }`}
                 >
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${regRole === 'NGO' ? 'bg-[#3b82f6]' : 'bg-[#374151]'}`}>
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${regRole === 'NGO' ? 'bg-blue-600 shadow-sm shadow-blue-600/20' : 'bg-gray-300'}`}>
                     <Building2 className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <p className={`text-[13px] font-bold ${regRole === 'NGO' ? 'text-white' : 'text-[#9ca3af]'}`}>NGO / Org</p>
-                    <p className="text-[10px] text-[#6b7280] mt-0.5 leading-snug">Relief organization, food donor, media</p>
+                    <p className={`text-[13px] font-bold ${regRole === 'NGO' ? 'text-gray-900' : 'text-gray-500'}`}>NGO / Org</p>
+                    <p className="text-[10px] text-gray-500 mt-0.5 leading-snug">Relief organization, food donor, media</p>
                   </div>
                   {regRole === 'NGO' && (
                     <span className="text-[10px] font-bold text-[#3b82f6]">✓ Selected</span>
@@ -585,16 +585,16 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                   onClick={() => { setRegRole('VOLUNTEER'); setRegShowPhone(false); }}
                   className={`flex flex-col items-start gap-2 p-3.5 rounded-xl border transition-all cursor-pointer text-left ${
                     regRole === 'VOLUNTEER'
-                      ? 'bg-[#1e3a5f] border-[#3b82f6]'
-                      : 'bg-[#1f2937] border-[#374151] hover:border-[#4b5563]'
+                      ? 'bg-blue-50 border-2 border-blue-500 shadow-sm shadow-blue-500/10'
+                      : 'bg-white border border-gray-200 hover:border-blue-300 hover:shadow-sm'
                   }`}
                 >
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${regRole === 'VOLUNTEER' ? 'bg-[#3b82f6]' : 'bg-[#374151]'}`}>
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${regRole === 'VOLUNTEER' ? 'bg-blue-600 shadow-sm shadow-blue-600/20' : 'bg-gray-300'}`}>
                     <UserCheck className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <p className={`text-[13px] font-bold ${regRole === 'VOLUNTEER' ? 'text-white' : 'text-[#9ca3af]'}`}>Relief Helper</p>
-                    <p className="text-[10px] text-[#6b7280] mt-0.5 leading-snug">Boat owner, 4×4, medical, transport</p>
+                    <p className={`text-[13px] font-bold ${regRole === 'VOLUNTEER' ? 'text-gray-900' : 'text-gray-500'}`}>Relief Helper</p>
+                    <p className="text-[10px] text-gray-500 mt-0.5 leading-snug">Boat owner, 4×4, medical, transport</p>
                   </div>
                   {regRole === 'VOLUNTEER' && (
                     <span className="text-[10px] font-bold text-[#3b82f6]">✓ Selected</span>
@@ -604,7 +604,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
             </div>
 
             {regError && (
-              <div className="p-3 bg-red-950/80 border border-red-500/40 rounded-xl text-red-200 text-xs font-semibold flex items-center gap-2">
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-semibold flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
                 <span>{regError}</span>
               </div>
@@ -612,32 +612,32 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
 
             {/* SUCCESS STATES */}
             {regSuccess ? (
-                <div className="bg-slate-950 border border-amber-500/50 rounded-2xl p-5 space-y-4 text-slate-100 shadow-xl animate-fadeIn">
+                <div className="bg-white border border-amber-500/50 rounded-2xl p-5 space-y-4 text-slate-100 shadow-xl animate-fadeIn">
                   <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center shrink-0">
                     <ShieldCheck className="w-6 h-6" />
                   </div>
                   <div>
-                    <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black uppercase tracking-wider mb-1">
+                    <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-black uppercase tracking-wider mb-1">
                       Status: Pending Verification
                     </div>
-                    <h4 className="text-base font-black text-white leading-tight">
+                    <h4 className="text-base font-semibold text-gray-900 leading-tight">
                       Awaiting Admin Approval
                     </h4>
                   </div>
                 </div>
 
-                <div className="space-y-3 text-xs leading-relaxed border-t border-b border-slate-800 py-3">
-                  <p className="font-semibold text-slate-200">
-                    Your <span className="text-blue-400 font-bold">{regRole === 'NGO' ? 'NGO' : 'Relief Helper'}</span> registration for <strong className="text-white">{regName}</strong> has been submitted successfully!
+                <div className="space-y-3 text-xs leading-relaxed border-t border-b border-gray-100 py-3">
+                  <p className="font-semibold text-gray-700">
+                    Your <span className="text-blue-600 font-bold">{regRole === 'NGO' ? 'NGO' : 'Relief Helper'}</span> registration for <strong className="text-gray-900">{regName}</strong> has been submitted successfully!
                   </p>
                   
-                  <div className="p-3 bg-amber-950/40 border border-amber-500/30 rounded-xl space-y-1.5 text-amber-200">
-                    <div className="flex items-center gap-2 font-bold text-amber-300">
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-1.5 text-amber-800">
+                    <div className="flex items-center gap-2 font-bold text-amber-700">
                       <ShieldCheck className="w-4 h-4 text-amber-400 animate-pulse shrink-0" />
                       <span>Approval Pending</span>
                     </div>
-                    <p className="text-[11px] text-slate-300 leading-normal">
+                    <p className="text-[11px] text-gray-600 leading-normal">
                       Your account is sent for approval. Try logging in after sometime.
                     </p>
                   </div>
@@ -650,35 +650,35 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                       setRegSuccess(false);
                       setActiveMode(regRole === 'NGO' ? 'NGO_LOGIN' : 'VOLUNTEER_LOGIN');
                     }}
-                    className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs transition-colors"
+                    className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl text-xs transition-colors"
                   >
                     Go to Login Screen
                   </button>
                   <button
                     type="button"
                     onClick={onClose}
-                    className="flex-1 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition-colors shadow-md"
+                    className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs transition-all shadow-md shadow-blue-600/20"
                   >
                     Done
                   </button>
                 </div>
               </div>
             ) : otpStep ? (
-              <form onSubmit={handleDirectRegister} className="space-y-4 bg-slate-900 border border-slate-700 rounded-xl p-5">
+              <form onSubmit={handleDirectRegister} className="space-y-4 bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
                 <div className="text-center">
                   <Mail className="w-10 h-10 text-emerald-400 mx-auto mb-2" />
-                  <h3 className="text-white font-bold mb-1">Verify Your Email</h3>
-                  <p className="text-xs text-slate-400">We've sent a 6-digit code to <strong className="text-slate-200">{regEmail}</strong></p>
+                  <h3 className="text-gray-900 font-semibold mb-1">Verify Your Email</h3>
+                  <p className="text-xs text-gray-500">We've sent a 6-digit code to <strong className="text-gray-900">{regEmail}</strong></p>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">OTP Code</label>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">OTP Code</label>
                   <input
                     type="text"
                     value={otpCode}
                     onChange={(e) => setOtpCode(e.target.value)}
                     placeholder="Enter 6-digit code"
                     maxLength={6}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-3 text-center tracking-widest text-lg font-mono text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-white border border-gray-300 rounded-xl shadow-sm px-3.5 py-3 text-center tracking-widest text-lg font-mono text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
                     required
                   />
                 </div>
@@ -686,14 +686,14 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                   <button
                     type="button"
                     onClick={() => setOtpStep(false)}
-                    className="py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs transition-colors"
+                    className="py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl text-xs border border-gray-200 transition-colors"
                   >
                     Back
                   </button>
                   <button
                     type="submit"
                     disabled={isVerifying}
-                    className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-2"
+                    className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs transition-all shadow-md shadow-blue-600/20 flex items-center justify-center gap-2"
                   >
                     {isVerifying ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
                     <span>Verify & Register</span>
@@ -703,7 +703,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
             ) : (
               <form onSubmit={handleDirectRegister} className="space-y-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
                     {regRole !== 'NGO' 
                       ? 'Full Name *'
                       : (regNgoType.includes('Individual') || regNgoType.includes('Influencer')) 
@@ -725,14 +725,14 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                             ? 'e.g. Assam Relief Alliance or Bishal Dutta'
                             : 'e.g. Assam Relief Alliance'
                     }
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 min-h-[44px]"
+                    className="w-full bg-white border border-gray-300 rounded-xl shadow-sm px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 min-h-[44px]"
                     required
                   />
                 </div>
 
                 {regRole === 'NGO' && (
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
                       Registration Type
                     </label>
                     <select
@@ -747,7 +747,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                           setRegShowPhone(false);
                         }
                       }}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs font-bold text-amber-300 focus:outline-none min-h-[44px]"
+                      className="w-full bg-white border border-gray-300 rounded-xl shadow-sm px-3 py-2.5 text-xs font-bold text-amber-300 focus:outline-none min-h-[44px]"
                       required
                     >
                       <option value="" disabled>-- Select Coordinator / NGO Type * --</option>
@@ -761,7 +761,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                 {regRole === 'NGO' && (
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="block text-xs font-bold text-slate-300 mt-2">
+                      <label className="block text-xs font-medium text-gray-600 mt-2">
                         Logo Image (Optional)
                       </label>
                       <span className="text-[10px] text-amber-400 font-bold mt-2">
@@ -776,14 +776,14 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                           <button
                             type="button"
                             onClick={handleClearLogo}
-                            className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-600 hover:bg-red-500 text-white rounded-full shadow-lg flex items-center justify-center transition-transform active:scale-95 border border-slate-900"
+                            className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-600 hover:bg-red-500 text-white rounded-full shadow-lg flex items-center justify-center transition-transform active:scale-95 border border-white"
                             title="Remove selected logo image"
                           >
                             <X className="w-3 h-3" />
                           </button>
                         </div>
                       ) : (
-                        <div className="w-11 h-11 rounded-xl bg-slate-950 border border-dashed border-slate-700 flex items-center justify-center text-slate-500 shrink-0 text-[10px] font-black">
+                        <div className="w-11 h-11 rounded-xl bg-white border border-dashed border-slate-700 flex items-center justify-center text-slate-500 shrink-0 text-[10px] font-black">
                           LOGO
                         </div>
                       )}
@@ -794,14 +794,14 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                           type="file"
                           accept="image/jpeg,image/jpg,image/png"
                           onChange={handleLogoChange}
-                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-2 text-xs text-slate-300 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400 cursor-pointer min-h-[44px]"
+                          className="w-full bg-white border border-gray-300 rounded-xl shadow-sm px-2.5 py-2 text-xs text-gray-600 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer min-h-[44px]"
                         />
 
                         {regLogoUrl && (
                           <button
                             type="button"
                             onClick={handleClearLogo}
-                            className="px-2.5 py-2 bg-red-950/80 hover:bg-red-900 text-red-300 border border-red-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1 shrink-0 transition-colors min-h-[44px]"
+                            className="px-2.5 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1 shrink-0 transition-colors min-h-[44px]"
                             title="Remove selected image"
                           >
                             <X className="w-4 h-4 text-red-400" />
@@ -812,7 +812,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                     </div>
 
                     {logoError && (
-                      <div className="p-2 bg-red-950/40 border border-red-800/60 rounded-xl mt-1.5 flex items-center justify-between gap-2 animate-fadeIn">
+                      <div className="p-2 bg-red-50 border border-red-200 rounded-xl mt-1.5 flex items-center justify-between gap-2 animate-fadeIn">
                         <p className="text-[11px] font-bold text-red-400 flex items-center gap-1.5">
                           <X className="w-3.5 h-3.5 shrink-0 text-red-400" />
                           <span>{logoError}</span>
@@ -820,7 +820,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                         <button
                           type="button"
                           onClick={() => setLogoError('')}
-                          className="text-red-400 hover:text-white p-0.5"
+                          className="text-red-500 hover:text-red-700 p-0.5"
                           title="Dismiss error"
                         >
                           <X className="w-3 h-3" />
@@ -832,13 +832,13 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
 
                 {regRole === 'VOLUNTEER' && (
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
                       Relief Helper Specialty / Role
                     </label>
                     <select
                       value={regRoleType}
                       onChange={(e) => setRegRoleType(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs font-bold text-blue-300 focus:outline-none min-h-[44px]"
+                      className="w-full bg-white border border-gray-300 rounded-xl shadow-sm px-3 py-2.5 text-xs font-bold text-blue-300 focus:outline-none min-h-[44px]"
                       required
                     >
                       <option value="" disabled>-- Select Relief Service Role * --</option>
@@ -852,11 +852,11 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                 {/* Phone (+91 fixed badge) & Email Input Row */}
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
                       {regRole === 'NGO' ? 'Official NGO Contact Phone (India +91) *' : 'Mobile Phone (India +91) *'}
                     </label>
                     <div className="flex items-center">
-                      <span className="px-3 py-2.5 bg-slate-800 border border-r-0 border-slate-700 rounded-l-xl text-xs font-black text-amber-300 min-h-[44px] flex items-center justify-center shrink-0">
+                      <span className="px-3 py-2.5 bg-gray-100 border border-r-0 border-gray-300 rounded-l-xl text-xs font-bold text-gray-600 min-h-[44px] flex items-center justify-center shrink-0">
                         +91
                       </span>
                       <input
@@ -872,31 +872,31 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                         }}
                         onBlur={() => setPhoneTouched(true)}
                         placeholder="9864000000 (10 digits)"
-                        className={`w-full bg-slate-950 border rounded-r-xl px-3.5 py-2.5 text-xs text-white font-mono tracking-wider focus:outline-none min-h-[44px] ${
-                          phoneError ? 'border-red-500 focus:border-red-400' : 'border-slate-700 focus:border-emerald-500'
+                        className={`w-full bg-white border rounded-r-xl px-3.5 py-2.5 text-sm text-gray-900 font-mono tracking-wider focus:outline-none min-h-[44px] shadow-sm ${
+                          phoneError ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/10' : 'border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 shadow-sm'
                         }`}
                         required
                       />
                     </div>
                     {regRole === 'NGO' && (
                       <div className="space-y-1.5 mt-2">
-                        <div className="flex items-center gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <div className="flex items-center gap-2 bg-white p-2.5 rounded-xl border border-gray-200">
                           <input
                             type="checkbox"
                             checked={regShowPhone}
                             onChange={(e) => setRegShowPhone(e.target.checked)}
-                            className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-amber-500 cursor-pointer"
+                            className="w-4 h-4 rounded border-gray-300 bg-white text-blue-600 focus:ring-blue-500 rounded cursor-pointer"
                             id="regShowPhoneToggle"
                           />
-                          <label htmlFor="regShowPhoneToggle" className="text-[11px] font-bold text-slate-200 cursor-pointer">
+                          <label htmlFor="regShowPhoneToggle" className="text-[11px] font-medium text-gray-700 cursor-pointer">
                             Show phone number publicly in public relief directory
                           </label>
                         </div>
                         <p className="text-[11px] font-semibold leading-normal px-1">
                           {regShowPhone ? (
-                            <span className="text-amber-300">Public: Victims & volunteers can view and call your NGO directly.</span>
+                            <span className="text-amber-700">Public: Victims & volunteers can view and call your NGO directly.</span>
                           ) : (
-                            <span className="text-emerald-300">Protected: Phone number will be hidden from public guests and only visible to verified NGO partners & Control Room.</span>
+                            <span className="text-emerald-700">Protected: Phone number will be hidden from public guests and only visible to verified NGO partners & Control Room.</span>
                           )}
                         </p>
                       </div>
@@ -910,7 +910,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
                       Email Address *
                     </label>
                     <input
@@ -925,8 +925,8 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                       }}
                       onBlur={() => setEmailTouched(true)}
                       placeholder="email@domain.com"
-                      className={`w-full bg-slate-950 border rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none min-h-[44px] ${
-                        emailError ? 'border-red-500 focus:border-red-400' : 'border-slate-700 focus:border-emerald-500'
+                      className={`w-full bg-white border rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none min-h-[44px] ${
+                        emailError ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/10' : 'border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 shadow-sm'
                       }`}
                       required
                     />
@@ -941,7 +941,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
 
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold text-slate-300">
+                    <label className="block text-xs font-medium text-gray-600">
                       Set Account Password *
                     </label>
                     <span className="text-[10px] text-amber-400 font-medium">
@@ -961,15 +961,15 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                       }}
                       onBlur={() => setPasswordTouched(true)}
                       placeholder="e.g. Relief@2026"
-                      className={`w-full bg-slate-950 border rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-white focus:outline-none min-h-[44px] ${
-                        passwordError ? 'border-red-500 focus:border-red-400' : 'border-slate-700 focus:border-emerald-500'
+                      className={`w-full bg-white border rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-gray-900 focus:outline-none min-h-[44px] ${
+                        passwordError ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/10' : 'border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 shadow-sm'
                       }`}
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowRegPassword(!showRegPassword)}
-                      className="absolute right-3 top-2.5 text-slate-400 hover:text-white p-1 rounded-lg focus:outline-none"
+                      className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-700 p-1 rounded-lg focus:outline-none"
                       title={showRegPassword ? "Hide password" : "Show password"}
                     >
                       {showRegPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -988,7 +988,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                 <button
                   type="submit"
                   disabled={isRegistering}
-                  className="w-full py-3.5 bg-[#3b82f6] hover:bg-[#2563eb] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-xl text-[13px] transition-colors flex items-center justify-center gap-2 min-h-[48px] shadow-lg shadow-blue-500/20 mt-4 cursor-pointer"
+                  className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl text-sm transition-all flex items-center justify-center gap-2 min-h-[48px] shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/25 active:shadow-sm active:scale-[0.99] mt-4 cursor-pointer"
                 >
                   {isRegistering ? (
                     <>
@@ -1013,21 +1013,21 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
           <div className="space-y-4 overflow-y-auto pr-1 flex-1 min-h-0 pb-3">
             <div>
               <div className="flex items-center gap-2">
-                <div className="p-2 bg-amber-500/20 text-amber-400 rounded-xl border border-amber-500/30">
+                <div className="p-2 bg-amber-50 text-amber-600 rounded-xl border border-amber-200">
                   <Key className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-white">Reset Account Password</h3>
+                  <h3 className="text-base font-semibold text-gray-900">Reset Account Password</h3>
                   <p className="text-xs text-slate-400">Send password recovery request to Platform Administrator.</p>
                 </div>
               </div>
             </div>
 
             {recSuccess ? (
-              <div className="p-5 bg-slate-900 border border-emerald-500/40 rounded-2xl text-center space-y-3">
-                <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
-                <h4 className="text-base font-black text-white">Request Sent to Admin Desk!</h4>
-                <p className="text-xs text-slate-300 leading-relaxed">
+              <div className="p-5 bg-emerald-50 border border-emerald-200 rounded-2xl text-center space-y-3">
+                <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
+                <h4 className="text-base font-semibold text-gray-900">Request Sent to Admin Desk!</h4>
+                <p className="text-xs text-gray-600 leading-relaxed">
                   Your password recovery request has been dispatched. Platform Admin will review your details and contact you via Phone/WhatsApp to help recover your login password.
                 </p>
                 <button
@@ -1036,7 +1036,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                     setActiveMode(recAccountRole === 'NGO' ? 'NGO_LOGIN' : 'VOLUNTEER_LOGIN');
                     setRecSuccess(false);
                   }}
-                  className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs"
+                  className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs shadow-md shadow-blue-600/20"
                 >
                   Return to Login
                 </button>
@@ -1044,26 +1044,26 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
             ) : (
               <form onSubmit={handleForgotPasswordSubmit} className="space-y-3">
                 {recError && (
-                  <div className="p-3 bg-red-950/80 border border-red-500/40 rounded-xl text-red-200 text-xs font-semibold flex items-center gap-2">
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-semibold flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
                     <span>{recError}</span>
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Account Role *</label>
-                  <div className="flex items-center gap-2 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-bold">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Account Role *</label>
+                  <div className="flex items-center gap-2 bg-gray-50 p-1 rounded-xl border border-gray-200 text-xs font-medium">
                     <button
                       type="button"
                       onClick={() => setRecAccountRole('NGO')}
-                      className={`flex-1 py-2 rounded-lg text-center min-h-[36px] ${recAccountRole === 'NGO' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400'}`}
+                      className={`flex-1 py-2 rounded-lg text-center min-h-[36px] ${recAccountRole === 'NGO' ? 'bg-blue-600 text-white font-semibold shadow-sm' : 'text-gray-500'}`}
                     >
                       NGO Account
                     </button>
                     <button
                       type="button"
                       onClick={() => setRecAccountRole('VOLUNTEER')}
-                      className={`flex-1 py-2 rounded-lg text-center min-h-[36px] ${recAccountRole === 'VOLUNTEER' ? 'bg-purple-600 text-white font-black' : 'text-slate-400'}`}
+                      className={`flex-1 py-2 rounded-lg text-center min-h-[36px] ${recAccountRole === 'VOLUNTEER' ? 'bg-blue-600 text-white font-semibold shadow-sm' : 'text-gray-500'}`}
                     >
                       Volunteer Account
                     </button>
@@ -1071,7 +1071,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
                     Registered Email Address *
                   </label>
                   <div className="relative">
@@ -1081,14 +1081,14 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                       value={recEmail}
                       onChange={(e) => setRecEmail(e.target.value)}
                       placeholder="e.g. ngo@organization.org"
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 min-h-[44px]"
+                      className="w-full bg-white border border-gray-300 rounded-xl shadow-sm pl-9 pr-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 min-h-[44px]"
                       required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
                     Contact Phone Number (For Admin to Call/WhatsApp) *
                   </label>
                   <div className="relative">
@@ -1098,14 +1098,14 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                       value={recPhone}
                       onChange={(e) => setRecPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 10))}
                       placeholder="10-digit mobile number"
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500 min-h-[44px]"
+                      className="w-full bg-white border border-gray-300 rounded-xl shadow-sm pl-9 pr-3.5 py-2.5 text-sm text-gray-900 font-mono focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 min-h-[44px]"
                       required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
                     Organization / Volunteer Name (Optional)
                   </label>
                   <input
@@ -1113,12 +1113,12 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                     value={recName}
                     onChange={(e) => setRecName(e.target.value)}
                     placeholder="e.g. Assam Flood Care Unit"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500 min-h-[44px]"
+                    className="w-full bg-white border border-gray-300 rounded-xl shadow-sm px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 min-h-[44px]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
                     Additional Details / Verification Note
                   </label>
                   <textarea
@@ -1126,7 +1126,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                     value={recDetails}
                     onChange={(e) => setRecDetails(e.target.value)}
                     placeholder="Any detail to help admin identify your account..."
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                    className="w-full bg-white border border-gray-300 rounded-xl shadow-sm px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
                   />
                 </div>
 
@@ -1134,13 +1134,13 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                   <button
                     type="button"
                     onClick={() => setActiveMode(recAccountRole === 'NGO' ? 'NGO_LOGIN' : 'VOLUNTEER_LOGIN')}
-                    className="py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs min-h-[44px]"
+                    className="py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl text-xs min-h-[44px] border border-gray-200"
                   >
                     Back to Login
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black rounded-xl text-xs sm:text-sm shadow-lg flex items-center justify-center gap-2 min-h-[44px]"
+                    className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs sm:text-sm shadow-md shadow-blue-600/20 flex items-center justify-center gap-2 min-h-[44px]"
                   >
                     <Send className="w-4 h-4" />
                     <span>Send Password Request to Admin</span>
@@ -1156,21 +1156,21 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
           <div className="space-y-4 overflow-y-auto pr-1 flex-1 min-h-0 pb-3">
             <div>
               <div className="flex items-center gap-2">
-                <div className="p-2 bg-cyan-500/20 text-cyan-400 rounded-xl border border-cyan-500/30">
+                <div className="p-2 bg-sky-50 text-sky-600 rounded-xl border border-sky-200">
                   <Mail className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-white">Forgot Email Recovery</h3>
+                  <h3 className="text-base font-semibold text-gray-900">Forgot Email Recovery</h3>
                   <p className="text-xs text-slate-400">Request Admin to find and send your registered account email.</p>
                 </div>
               </div>
             </div>
 
             {recSuccess ? (
-              <div className="p-5 bg-slate-900 border border-emerald-500/40 rounded-2xl text-center space-y-3">
-                <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
-                <h4 className="text-base font-black text-white">Request Sent to Admin Desk!</h4>
-                <p className="text-xs text-slate-300 leading-relaxed">
+              <div className="p-5 bg-emerald-50 border border-emerald-200 rounded-2xl text-center space-y-3">
+                <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
+                <h4 className="text-base font-semibold text-gray-900">Request Sent to Admin Desk!</h4>
+                <p className="text-xs text-gray-600 leading-relaxed">
                   Your email recovery request has been sent to Admin. Admin will search records and contact your phone number with your registered email address.
                 </p>
                 <button
@@ -1179,7 +1179,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                     setActiveMode(recAccountRole === 'NGO' ? 'NGO_LOGIN' : 'VOLUNTEER_LOGIN');
                     setRecSuccess(false);
                   }}
-                  className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs"
+                  className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs shadow-md shadow-blue-600/20"
                 >
                   Return to Login
                 </button>
@@ -1187,26 +1187,26 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
             ) : (
               <form onSubmit={handleForgotEmailSubmit} className="space-y-3">
                 {recError && (
-                  <div className="p-3 bg-red-950/80 border border-red-500/40 rounded-xl text-red-200 text-xs font-semibold flex items-center gap-2">
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-semibold flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
                     <span>{recError}</span>
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Account Role *</label>
-                  <div className="flex items-center gap-2 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-bold">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Account Role *</label>
+                  <div className="flex items-center gap-2 bg-gray-50 p-1 rounded-xl border border-gray-200 text-xs font-medium">
                     <button
                       type="button"
                       onClick={() => setRecAccountRole('NGO')}
-                      className={`flex-1 py-2 rounded-lg text-center min-h-[36px] ${recAccountRole === 'NGO' ? 'bg-amber-500 text-slate-950 font-black' : 'text-slate-400'}`}
+                      className={`flex-1 py-2 rounded-lg text-center min-h-[36px] ${recAccountRole === 'NGO' ? 'bg-blue-600 text-white font-semibold shadow-sm' : 'text-gray-500'}`}
                     >
                       NGO Account
                     </button>
                     <button
                       type="button"
                       onClick={() => setRecAccountRole('VOLUNTEER')}
-                      className={`flex-1 py-2 rounded-lg text-center min-h-[36px] ${recAccountRole === 'VOLUNTEER' ? 'bg-purple-600 text-white font-black' : 'text-slate-400'}`}
+                      className={`flex-1 py-2 rounded-lg text-center min-h-[36px] ${recAccountRole === 'VOLUNTEER' ? 'bg-blue-600 text-white font-semibold shadow-sm' : 'text-gray-500'}`}
                     >
                       Volunteer Account
                     </button>
@@ -1214,7 +1214,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
                     Organization / Volunteer Registered Name *
                   </label>
                   <input
@@ -1222,13 +1222,13 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                     value={recName}
                     onChange={(e) => setRecName(e.target.value)}
                     placeholder="e.g. Assam Relief Network / Bishal Dutta"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 min-h-[44px]"
+                    className="w-full bg-white border border-gray-300 rounded-xl shadow-sm px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-cyan-500 min-h-[44px]"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
                     Registered Mobile Phone Number *
                   </label>
                   <div className="relative">
@@ -1238,14 +1238,14 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                       value={recPhone}
                       onChange={(e) => setRecPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 10))}
                       placeholder="10-digit mobile number"
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-cyan-500 min-h-[44px]"
+                      className="w-full bg-white border border-gray-300 rounded-xl shadow-sm pl-9 pr-3.5 py-2.5 text-sm text-gray-900 font-mono focus:outline-none focus:border-cyan-500 min-h-[44px]"
                       required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
                     District / Address or Verification Note
                   </label>
                   <textarea
@@ -1253,7 +1253,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                     value={recDetails}
                     onChange={(e) => setRecDetails(e.target.value)}
                     placeholder="e.g. Registered in Jorhat district for boat rescue service..."
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-cyan-500"
+                    className="w-full bg-white border border-gray-300 rounded-xl shadow-sm px-3.5 py-2 text-sm text-gray-900 focus:outline-none focus:border-cyan-500"
                   />
                 </div>
 
@@ -1261,13 +1261,13 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                   <button
                     type="button"
                     onClick={() => setActiveMode(recAccountRole === 'NGO' ? 'NGO_LOGIN' : 'VOLUNTEER_LOGIN')}
-                    className="py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs min-h-[44px]"
+                    className="py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl text-xs min-h-[44px] border border-gray-200"
                   >
                     Back to Login
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-black rounded-xl text-xs sm:text-sm shadow-lg flex items-center justify-center gap-2 min-h-[44px]"
+                    className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs sm:text-sm shadow-md shadow-blue-600/20 flex items-center justify-center gap-2 min-h-[44px]"
                   >
                     <Send className="w-4 h-4" />
                     <span>Send Email Request to Admin</span>
