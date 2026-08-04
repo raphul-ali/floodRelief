@@ -13,6 +13,13 @@ from datetime import datetime, timedelta
 import time
 from fastapi.responses import JSONResponse
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv(dotenv_path=".env.local")
+    load_dotenv(dotenv_path=".env")
+except Exception:
+    pass
+
 app = FastAPI()
 
 # Enable CORS for local development (Vercel handles this in prod usually, but good practice)
