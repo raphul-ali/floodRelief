@@ -123,7 +123,7 @@ def get_supabase_client():
 
 def get_jwt_secret():
     import os
-    return os.environ.get("get_jwt_secret()", "super-secret-fallback-key")
+    return os.environ.get("JWT_SECRET") or os.environ.get("get_jwt_secret()") or "super-secret-fallback-key"
 
 
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
