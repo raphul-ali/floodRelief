@@ -147,7 +147,7 @@ export default function CampaignsAdmin() {
                     <input type="text" value={editDate} onChange={e => setEditDate(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Date" />
                     <input type="text" value={editLocation} onChange={e => setEditLocation(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Location" />
                     <input type="text" value={editContactPerson} onChange={e => setEditContactPerson(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Contact Person" />
-                    <input type="text" value={editWhatsappNumber} onChange={e => setEditWhatsappNumber(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm placeholder="WhatsApp Number" />
+                    <input type="text" value={editWhatsappNumber} onChange={e => setEditWhatsappNumber(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="WhatsApp Number" />
                   </div>
                   <input type="text" value={editMapLink} onChange={e => setEditMapLink(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm" placeholder="Map Link" />
                   <textarea value={editDescription} onChange={e => setEditDescription(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm min-h-[80px]" placeholder="Description" />

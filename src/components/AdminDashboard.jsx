@@ -331,33 +331,56 @@ export default function AdminDashboard({ onDataUpdated }) {
   const userStartIndex = (safeUserCurrentPage - 1) * userItemsPerPage;
   const paginatedUsers = filteredUsers.slice(userStartIndex, userStartIndex + userItemsPerPage);
 
+  const sidebarNavItems = [
+    { id: 'overview', label: 'Dashboard Overview', icon: RefreshCw, count: null },
+    { id: 'sos', label: 'SOS Requests', icon: ShieldAlert, count: pendingRequests.length, badgeColor: 'bg-red-500 text-white' },
+    { id: 'deliveries', label: 'Relief Deliveries', icon: Package, count: pendingDeliveries.length, badgeColor: 'bg-blue-500 text-white' },
+    { id: 'ngos', label: 'NGO Partners', icon: HeartHandshake, count: pendingNgos.length, badgeColor: 'bg-emerald-500 text-white' },
+    { id: 'volunteers', label: 'Relief Helpers', icon: UserCheck, count: pendingVolunteers.length, badgeColor: 'bg-purple-500 text-white' },
+    { id: 'campaigns', label: 'Relief Campaigns', icon: Megaphone, count: null },
+    { id: 'recovery', label: 'Account Recovery', icon: Key, count: pendingRecoveryCount, badgeColor: 'bg-amber-500 text-slate-950' },
+    { id: 'users', label: 'User Directory', icon: Users, count: allUsers.length, badgeColor: 'bg-slate-800 text-slate-300' },
+    { id: 'helplines', label: 'Control Room Lines', icon: Phone, count: helplinesList.length, badgeColor: 'bg-slate-800 text-slate-300' },
+  ];
+
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="flex flex-col lg:flex-row min-h-[85vh] bg-slate-950 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl text-slate-100">
       
-      {/* Top Banner Header */}
-      <div className="bg-slate-900 border border-red-500/40 rounded-2xl p-3.5 sm:p-5 shadow-2xl space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2.5 bg-red-600/20 text-red-400 rounded-xl border border-red-500/40 shrink-0">
-              <ShieldCheck className="w-6 h-6 sm:w-7 sm:h-7" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-xl font-black text-white uppercase tracking-tight">SUPER ADMIN CONTROL ROOM</h2>
+      {/* ── SIDEBAR NAVIGATION ────────────────────────────────────────── */}
+      <aside className="w-full lg:w-72 bg-slate-900/90 border-b lg:border-b-0 lg:border-r border-slate-800/80 p-4 sm:p-5 flex flex-col justify-between shrink-0">
+        <div className="space-y-6">
+          
+          {/* CMS Brand / Control Header */}
+          <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-red-600/20 border border-red-500/40 rounded-2xl flex items-center justify-center text-red-400 shrink-0 shadow-inner">
+                <ShieldCheck className="w-5 h-5" />
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-300 font-semibold mt-0.5">
-                Verify incoming distress signals, relief logs, NGO/Volunteer registrations & account recovery requests.
-              </p>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h2 className="text-sm font-black tracking-wider uppercase text-white">CMS ADMIN</h2>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                </div>
+                <p className="text-[11px] text-slate-400 font-medium">Control Center</p>
+              </div>
             </div>
+
+            <button 
+              onClick={loadAdminData}
+              title="Refresh all records"
+              className="p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl transition-all active:scale-95 border border-slate-700"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
           </div>
 
-          {/* View Mode Toggle Pill Bar */}
-          <div className="flex items-center gap-2 shrink-0">
+          {/* Mode Switcher: Queue vs Full Directory */}
+          <div className="bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 flex items-center gap-1">
             <button
               onClick={() => setViewMode('PENDING')}
-              className={`px-3 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 min-h-[40px] ${
+              className={`flex-1 py-2 text-center rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                 viewMode === 'PENDING'
-                  ? 'bg-red-600 text-white shadow-lg border border-red-400 animate-pulse'
+                  ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
                   : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
               }`}
             >
@@ -392,11 +415,10 @@ export default function AdminDashboard({ onDataUpdated }) {
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0"></span>
                 <span>Offline Local Storage Mode: Supabase Database Not Connected.</span>
               </div>
-              <span className="text-[11px] font-semibold text-slate-300 hidden sm:inline">Add VITE_SUPABASE_URL & VITE_SUPABASE_ANON_KEY to hosting platform</span>
             </div>
           )}
         </div>
-      </div>
+      </aside>
 
       {/* Notification Queue Tabs */}
       <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap pb-2 border-b border-slate-800 text-xs font-black">
