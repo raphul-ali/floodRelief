@@ -359,7 +359,7 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-3 pt-4">
+            <div className="flex items-center justify-start sm:justify-center gap-2.5 sm:gap-3 pt-6 pb-24 sm:pb-6 pl-4 sm:pl-0 pr-28 sm:pr-0">
               <RippleButton
                 variant="glass"
                 darkRipple
@@ -370,7 +370,7 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
                 <ChevronLeft className="w-5 h-5 text-slate-700" />
               </RippleButton>
 
-              <span className="text-xs font-bold text-slate-600 bg-white px-5 py-2.5 rounded-xl border border-slate-200 shadow-flat min-h-[40px] flex items-center">
+              <span className="text-xs font-bold text-slate-600 bg-white px-4 sm:px-5 py-2.5 rounded-xl border border-slate-200 shadow-flat min-h-[40px] flex items-center shrink-0">
                 {currentPage} / {totalPages}
               </span>
 
