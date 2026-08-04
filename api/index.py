@@ -170,8 +170,8 @@ class VictimRequestCreate(BaseModel):
     pin_code: str
     landmark: str
     location_name: str
-    latitude: float
-    longitude: float
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     is_urgent_rescue: bool
     needs: List[str]
     details: str
