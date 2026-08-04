@@ -7,3 +7,6 @@ dist-isolation
 .env.test.local
 .env.production.local
 .DS_Store
+venv/
+*.cjs
+
