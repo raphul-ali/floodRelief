@@ -61,10 +61,10 @@ const notifyDataChanged = () => {
 
 const getAuthToken = () => {
   try {
-    const sessionStr = localStorage.getItem('flood_relief_auth_session');
+    const sessionStr = localStorage.getItem('flood_portal_auth_session_v1') || localStorage.getItem('flood_relief_auth_session');
     if (sessionStr) {
       const session = JSON.parse(sessionStr);
-      return session.accessToken;
+      return session.accessToken || session.token;
     }
   } catch (e) {}
   return null;

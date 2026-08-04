@@ -333,55 +333,55 @@ export default function AdminDashboard({ onDataUpdated }) {
 
   const sidebarNavItems = [
     { id: 'overview', label: 'Dashboard Overview', icon: RefreshCw, count: null },
-    { id: 'sos', label: 'SOS Requests', icon: ShieldAlert, count: pendingRequests.length, badgeColor: 'bg-red-500 text-white' },
-    { id: 'deliveries', label: 'Relief Deliveries', icon: Package, count: pendingDeliveries.length, badgeColor: 'bg-blue-500 text-white' },
-    { id: 'ngos', label: 'NGO Partners', icon: HeartHandshake, count: pendingNgos.length, badgeColor: 'bg-emerald-500 text-white' },
-    { id: 'volunteers', label: 'Relief Helpers', icon: UserCheck, count: pendingVolunteers.length, badgeColor: 'bg-purple-500 text-white' },
+    { id: 'sos', label: 'SOS Requests', icon: ShieldAlert, count: pendingRequests.length, badgeColor: 'bg-red-600 text-white' },
+    { id: 'deliveries', label: 'Relief Deliveries', icon: Package, count: pendingDeliveries.length, badgeColor: 'bg-blue-600 text-white' },
+    { id: 'ngos', label: 'NGO Partners', icon: HeartHandshake, count: pendingNgos.length, badgeColor: 'bg-emerald-600 text-white' },
+    { id: 'volunteers', label: 'Relief Helpers', icon: UserCheck, count: pendingVolunteers.length, badgeColor: 'bg-purple-600 text-white' },
     { id: 'campaigns', label: 'Relief Campaigns', icon: Megaphone, count: null },
     { id: 'recovery', label: 'Account Recovery', icon: Key, count: pendingRecoveryCount, badgeColor: 'bg-amber-500 text-slate-950' },
-    { id: 'users', label: 'User Directory', icon: Users, count: allUsers.length, badgeColor: 'bg-slate-800 text-slate-300' },
-    { id: 'helplines', label: 'Control Room Lines', icon: Phone, count: helplinesList.length, badgeColor: 'bg-slate-800 text-slate-300' },
+    { id: 'users', label: 'User Directory', icon: Users, count: allUsers.length, badgeColor: 'bg-slate-100 text-slate-700 border border-slate-200' },
+    { id: 'helplines', label: 'Control Room Lines', icon: Phone, count: helplinesList.length, badgeColor: 'bg-slate-100 text-slate-700 border border-slate-200' },
   ];
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-[85vh] bg-slate-950 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl text-slate-100">
+    <div className="flex flex-col lg:flex-row min-h-[85vh] bg-slate-50 border border-slate-200 rounded-3xl overflow-hidden shadow-xl text-slate-900">
       
       {/* ── SIDEBAR NAVIGATION ────────────────────────────────────────── */}
-      <aside className="w-full lg:w-72 bg-slate-900/90 border-b lg:border-b-0 lg:border-r border-slate-800/80 p-4 sm:p-5 flex flex-col justify-between shrink-0">
+      <aside className="w-full lg:w-72 bg-white border-b lg:border-b-0 lg:border-r border-slate-200/80 p-4 sm:p-5 flex flex-col justify-between shrink-0">
         <div className="space-y-6">
           
           {/* CMS Brand / Control Header */}
-          <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+          <div className="flex items-center justify-between pb-4 border-b border-slate-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-red-600/20 border border-red-500/40 rounded-2xl flex items-center justify-center text-red-400 shrink-0 shadow-inner">
+              <div className="w-10 h-10 bg-red-50 border border-red-200 rounded-2xl flex items-center justify-center text-red-600 shrink-0 shadow-inner">
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h2 className="text-sm font-black tracking-wider uppercase text-white">CMS ADMIN</h2>
+                  <h2 className="text-sm font-black tracking-wider uppercase text-slate-900">CMS ADMIN</h2>
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 </div>
-                <p className="text-[11px] text-slate-400 font-medium">Control Center</p>
+                <p className="text-[11px] text-slate-500 font-medium">Control Center</p>
               </div>
             </div>
 
             <button 
               onClick={loadAdminData}
               title="Refresh all records"
-              className="p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl transition-all active:scale-95 border border-slate-700"
+              className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all active:scale-95 border border-slate-200"
             >
               <RefreshCw className="w-4 h-4" />
             </button>
           </div>
 
           {/* Mode Switcher: Queue vs Full Directory */}
-          <div className="bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 flex items-center gap-1">
+          <div className="bg-slate-100 p-1.5 rounded-2xl border border-slate-200 flex items-center gap-1">
             <button
               onClick={() => setViewMode('PENDING')}
               className={`flex-1 py-2 text-center rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                 viewMode === 'PENDING'
                   ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                  : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                  : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 shadow-sm'
               }`}
             >
               <Bell className="w-3.5 h-3.5" />
@@ -393,7 +393,7 @@ export default function AdminDashboard({ onDataUpdated }) {
               className={`px-3 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 min-h-[40px] ${
                 viewMode === 'ALL_LIVE'
                   ? 'bg-emerald-600 text-white shadow-lg border border-emerald-400'
-                  : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                  : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 shadow-sm'
               }`}
             >
               <ShieldCheck className="w-3.5 h-3.5" />
@@ -403,7 +403,7 @@ export default function AdminDashboard({ onDataUpdated }) {
         </div>
 
         {/* Supabase Cloud Connection Status Indicator */}
-        <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs">
+        <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-xs">
           {isSupabaseConfigured ? (
             <div className="flex items-center gap-2 text-emerald-300 font-bold bg-emerald-950/80 border border-emerald-500/40 px-3 py-2 rounded-xl w-full">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping shrink-0"></span>
@@ -421,7 +421,7 @@ export default function AdminDashboard({ onDataUpdated }) {
       </aside>
 
       {/* Notification Queue Tabs */}
-      <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap pb-2 border-b border-slate-800 text-xs font-black">
+      <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap pb-2 border-b border-slate-200 text-xs font-black">
         
         {/* Tab 1: SOS Requests */}
         <button
@@ -429,13 +429,13 @@ export default function AdminDashboard({ onDataUpdated }) {
           className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
             activeQueueTab === 'sos'
               ? 'bg-red-600 text-white font-black shadow-lg border border-red-400'
-              : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+              : 'bg-white text-slate-600 hover:bg-slate-800 border border-slate-200'
           }`}
         >
           <ShieldAlert className="w-4 h-4 text-red-300 shrink-0" />
           <span>{viewMode === 'ALL_LIVE' ? 'All SOS Requests' : 'Pending SOS Requests'}</span>
           <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-            targetRequests.length > 0 ? (viewMode === 'PENDING' ? 'bg-white text-red-600 animate-pulse' : 'bg-red-950 text-red-300 border border-red-800') : 'bg-slate-800 text-slate-400'
+            targetRequests.length > 0 ? (viewMode === 'PENDING' ? 'bg-white text-red-600 animate-pulse' : 'bg-red-950 text-red-300 border border-red-800') : 'bg-slate-800 text-slate-500'
           }`}>
             {targetRequests.length}
           </span>
@@ -447,13 +447,13 @@ export default function AdminDashboard({ onDataUpdated }) {
           className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
             activeQueueTab === 'deliveries'
               ? 'bg-amber-500 text-slate-950 font-black shadow-lg border border-amber-400'
-              : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+              : 'bg-white text-slate-600 hover:bg-slate-800 border border-slate-200'
           }`}
         >
           <Package className="w-4 h-4 text-amber-400 shrink-0" />
           <span>{viewMode === 'ALL_LIVE' ? 'All Delivery Logs' : 'Pending Delivery Logs'}</span>
           <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-            targetDeliveries.length > 0 ? 'bg-amber-400 text-slate-950 font-black' : 'bg-slate-800 text-slate-400'
+            targetDeliveries.length > 0 ? 'bg-amber-400 text-slate-950 font-black' : 'bg-slate-800 text-slate-500'
           }`}>
             {targetDeliveries.length}
           </span>
@@ -465,13 +465,13 @@ export default function AdminDashboard({ onDataUpdated }) {
           className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
             activeQueueTab === 'ngos'
               ? 'bg-blue-600 text-white font-black shadow-lg border border-blue-400'
-              : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+              : 'bg-white text-slate-600 hover:bg-slate-800 border border-slate-200'
           }`}
         >
           <HeartHandshake className="w-4 h-4 text-blue-400 shrink-0" />
           <span>{viewMode === 'ALL_LIVE' ? 'Registered NGOs' : 'Pending NGOs'}</span>
           <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-            targetNgos.length > 0 ? 'bg-blue-400 text-slate-950 font-black' : 'bg-slate-800 text-slate-400'
+            targetNgos.length > 0 ? 'bg-blue-400 text-slate-950 font-black' : 'bg-slate-800 text-slate-500'
           }`}>
             {targetNgos.length}
           </span>
@@ -483,13 +483,13 @@ export default function AdminDashboard({ onDataUpdated }) {
           className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
             activeQueueTab === 'volunteers'
               ? 'bg-purple-600 text-white font-black shadow-lg border border-purple-400'
-              : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+              : 'bg-white text-slate-600 hover:bg-slate-800 border border-slate-200'
           }`}
         >
           <UserCheck className="w-4 h-4 text-purple-400 shrink-0" />
           <span>{viewMode === 'ALL_LIVE' ? 'All Volunteers' : 'Pending Volunteers'}</span>
           <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-            targetVolunteers.length > 0 ? 'bg-purple-400 text-slate-950 font-black' : 'bg-slate-800 text-slate-400'
+            targetVolunteers.length > 0 ? 'bg-purple-400 text-slate-950 font-black' : 'bg-slate-800 text-slate-500'
           }`}>
             {targetVolunteers.length}
           </span>
@@ -500,14 +500,14 @@ export default function AdminDashboard({ onDataUpdated }) {
           onClick={() => setActiveQueueTab('recovery')}
           className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
             activeQueueTab === 'recovery'
-              ? 'bg-cyan-600 text-white font-black shadow-lg border border-cyan-400'
-              : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+              ? 'bg-cyan-600 text-slate-900 font-black shadow-lg border border-cyan-400'
+              : 'bg-white text-slate-600 hover:bg-slate-800 border border-slate-200'
           }`}
         >
           <Key className="w-4 h-4 text-cyan-400 shrink-0" />
           <span>Account Recovery</span>
           <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-            pendingRecoveryCount > 0 ? 'bg-cyan-400 text-slate-950 animate-pulse' : 'bg-slate-800 text-slate-400'
+            pendingRecoveryCount > 0 ? 'bg-cyan-400 text-slate-950 animate-pulse' : 'bg-slate-800 text-slate-500'
           }`}>
             {pendingRecoveryCount}
           </span>
@@ -519,7 +519,7 @@ export default function AdminDashboard({ onDataUpdated }) {
           className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
             activeQueueTab === 'users'
               ? 'bg-emerald-600 text-white font-black shadow-lg border border-emerald-400'
-              : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+              : 'bg-white text-slate-600 hover:bg-slate-800 border border-slate-200'
           }`}
         >
           <Users className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -535,7 +535,7 @@ export default function AdminDashboard({ onDataUpdated }) {
           className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
             activeQueueTab === 'helplines'
               ? 'bg-red-600 text-white font-black shadow-lg border border-red-400'
-              : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+              : 'bg-white text-slate-600 hover:bg-slate-800 border border-slate-200'
           }`}
         >
           <Phone className="w-4 h-4 text-red-400 shrink-0" />
@@ -551,7 +551,7 @@ export default function AdminDashboard({ onDataUpdated }) {
           className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl transition-all whitespace-nowrap min-h-[44px] ${
             activeQueueTab === 'campaigns'
               ? 'bg-amber-600 text-white font-black shadow-lg border border-amber-500'
-              : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+              : 'bg-white text-slate-600 hover:bg-slate-800 border border-slate-200'
           }`}
         >
           <Megaphone className="w-4 h-4 text-amber-300 shrink-0" />
@@ -561,15 +561,15 @@ export default function AdminDashboard({ onDataUpdated }) {
       </div>
 
       {/* Global Filters */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-900 p-3 rounded-xl border border-slate-800">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200">
         <div className="flex items-center gap-2 w-full sm:w-auto flex-1">
-          <Search className="w-4 h-4 text-slate-400 shrink-0" />
+          <Search className="w-4 h-4 text-slate-500 shrink-0" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search name, ID, phone, district..."
-            className="bg-transparent border-none text-xs text-white placeholder-slate-500 focus:outline-none w-full min-h-[36px]"
+            className="bg-transparent border-none text-xs text-slate-900 placeholder-slate-500 focus:outline-none w-full min-h-[36px]"
           />
         </div>
         
@@ -577,7 +577,7 @@ export default function AdminDashboard({ onDataUpdated }) {
           <select
             value={selectedDistrict}
             onChange={(e) => setSelectedDistrict(e.target.value)}
-            className="bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-lg px-3 py-2 focus:outline-none w-full sm:w-auto min-h-[36px]"
+            className="bg-slate-50 border border-slate-200 text-xs text-slate-200 rounded-lg px-3 py-2 focus:outline-none w-full sm:w-auto min-h-[36px]"
           >
             <option value="ALL">All Districts</option>
             {ASSAM_DISTRICTS.map(d => (
@@ -589,7 +589,7 @@ export default function AdminDashboard({ onDataUpdated }) {
             onClick={() => {
               window.location.reload();
             }}
-            className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-purple-400 rounded-lg border border-slate-700 transition-colors flex items-center justify-center min-h-[36px]"
+            className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-purple-400 rounded-lg border border-slate-300 transition-colors flex items-center justify-center min-h-[36px]"
             title="Refresh Data"
           >
             <RefreshCw className="w-3.5 h-3.5" />
@@ -602,12 +602,12 @@ export default function AdminDashboard({ onDataUpdated }) {
         <div className="space-y-4">
 
           {filteredSos.length === 0 ? (
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center space-y-2">
+            <div className="bg-white/60 border border-slate-200 rounded-2xl p-8 text-center space-y-2">
               <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-bold text-white">
+              <h3 className="text-base font-bold text-slate-900">
                 {viewMode === 'ALL_LIVE' ? 'No SOS Requests Match Search' : 'No Pending SOS Requests'}
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500">
                 {viewMode === 'ALL_LIVE' 
                   ? 'Try adjusting district or search query filters.' 
                   : 'All incoming distress signals have been verified & published live.'}
@@ -616,7 +616,7 @@ export default function AdminDashboard({ onDataUpdated }) {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredSos.map(req => (
-                <div key={req.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3">
+                <div key={req.id} className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 shadow-xl space-y-3">
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-1.5 flex-wrap">
@@ -632,17 +632,17 @@ export default function AdminDashboard({ onDataUpdated }) {
                             PENDING VERIFICATION
                           </span>
                         )}
-                        <span className="text-xs font-mono text-slate-400">{req.id}</span>
+                        <span className="text-xs font-mono text-slate-500">{req.id}</span>
                       </div>
-                      <h3 className="text-base font-black text-white mt-1">{req.name}</h3>
+                      <h3 className="text-base font-black text-slate-900 mt-1">{req.name}</h3>
                       <p className="text-xs text-amber-300 font-bold">{req.district}: {req.locationName || req.villageName}</p>
                     </div>
                   </div>
 
 
-                  <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1">
-                    <p className="text-slate-300"><strong className="text-white">Affected:</strong> {req.familiesCount > 0 ? `${req.familiesCount} Families` : `${req.peopleCount || 1} People`}</p>
-                    <p className="text-slate-300"><strong className="text-white">Phone:</strong> {req.phone}</p>
+                  <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
+                    <p className="text-slate-600"><strong className="text-slate-900">Affected:</strong> {req.familiesCount > 0 ? `${req.familiesCount} Families` : `${req.peopleCount || 1} People`}</p>
+                    <p className="text-slate-600"><strong className="text-slate-900">Phone:</strong> {req.phone}</p>
                     {req.details && <ExpandableNotes text={req.details} dark={true} className="mt-1" />}
                   </div>
 
@@ -652,7 +652,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                       href={getWhatsAppVerifyUrl(req.phone, req.name, req.id, "SOS")}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
+                      className="py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-slate-900 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
                     >
                       <MessageSquare className="w-3.5 h-3.5" />
                       <span>WhatsApp Geotag</span>
@@ -660,7 +660,7 @@ export default function AdminDashboard({ onDataUpdated }) {
 
                     <a
                       href={`tel:${(req.phone || '').replace(/[^0-9]/g, '')}`}
-                      className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-xl text-xs font-black flex items-center justify-center gap-1 border border-slate-700 min-h-[44px]"
+                      className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-xl text-xs font-black flex items-center justify-center gap-1 border border-slate-300 min-h-[44px]"
                     >
                       <Phone className="w-3.5 h-3.5" />
                       <span>Call Victim</span>
@@ -702,19 +702,19 @@ export default function AdminDashboard({ onDataUpdated }) {
       {activeQueueTab === 'deliveries' && (
         <div className="space-y-4">
           {filteredDeliveries.length === 0 ? (
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center space-y-2">
+            <div className="bg-white/60 border border-slate-200 rounded-2xl p-8 text-center space-y-2">
               <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-bold text-white">
+              <h3 className="text-base font-bold text-slate-900">
                 {viewMode === 'ALL_LIVE' ? 'No Delivery Logs Match Search' : 'No Pending Delivery Logs'}
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500">
                 {viewMode === 'ALL_LIVE' ? 'Try adjusting your search terms.' : 'All relief dispatches have been audited and verified.'}
               </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredDeliveries.map(log => (
-                <div key={log.logId} className="bg-slate-900 border border-amber-500/40 rounded-2xl p-4 shadow-xl space-y-3">
+                <div key={log.logId} className="bg-white border border-amber-500/40 rounded-2xl p-4 shadow-xl space-y-3">
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center gap-1.5 flex-wrap">
@@ -731,14 +731,14 @@ export default function AdminDashboard({ onDataUpdated }) {
                           </span>
                         )}
                       </div>
-                      <h3 className="text-base font-black text-white mt-1">Delivered by: {log.deliveredBy}</h3>
-                      <p className="text-xs text-slate-300">Items: <strong className="text-amber-300">{log.itemsDelivered}</strong></p>
+                      <h3 className="text-base font-black text-slate-900 mt-1">Delivered by: {log.deliveredBy}</h3>
+                      <p className="text-xs text-slate-600">Items: <strong className="text-amber-300">{log.itemsDelivered}</strong></p>
                     </div>
                   </div>
 
-                  <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1">
-                    <p className="text-slate-300"><strong className="text-white">Volunteer Phone:</strong> {log.volunteerPhone}</p>
-                    {log.peopleImpacted && <p className="text-slate-300"><strong className="text-white">People Impacted:</strong> {log.peopleImpacted}</p>}
+                  <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
+                    <p className="text-slate-600"><strong className="text-slate-900">Volunteer Phone:</strong> {log.volunteerPhone}</p>
+                    {log.peopleImpacted && <p className="text-slate-600"><strong className="text-slate-900">People Impacted:</strong> {log.peopleImpacted}</p>}
                     {log.deliveryNotes && <ExpandableNotes text={log.deliveryNotes} dark={true} className="mt-1" />}
                   </div>
 
@@ -782,16 +782,16 @@ export default function AdminDashboard({ onDataUpdated }) {
       {activeQueueTab === 'ngos' && (
         <div className="space-y-4">
           {filteredNgos.length === 0 ? (
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center space-y-2">
+            <div className="bg-white/60 border border-slate-200 rounded-2xl p-8 text-center space-y-2">
               <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-bold text-white">
+              <h3 className="text-base font-bold text-slate-900">
                 {viewMode === 'ALL_LIVE' ? 'No Registered NGOs Match Search' : 'No Pending NGO Registrations'}
               </h3>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredNgos.map(ngo => (
-                <div key={ngo.id} className="bg-slate-900 border border-blue-500/40 rounded-2xl p-4 shadow-xl space-y-3">
+                <div key={ngo.id} className="bg-white border border-blue-500/40 rounded-2xl p-4 shadow-xl space-y-3">
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-1.5 flex-wrap">
@@ -804,10 +804,10 @@ export default function AdminDashboard({ onDataUpdated }) {
                             PENDING VERIFICATION
                           </span>
                         )}
-                        <span className="text-xs font-mono text-slate-400">{ngo.id}</span>
+                        <span className="text-xs font-mono text-slate-500">{ngo.id}</span>
                       </div>
-                      <h3 className="text-base font-black text-white mt-1">{ngo.name}</h3>
-                      <p className="text-xs text-slate-300">Contact: <strong>{ngo.contactPerson || 'Official NGO'}</strong> ({ngo.phone})</p>
+                      <h3 className="text-base font-black text-slate-900 mt-1">{ngo.name}</h3>
+                      <p className="text-xs text-slate-600">Contact: <strong>{ngo.contactPerson || 'Official NGO'}</strong> ({ngo.phone})</p>
                       {ngo.email && <p className="text-xs text-amber-300 font-mono mt-0.5">{ngo.email}</p>}
                     </div>
                   </div>
@@ -824,7 +824,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                     ) : (
                       <a
                         href={`tel:${(ngo.phone || '').replace(/[^0-9]/g, '')}`}
-                        className="py-2.5 px-3 bg-slate-800 text-emerald-300 border border-slate-700 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
+                        className="py-2.5 px-3 bg-slate-800 text-emerald-300 border border-slate-300 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
                       >
                         <Phone className="w-3.5 h-3.5" />
                         <span>Call NGO</span>
@@ -850,16 +850,16 @@ export default function AdminDashboard({ onDataUpdated }) {
       {activeQueueTab === 'volunteers' && (
         <div className="space-y-4">
           {filteredVolunteers.length === 0 ? (
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center space-y-2">
+            <div className="bg-white/60 border border-slate-200 rounded-2xl p-8 text-center space-y-2">
               <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-bold text-white">
+              <h3 className="text-base font-bold text-slate-900">
                 {viewMode === 'ALL_LIVE' ? 'No Volunteer Profiles Match Search' : 'No Pending Volunteer Profiles'}
               </h3>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredVolunteers.map(vol => (
-                <div key={vol.id} className="bg-slate-900 border border-purple-500/40 rounded-2xl p-4 shadow-xl space-y-3">
+                <div key={vol.id} className="bg-white border border-purple-500/40 rounded-2xl p-4 shadow-xl space-y-3">
                   <div>
                     <div className="flex items-center gap-1.5 flex-wrap">
                       {vol.verified ? (
@@ -871,11 +871,11 @@ export default function AdminDashboard({ onDataUpdated }) {
                           PENDING VERIFICATION
                         </span>
                       )}
-                      <span className="text-xs font-mono text-slate-400">{vol.id}</span>
+                      <span className="text-xs font-mono text-slate-500">{vol.id}</span>
                     </div>
-                    <h3 className="text-base font-black text-white mt-1">{vol.name}</h3>
+                    <h3 className="text-base font-black text-slate-900 mt-1">{vol.name}</h3>
                     <p className="text-xs text-purple-300 font-bold">{vol.roleType} - {vol.phone}</p>
-                    {vol.offerings && <p className="text-xs text-slate-300 mt-1">"{vol.offerings}"</p>}
+                    {vol.offerings && <p className="text-xs text-slate-600 mt-1">"{vol.offerings}"</p>}
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
@@ -890,7 +890,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                     ) : (
                       <a
                         href={`tel:${(vol.phone || '').replace(/[^0-9]/g, '')}`}
-                        className="py-2.5 px-3 bg-slate-800 text-purple-300 border border-slate-700 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
+                        className="py-2.5 px-3 bg-slate-800 text-purple-300 border border-slate-300 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
                       >
                         <Phone className="w-3.5 h-3.5" />
                         <span>Call Volunteer</span>
@@ -916,7 +916,7 @@ export default function AdminDashboard({ onDataUpdated }) {
       {activeQueueTab === 'recovery' && (
         <div className="space-y-4">
           {/* Header & Info */}
-          <div className="flex items-center justify-between gap-3 bg-slate-900 p-3 rounded-xl border border-slate-800">
+          <div className="flex items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200">
             <div className="flex items-center gap-2">
               <Key className="w-4 h-4 text-cyan-400 shrink-0" />
               <span className="text-xs font-bold text-slate-200">Account Recovery Queue ({pendingRecovery.length} Total)</span>
@@ -924,10 +924,10 @@ export default function AdminDashboard({ onDataUpdated }) {
           </div>
 
           {pendingRecovery.length === 0 ? (
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center space-y-2">
+            <div className="bg-white/60 border border-slate-200 rounded-2xl p-8 text-center space-y-2">
               <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-bold text-white">No Account Recovery Requests</h3>
-              <p className="text-xs text-slate-400">All forgot password & forgot email requests have been processed.</p>
+              <h3 className="text-base font-bold text-slate-900">No Account Recovery Requests</h3>
+              <p className="text-xs text-slate-500">All forgot password & forgot email requests have been processed.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -947,7 +947,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                   const isPasswordReq = req.requestType === 'FORGOT_PASSWORD';
 
                   return (
-                    <div key={req.id} className={`bg-slate-900 border rounded-2xl p-4 shadow-xl space-y-3 ${req.status === 'RESOLVED' ? 'border-emerald-500/30 opacity-75' : isPasswordReq ? 'border-amber-500/40' : 'border-cyan-500/40'}`}>
+                    <div key={req.id} className={`bg-white border rounded-2xl p-4 shadow-xl space-y-3 ${req.status === 'RESOLVED' ? 'border-emerald-500/30 opacity-75' : isPasswordReq ? 'border-amber-500/40' : 'border-cyan-500/40'}`}>
                       
                       {/* Request Header Badges */}
                       <div className="flex items-center justify-between gap-2">
@@ -957,7 +957,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                           }`}>
                             {isPasswordReq ? 'FORGOT PASSWORD' : 'FORGOT EMAIL'}
                           </span>
-                          <span className="px-2 py-0.5 text-[10px] font-bold bg-slate-800 text-slate-300 rounded-md border border-slate-700">
+                          <span className="px-2 py-0.5 text-[10px] font-bold bg-slate-800 text-slate-600 rounded-md border border-slate-300">
                             {req.accountRole}
                           </span>
                           <span className="text-[11px] font-mono text-slate-500">{req.id}</span>
@@ -971,23 +971,23 @@ export default function AdminDashboard({ onDataUpdated }) {
                       </div>
 
                       {/* Request Details */}
-                      <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1.5">
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1.5">
                         <div className="flex items-center justify-between">
-                          <span className="text-slate-400 font-medium">Submitted Name:</span>
-                          <span className="text-white font-bold">{req.name || 'Not provided'}</span>
+                          <span className="text-slate-500 font-medium">Submitted Name:</span>
+                          <span className="text-slate-900 font-bold">{req.name || 'Not provided'}</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-slate-400 font-medium">Contact Phone:</span>
+                          <span className="text-slate-500 font-medium">Contact Phone:</span>
                           <span className="text-amber-300 font-mono font-bold">{req.phone || 'N/A'}</span>
                         </div>
                         {req.email && (
                           <div className="flex items-center justify-between">
-                            <span className="text-slate-400 font-medium">Entered Email:</span>
+                            <span className="text-slate-500 font-medium">Entered Email:</span>
                             <span className="text-cyan-300 font-mono font-bold">{req.email}</span>
                           </div>
                         )}
                         {req.details && (
-                          <div className="pt-1 border-t border-slate-800">
+                          <div className="pt-1 border-t border-slate-200">
                             <ExpandableNotes text={req.details} dark={true} label="User Verification Note:" />
                           </div>
                         )}
@@ -1004,11 +1004,11 @@ export default function AdminDashboard({ onDataUpdated }) {
                               <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
                               <span>System Record Matched!</span>
                             </span>
-                            <span className="text-[10px] font-bold text-slate-400">
+                            <span className="text-[10px] font-bold text-slate-500">
                               {matchedAccount.verified ? 'Verified' : 'Unverified'}
                             </span>
                           </div>
-                          <div className="text-xs space-y-1 text-slate-200 bg-slate-950/80 p-2 rounded-lg font-mono">
+                          <div className="text-xs space-y-1 text-slate-200 bg-slate-50 p-2 rounded-lg font-mono">
                             <p><strong>Registered Email:</strong> <span className="text-cyan-300">{matchedAccount.email}</span></p>
                             <p><strong>Password:</strong> <span className="text-amber-300">{matchedAccount.password || 'Standard Pass'}</span></p>
                             <p><strong>Registered Name:</strong> {matchedAccount.name}</p>
@@ -1019,13 +1019,13 @@ export default function AdminDashboard({ onDataUpdated }) {
                               navigator.clipboard.writeText(`Email: ${matchedAccount.email} | Password: ${matchedAccount.password || 'Standard Password'}`);
                               alert("Copied user credentials to clipboard!");
                             }}
-                            className="w-full py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold rounded-lg transition-colors border border-slate-700 flex items-center justify-center gap-1"
+                            className="w-full py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold rounded-lg transition-colors border border-slate-300 flex items-center justify-center gap-1"
                           >
                             <span>Copy Credentials</span>
                           </button>
                         </div>
                       ) : (
-                        <div className="p-2.5 bg-slate-950 border border-dashed border-slate-800 rounded-xl text-center text-xs text-slate-400">
+                        <div className="p-2.5 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-center text-xs text-slate-500">
                           No exact matching registered record found automatically. Use phone/email to verify with user.
                         </div>
                       )}
@@ -1036,7 +1036,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                           href={getWhatsAppRecoveryUrl(req.phone, req.name, req.requestType, req.accountRole, matchedAccount)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
+                          className="py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-slate-900 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
                         >
                           <MessageSquare className="w-3.5 h-3.5" />
                           <span>WhatsApp Details</span>
@@ -1045,7 +1045,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                         {req.status === 'PENDING' ? (
                           <button
                             onClick={() => handleResolveRecovery(req.id)}
-                            className="py-2.5 px-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
+                            className="py-2.5 px-3 bg-cyan-600 hover:bg-cyan-500 text-slate-900 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[44px]"
                           >
                             <CheckCircle2 className="w-3.5 h-3.5" />
                             <span>Mark Resolved</span>
@@ -1053,7 +1053,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                         ) : (
                           <button
                             onClick={() => handleDeleteRecovery(req.id)}
-                            className="py-2.5 px-3 bg-slate-800 hover:bg-red-950 text-slate-400 hover:text-red-300 rounded-xl text-xs font-bold flex items-center justify-center gap-1 border border-slate-700 min-h-[44px]"
+                            className="py-2.5 px-3 bg-slate-800 hover:bg-red-950 text-slate-500 hover:text-red-300 rounded-xl text-xs font-bold flex items-center justify-center gap-1 border border-slate-300 min-h-[44px]"
                           >
                             <XCircle className="w-3.5 h-3.5" />
                             <span>Delete</span>
@@ -1074,13 +1074,13 @@ export default function AdminDashboard({ onDataUpdated }) {
         <div className="space-y-4">
           
           {/* Header & Controls Bar */}
-          <div className="bg-slate-900 p-4 rounded-2xl border border-emerald-500/40 space-y-3 shadow-xl">
+          <div className="bg-white p-4 rounded-2xl border border-emerald-500/40 space-y-3 shadow-xl">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-emerald-400 shrink-0" />
                 <div>
-                  <h3 className="text-sm font-black text-white uppercase tracking-tight">ALL REGISTERED USER ACCOUNTS</h3>
-                  <p className="text-[11px] text-slate-400">Total {filteredUsers.length} users matching filters (Page {safeUserCurrentPage} of {totalUserPages})</p>
+                  <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">ALL REGISTERED USER ACCOUNTS</h3>
+                  <p className="text-[11px] text-slate-500">Total {filteredUsers.length} users matching filters (Page {safeUserCurrentPage} of {totalUserPages})</p>
                 </div>
               </div>
 
@@ -1090,7 +1090,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                 <select
                   value={userRoleFilter}
                   onChange={(e) => { setUserRoleFilter(e.target.value); setUserCurrentPage(1); }}
-                  className="bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none min-h-[38px]"
+                  className="bg-slate-50 border border-slate-200 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none min-h-[38px]"
                 >
                   <option value="ALL">All Roles ({allUsers.length})</option>
                   <option value="NGO">NGOs ({allUsers.filter(u=>u.userType==='NGO').length})</option>
@@ -1101,7 +1101,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                 <select
                   value={userStatusFilter}
                   onChange={(e) => { setUserStatusFilter(e.target.value); setUserCurrentPage(1); }}
-                  className="bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none min-h-[38px]"
+                  className="bg-slate-50 border border-slate-200 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none min-h-[38px]"
                 >
                   <option value="ALL">All Statuses</option>
                   <option value="VERIFIED">Verified Only</option>
@@ -1109,16 +1109,16 @@ export default function AdminDashboard({ onDataUpdated }) {
                 </select>
 
                 {/* Items Per Page Selector */}
-                <div className="flex items-center gap-1 text-xs text-slate-400 bg-slate-950 px-2.5 py-1.5 rounded-xl border border-slate-800">
+                <div className="flex items-center gap-1 text-xs text-slate-500 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200">
                   <span className="font-semibold">Show:</span>
                   <select
                     value={userItemsPerPage}
                     onChange={(e) => { setUserItemsPerPage(Number(e.target.value)); setUserCurrentPage(1); }}
                     className="bg-transparent text-emerald-300 font-bold focus:outline-none cursor-pointer"
                   >
-                    <option value={5} className="bg-slate-900 text-white">5 per page</option>
-                    <option value={10} className="bg-slate-900 text-white">10 per page</option>
-                    <option value={20} className="bg-slate-900 text-white">20 per page</option>
+                    <option value={5} className="bg-white text-white">5 per page</option>
+                    <option value={10} className="bg-white text-white">10 per page</option>
+                    <option value={20} className="bg-white text-white">20 per page</option>
                   </select>
                 </div>
               </div>
@@ -1127,15 +1127,15 @@ export default function AdminDashboard({ onDataUpdated }) {
 
           {/* User Cards / List */}
           {filteredUsers.length === 0 ? (
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center space-y-2">
+            <div className="bg-white/60 border border-slate-200 rounded-2xl p-8 text-center space-y-2">
               <Users className="w-10 h-10 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-bold text-white">No Registered Users Found</h3>
-              <p className="text-xs text-slate-400">No user accounts match your current filters or search term.</p>
+              <h3 className="text-base font-bold text-slate-900">No Registered Users Found</h3>
+              <p className="text-xs text-slate-500">No user accounts match your current filters or search term.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {paginatedUsers.map(usr => (
-                <div key={usr.id} className="bg-slate-900 border border-slate-800 hover:border-emerald-500/50 rounded-2xl p-4 shadow-xl space-y-3 transition-all">
+                <div key={usr.id} className="bg-white border border-slate-200 hover:border-emerald-500/50 rounded-2xl p-4 shadow-xl space-y-3 transition-all">
                   
                   {/* Top Badge & Type */}
                   <div className="flex items-start justify-between gap-2">
@@ -1158,36 +1158,36 @@ export default function AdminDashboard({ onDataUpdated }) {
                             </span>
                           )}
                         </div>
-                        <h4 className="text-base font-black text-white mt-1">{usr.name}</h4>
-                        <p className="text-xs font-mono text-slate-400">ID: {usr.id}</p>
+                        <h4 className="text-base font-black text-slate-900 mt-1">{usr.name}</h4>
+                        <p className="text-xs font-mono text-slate-500">ID: {usr.id}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Account Details Box */}
-                  <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1.5">
-                    <div className="flex items-center justify-between text-slate-300">
-                      <span className="font-semibold text-slate-400">Email Address:</span>
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1.5">
+                    <div className="flex items-center justify-between text-slate-600">
+                      <span className="font-semibold text-slate-500">Email Address:</span>
                       <span className="font-mono text-emerald-300 font-bold">{usr.email}</span>
                     </div>
 
                     {/* Password Credential Row (Viewable by Admin with Toggle) */}
-                    <div className="flex items-center justify-between text-slate-300 pt-1 border-t border-slate-900">
-                      <span className="font-semibold text-slate-400 flex items-center gap-1">
+                    <div className="flex items-center justify-between text-slate-600 pt-1 border-t border-slate-900">
+                      <span className="font-semibold text-slate-500 flex items-center gap-1">
                         <Lock className="w-3 h-3 text-amber-400" /> Password Credential:
                       </span>
                       <div className="flex items-center gap-1.5">
                         <span className={`px-2 py-0.5 rounded font-mono text-[11px] font-bold border transition-all ${
                           visiblePasswords[usr.id] 
                             ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' 
-                            : 'bg-slate-900 text-slate-400 border-slate-800 tracking-widest'
+                            : 'bg-white text-slate-500 border-slate-200 tracking-widest'
                         }`}>
                           {visiblePasswords[usr.id] ? (usr.password || '••••••••') : '••••••••'}
                         </span>
                         <button
                           type="button"
                           onClick={() => togglePasswordVisibility(usr.id)}
-                          className="p-1 text-slate-400 hover:text-amber-300 hover:bg-slate-900 rounded transition-colors"
+                          className="p-1 text-slate-500 hover:text-amber-300 hover:bg-white rounded transition-colors"
                           title={visiblePasswords[usr.id] ? "Hide Password" : "View Password"}
                         >
                           {visiblePasswords[usr.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5 text-amber-400" />}
@@ -1195,13 +1195,13 @@ export default function AdminDashboard({ onDataUpdated }) {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between text-slate-300 pt-1 border-t border-slate-900">
-                      <span className="font-semibold text-slate-400">Phone Contact:</span>
-                      <span className="font-semibold text-white">{usr.phone}</span>
+                    <div className="flex items-center justify-between text-slate-600 pt-1 border-t border-slate-900">
+                      <span className="font-semibold text-slate-500">Phone Contact:</span>
+                      <span className="font-semibold text-slate-900">{usr.phone}</span>
                     </div>
 
-                    <div className="flex items-center justify-between text-slate-300 pt-1 border-t border-slate-900">
-                      <span className="font-semibold text-slate-400">District Zone:</span>
+                    <div className="flex items-center justify-between text-slate-600 pt-1 border-t border-slate-900">
+                      <span className="font-semibold text-slate-500">District Zone:</span>
                       <span className="font-semibold text-amber-300">{usr.district}</span>
                     </div>
                   </div>
@@ -1222,7 +1222,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                     ) : (
                       <a
                         href={`tel:${(usr.phone || '').replace(/[^0-9]/g, '')}`}
-                        className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[42px]"
+                        className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-300 rounded-xl text-xs font-black flex items-center justify-center gap-1 min-h-[42px]"
                       >
                         <Phone className="w-3.5 h-3.5" />
                         <span>Call User</span>
@@ -1248,16 +1248,16 @@ export default function AdminDashboard({ onDataUpdated }) {
 
           {/* Pagination Controls Bar */}
           {filteredUsers.length > 0 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-900 p-3.5 rounded-2xl border border-slate-800 text-xs font-bold">
-              <div className="text-slate-400">
-                Showing <strong className="text-white">{userStartIndex + 1}</strong> to <strong className="text-white">{Math.min(userStartIndex + userItemsPerPage, filteredUsers.length)}</strong> of <strong className="text-emerald-400">{filteredUsers.length}</strong> registered users
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 text-xs font-bold">
+              <div className="text-slate-500">
+                Showing <strong className="text-slate-900">{userStartIndex + 1}</strong> to <strong className="text-slate-900">{Math.min(userStartIndex + userItemsPerPage, filteredUsers.length)}</strong> of <strong className="text-emerald-400">{filteredUsers.length}</strong> registered users
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   disabled={safeUserCurrentPage <= 1}
                   onClick={() => setUserCurrentPage(prev => Math.max(1, prev - 1))}
-                  className="px-3 py-2 bg-slate-950 hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-slate-950 text-white border border-slate-800 rounded-xl flex items-center gap-1 transition-all min-h-[38px]"
+                  className="px-3 py-2 bg-slate-50 hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-slate-50 text-slate-900 border border-slate-200 rounded-xl flex items-center gap-1 transition-all min-h-[38px]"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   <span>Previous</span>
@@ -1272,7 +1272,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                       className={`w-9 h-9 rounded-xl font-mono text-xs flex items-center justify-center transition-all ${
                         safeUserCurrentPage === page
                           ? 'bg-emerald-500 text-slate-950 font-black shadow-lg border border-emerald-400 scale-105'
-                          : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                          : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 shadow-sm'
                       }`}
                     >
                       {page}
@@ -1283,7 +1283,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                 <button
                   disabled={safeUserCurrentPage >= totalUserPages}
                   onClick={() => setUserCurrentPage(prev => Math.min(totalUserPages, prev + 1))}
-                  className="px-3 py-2 bg-slate-950 hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-slate-950 text-white border border-slate-800 rounded-xl flex items-center gap-1 transition-all min-h-[38px]"
+                  className="px-3 py-2 bg-slate-50 hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-slate-50 text-slate-900 border border-slate-200 rounded-xl flex items-center gap-1 transition-all min-h-[38px]"
                 >
                   <span>Next</span>
                   <ChevronRight className="w-4 h-4" />
@@ -1300,11 +1300,11 @@ export default function AdminDashboard({ onDataUpdated }) {
         <div className="space-y-6">
           
           {/* Section Header */}
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-2">
+          <div className="bg-white border border-slate-200 p-5 rounded-2xl space-y-2">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-2">
                 <Phone className="w-5 h-5 text-red-400" />
-                <h3 className="text-lg font-black text-white uppercase tracking-tight">
+                <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">
                   Control Room &amp; Helpline Management
                 </h3>
               </div>
@@ -1312,20 +1312,20 @@ export default function AdminDashboard({ onDataUpdated }) {
                 {helplinesList.length} Active Helplines
               </span>
             </div>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs text-slate-500 leading-relaxed">
               Add, update, or remove official emergency control room numbers. Changes sync live to all public user screens across Assam.
             </p>
           </div>
 
           {/* Add New Helpline Form */}
-          <form onSubmit={handleAddHelpline} className="bg-slate-900 border border-slate-800 p-4 sm:p-5 rounded-2xl space-y-4">
-            <h4 className="text-sm font-black text-white uppercase tracking-wide flex items-center gap-2">
+          <form onSubmit={handleAddHelpline} className="bg-white border border-slate-200 p-4 sm:p-5 rounded-2xl space-y-4">
+            <h4 className="text-sm font-black text-slate-900 uppercase tracking-wide flex items-center gap-2">
               <Bell className="w-4 h-4 text-red-400" />
               Add New Control Room / Helpline Number
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-slate-600 mb-1">
                   Control Room / District Label *
                 </label>
                 <input
@@ -1334,12 +1334,12 @@ export default function AdminDashboard({ onDataUpdated }) {
                   placeholder="e.g. Sivasagar Control Room"
                   value={newHelplineLabel}
                   onChange={e => setNewHelplineLabel(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white text-xs placeholder-slate-500 focus:outline-none focus:border-red-500 font-medium"
+                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-slate-900 text-xs placeholder-slate-500 focus:outline-none focus:border-red-500 font-medium"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-slate-600 mb-1">
                   Phone / Helpline Number *
                 </label>
                 <input
@@ -1348,12 +1348,12 @@ export default function AdminDashboard({ onDataUpdated }) {
                   placeholder="e.g. 8471864355 or 1077"
                   value={newHelplinePhone}
                   onChange={e => setNewHelplinePhone(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white text-xs placeholder-slate-500 focus:outline-none focus:border-red-500 font-mono font-medium"
+                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-slate-900 text-xs placeholder-slate-500 focus:outline-none focus:border-red-500 font-mono font-medium"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-slate-600 mb-1">
                   Sort Order Position
                 </label>
                 <input
@@ -1361,7 +1361,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                   placeholder={`Default (${helplinesList.length + 1})`}
                   value={newHelplineOrder}
                   onChange={e => setNewHelplineOrder(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white text-xs placeholder-slate-500 focus:outline-none focus:border-red-500 font-mono"
+                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-slate-900 text-xs placeholder-slate-500 focus:outline-none focus:border-red-500 font-mono"
                 />
               </div>
             </div>
@@ -1369,7 +1369,7 @@ export default function AdminDashboard({ onDataUpdated }) {
             <div className="flex justify-end">
               <button
                 type="submit"
-                className="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white font-black rounded-xl text-xs flex items-center gap-2 shadow-lg transition-all min-h-[40px]"
+                className="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-slate-900 font-black rounded-xl text-xs flex items-center gap-2 shadow-lg transition-all min-h-[40px]"
               >
                 <Phone className="w-4 h-4" />
                 <span>Add Helpline Number</span>
@@ -1379,14 +1379,14 @@ export default function AdminDashboard({ onDataUpdated }) {
 
           {/* List of Helplines */}
           <div className="space-y-3">
-            <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider">
+            <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider">
               Current Live Helplines List
             </h4>
 
             {helplinesList.length === 0 ? (
-              <div className="bg-slate-900 border border-slate-800 p-8 rounded-2xl text-center space-y-2">
+              <div className="bg-white border border-slate-200 p-8 rounded-2xl text-center space-y-2">
                 <Phone className="w-8 h-8 text-slate-600 mx-auto" />
-                <p className="text-sm font-bold text-slate-400">No Helpline Numbers Configured</p>
+                <p className="text-sm font-bold text-slate-500">No Helpline Numbers Configured</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1396,47 +1396,47 @@ export default function AdminDashboard({ onDataUpdated }) {
                   return (
                     <div
                       key={item.id}
-                      className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col justify-between gap-3"
+                      className="bg-white border border-slate-200 p-4 rounded-2xl flex flex-col justify-between gap-3"
                     >
                       {isEditing ? (
                         <form onSubmit={handleSaveEditHelpline} className="space-y-3">
                           <div className="space-y-2">
                             <div>
-                              <label className="block text-[11px] font-bold text-slate-400 mb-0.5">Control Room Label</label>
+                              <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Control Room Label</label>
                               <input
                                 type="text"
                                 required
                                 value={editHelplineLabel}
                                 onChange={e => setEditHelplineLabel(e.target.value)}
-                                className="w-full px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs font-bold"
+                                className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-xs font-bold"
                               />
                             </div>
                             <div>
-                              <label className="block text-[11px] font-bold text-slate-400 mb-0.5">Phone Number</label>
+                              <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Phone Number</label>
                               <input
                                 type="text"
                                 required
                                 value={editHelplinePhone}
                                 onChange={e => setEditHelplinePhone(e.target.value)}
-                                className="w-full px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs font-mono font-bold"
+                                className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-xs font-mono font-bold"
                               />
                             </div>
                             <div>
-                              <label className="block text-[11px] font-bold text-slate-400 mb-0.5">Sort Order</label>
+                              <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Sort Order</label>
                               <input
                                 type="number"
                                 value={editHelplineOrder}
                                 onChange={e => setEditHelplineOrder(e.target.value)}
-                                className="w-full px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs font-mono"
+                                className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-xs font-mono"
                               />
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+                          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
                             <button
                               type="button"
                               onClick={() => setEditingHelplineId(null)}
-                              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold"
+                              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-600 rounded-lg text-xs font-bold"
                             >
                               Cancel
                             </button>
@@ -1456,7 +1456,7 @@ export default function AdminDashboard({ onDataUpdated }) {
                                 #{item.sort_order ?? 0}
                               </span>
                               <div>
-                                <h5 className="text-sm font-black text-white leading-snug">
+                                <h5 className="text-sm font-black text-slate-900 leading-snug">
                                   {item.label}
                                 </h5>
                                 <p className="text-xs font-mono font-bold text-red-400 mt-0.5">
@@ -1467,21 +1467,21 @@ export default function AdminDashboard({ onDataUpdated }) {
 
                             <a
                               href={`tel:${(item.phone_number || '').replace(/[^0-9]/g, '')}`}
-                              className="p-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 rounded-xl shrink-0 transition-colors"
+                              className="p-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-300 rounded-xl shrink-0 transition-colors"
                               title="Test Call"
                             >
                               <Phone className="w-4 h-4" />
                             </a>
                           </div>
 
-                          <div className="flex items-center justify-between pt-3 border-t border-slate-800 text-xs">
+                          <div className="flex items-center justify-between pt-3 border-t border-slate-200 text-xs">
                             <span className="text-[10px] font-mono text-slate-500">
                               ID: {item.id ? item.id.substring(0, 8) : 'seed'}…
                             </span>
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={() => handleStartEditHelpline(item)}
-                                className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors"
+                                className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-600 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors"
                               >
                                 <Edit2 className="w-3 h-3 text-amber-400" /> Edit
                               </button>
@@ -1507,14 +1507,14 @@ export default function AdminDashboard({ onDataUpdated }) {
 
       {/* Edit Request Modal */}
       {editingSosId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-slate-950/85 backdrop-blur-lg overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-slate-900 border-2 border-amber-500/40 shadow-2xl rounded-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-slate-50/85 backdrop-blur-lg overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-white border-2 border-amber-500/40 shadow-2xl rounded-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col">
             <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b shrink-0 bg-gradient-to-r from-amber-950 via-slate-950 to-slate-950 border-amber-800">
-              <h3 className="text-sm sm:text-lg font-black text-white uppercase flex items-center gap-2">
+              <h3 className="text-sm sm:text-lg font-black text-slate-900 uppercase flex items-center gap-2">
                 <Edit2 className="w-5 h-5 text-amber-400" />
                 Edit SOS Request: {editSosData.id}
               </h3>
-              <button onClick={() => setEditingSosId(null)} className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors">
+              <button onClick={() => setEditingSosId(null)} className="p-2 text-slate-500 hover:text-slate-900 rounded-lg hover:bg-slate-800 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1522,50 +1522,50 @@ export default function AdminDashboard({ onDataUpdated }) {
             <form onSubmit={handleSaveSos} className="p-6 space-y-4 overflow-y-auto">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Victim Name</label>
-                  <input type="text" required value={editSosData.name || ''} onChange={e => setEditSosData({...editSosData, name: e.target.value})} className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm" />
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Victim Name</label>
+                  <input type="text" required value={editSosData.name || ''} onChange={e => setEditSosData({...editSosData, name: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Phone Number</label>
-                  <input type="tel" required value={editSosData.phone || ''} onChange={e => setEditSosData({...editSosData, phone: e.target.value})} className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm" />
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Phone Number</label>
+                  <input type="tel" required value={editSosData.phone || ''} onChange={e => setEditSosData({...editSosData, phone: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Village / Area</label>
-                  <input type="text" required value={editSosData.villageName || ''} onChange={e => setEditSosData({...editSosData, villageName: e.target.value})} className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm" />
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Village / Area</label>
+                  <input type="text" required value={editSosData.villageName || ''} onChange={e => setEditSosData({...editSosData, villageName: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1.5">District</label>
-                  <select value={editSosData.district || ''} onChange={e => setEditSosData({...editSosData, district: e.target.value})} className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm">
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">District</label>
+                  <select value={editSosData.district || ''} onChange={e => setEditSosData({...editSosData, district: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm">
                     {ASSAM_DISTRICTS.map(d => <option key={d} value={d}>{d}</option>)}
                   </select>
                 </div>
                 
                 {/* Demographics row */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Males Count</label>
-                  <input type="number" min="0" value={editSosData.malesCount} onChange={e => setEditSosData({...editSosData, malesCount: e.target.value})} className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm" />
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Males Count</label>
+                  <input type="number" min="0" value={editSosData.malesCount} onChange={e => setEditSosData({...editSosData, malesCount: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Females Count</label>
-                  <input type="number" min="0" value={editSosData.femalesCount} onChange={e => setEditSosData({...editSosData, femalesCount: e.target.value})} className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm" />
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Females Count</label>
+                  <input type="number" min="0" value={editSosData.femalesCount} onChange={e => setEditSosData({...editSosData, femalesCount: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Children Count</label>
-                  <input type="number" min="0" value={editSosData.childrenCount} onChange={e => setEditSosData({...editSosData, childrenCount: e.target.value})} className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm" />
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Children Count</label>
+                  <input type="number" min="0" value={editSosData.childrenCount} onChange={e => setEditSosData({...editSosData, childrenCount: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Families Count</label>
-                  <input type="number" min="0" value={editSosData.familiesCount} onChange={e => setEditSosData({...editSosData, familiesCount: e.target.value})} className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm" />
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Families Count</label>
+                  <input type="number" min="0" value={editSosData.familiesCount} onChange={e => setEditSosData({...editSosData, familiesCount: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm" />
                 </div>
               </div>
               
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5">Request Details</label>
-                <textarea rows="3" value={editSosData.details || ''} onChange={e => setEditSosData({...editSosData, details: e.target.value})} className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm"></textarea>
+                <label className="block text-xs font-bold text-slate-600 mb-1.5">Request Details</label>
+                <textarea rows="3" value={editSosData.details || ''} onChange={e => setEditSosData({...editSosData, details: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm"></textarea>
               </div>
 
-              <div className="pt-4 border-t border-slate-800 flex justify-end gap-3">
-                <button type="button" onClick={() => setEditingSosId(null)} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-bold">
+              <div className="pt-4 border-t border-slate-200 flex justify-end gap-3">
+                <button type="button" onClick={() => setEditingSosId(null)} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-900 rounded-xl text-sm font-bold">
                   Cancel
                 </button>
                 <button type="submit" className="px-6 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-sm font-black flex items-center gap-2">
