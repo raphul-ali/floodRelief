@@ -528,9 +528,12 @@ def health_check():
 
 # --- Campaigns Endpoints ---
 @app.get("/api/campaigns")
-def get_campaigns():
+def get_campaigns(status: Optional[str] = None):
     try:
-        res = get_supabase_client().table('campaigns').select('*').order('created_at', desc=True).execute()
+        query = get_supabase_client().table('campaigns').select('*')
+        if status:
+            query = query.eq('status', status)
+        res = query.order('created_at', desc=True).execute()
         return res.data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
