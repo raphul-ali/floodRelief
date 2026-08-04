@@ -24,27 +24,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-try:
-    from upstash_ratelimit.asyncio import AsyncRatelimit, SlidingWindow
-    from upstash_redis.asyncio import Redis
-    
-    UPSTASH_URL = os.environ.get("UPSTASH_REDIS_REST_URL")
-    UPSTASH_TOKEN = os.environ.get("UPSTASH_REDIS_REST_TOKEN")
-    
-    if UPSTASH_URL and UPSTASH_TOKEN:
-        upstash_redis = Redis(url=UPSTASH_URL, token=UPSTASH_TOKEN)
-        # 30 requests per 10 seconds for general API routes
-        global_ratelimit = AsyncRatelimit(
-            redis=upstash_redis,
-            limiter=SlidingWindow(max_requests=30, window=10)
-        )
-    else:
-        global_ratelimit = None
-except ImportError:
-    global_ratelimit = None
+
+def get_ratelimit():
+    try:
+        from upstash_ratelimit.asyncio import AsyncRatelimit, SlidingWindow
+        from upstash_redis.asyncio import Redis
+        import os
+        UPSTASH_URL = os.environ.get("UPSTASH_REDIS_REST_URL")
+        UPSTASH_TOKEN = os.environ.get("UPSTASH_REDIS_REST_TOKEN")
+        if UPSTASH_URL and UPSTASH_TOKEN:
+            upstash_redis = Redis(url=UPSTASH_URL, token=UPSTASH_TOKEN)
+            return AsyncRatelimit(redis=upstash_redis, limiter=SlidingWindow(max_requests=30, window=10))
+    except ImportError:
+        pass
+    return None
+
 
 async def check_rate_limit(request: Request):
-    if not global_ratelimit:
+    
+    ratelimit = get_ratelimit()
+    if not ratelimit:
+
         return # Rate limiting disabled if env vars or package missing
         
     ip = (
@@ -57,7 +57,7 @@ async def check_rate_limit(request: Request):
     if ip and "," in ip:
         ip = ip.split(",")[0].strip()
 
-    response = await global_ratelimit.limit(ip)
+    response = await ratelimit.limit(ip)
 
     if not response.allowed:
         raise HTTPException(status_code=429, detail="Too many requests")
@@ -67,7 +67,10 @@ async def security_audit_middleware(request: Request, call_next):
     if request.url.path.startswith("/api/"):
         
         # Rate Limiting
-        if global_ratelimit:
+        
+        ratelimit = get_ratelimit()
+        if ratelimit:
+
             try:
                 await check_rate_limit(request)
             except HTTPException as e:
@@ -85,9 +88,12 @@ async def security_audit_middleware(request: Request, call_next):
             path_parts = request.url.path.strip("/").split("/")
             target_table = path_parts[2] if len(path_parts) > 2 and path_parts[1] == "db" else path_parts[-1]
             
+            
+            supabase = get_supabase_client()
             if supabase:
+
                 try:
-                    supabase.table('security_logs').insert({
+                    get_supabase_client().table('security_logs').insert({
                         "ip_address": ip or "unknown",
                         "action": request.method,
                         "target_table": target_table,
@@ -98,19 +104,22 @@ async def security_audit_middleware(request: Request, call_next):
                     
     return await call_next(request)
 
-# Initialize Supabase Admin Client
-SUPABASE_URL = os.environ.get("VITE_SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
-JWT_SECRET = os.environ.get("JWT_SECRET", "super-secret-fallback-key")
 
-# Initialize Resend
-resend.api_key = os.environ.get("RESEND_API_KEY", "")
+def get_supabase_client():
+    import os
+    from supabase import create_client
+    url = os.environ.get("VITE_SUPABASE_URL")
+    key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+    if not url or not key:
+        key = os.environ.get("VITE_SUPABASE_ANON_KEY", "")
+    if url:
+        return create_client(url, key)
+    return None
 
-if not SUPABASE_URL or not SUPABASE_KEY:
-    # Fallback to anon key if service role is missing during local dev
-    SUPABASE_KEY = os.environ.get("VITE_SUPABASE_ANON_KEY", "")
+def get_jwt_secret():
+    import os
+    return os.environ.get("get_jwt_secret()", "super-secret-fallback-key")
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL else None
 
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 security = HTTPBearer()
@@ -118,7 +127,7 @@ security = HTTPBearer()
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     token = credentials.credentials
     try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        payload = jwt.decode(token, get_jwt_secret(), algorithms=["HS256"])
         return payload
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
@@ -185,12 +194,15 @@ class LoginRequest(BaseModel):
 
 @app.post("/api/auth/login")
 def login(creds: LoginRequest):
+    
+    supabase = get_supabase_client()
     if not supabase:
+
         raise HTTPException(status_code=500, detail="Database not configured")
         
     try:
         # Fetch the admin user
-        res = supabase.table('platform_admins').select('*').eq('email', creds.email).execute()
+        res = get_supabase_client().table('platform_admins').select('*').eq('email', creds.email).execute()
         if not res.data or len(res.data) == 0:
             raise HTTPException(status_code=401, detail="Invalid email or password")
             
@@ -210,7 +222,7 @@ def login(creds: LoginRequest):
             "exp": int(time.time()) + (24 * 60 * 60) # 24 hours expiry
         }
         
-        token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+        token = jwt.encode(payload, get_jwt_secret(), algorithm="HS256")
         
         return {
             "token": token,
@@ -231,9 +243,16 @@ class SendOtpRequest(BaseModel):
 
 @app.post("/api/auth/send-otp")
 def send_otp(req: SendOtpRequest):
-    if not resend.api_key:
+    # Fetch Resend API Key dynamically inside the request context
+    api_key = os.environ.get("RESEND_API_KEY")
+    if not api_key:
         raise HTTPException(status_code=500, detail="Resend API Key is missing")
+    resend.api_key = api_key
+
+    
+    supabase = get_supabase_client()
     if not supabase:
+
         raise HTTPException(status_code=500, detail="Database not configured")
         
     code = f"{random.randint(100000, 999999)}"
@@ -241,7 +260,7 @@ def send_otp(req: SendOtpRequest):
     
     try:
         # Save to Supabase
-        supabase.table('otps').insert({
+        get_supabase_client().table('otps').insert({
             "email": req.email.lower(),
             "otp_code": code,
             "expires_at": expires_at
@@ -264,12 +283,15 @@ class VerifyOtpRequest(BaseModel):
 
 @app.post("/api/auth/verify-otp")
 def verify_otp(req: VerifyOtpRequest):
+    
+    supabase = get_supabase_client()
     if not supabase:
+
         raise HTTPException(status_code=500, detail="Database not configured")
         
     try:
         email = req.email.lower()
-        res = supabase.table('otps').select('*').eq('email', email).execute()
+        res = get_supabase_client().table('otps').select('*').eq('email', email).execute()
         
         if not res.data or len(res.data) == 0:
             raise HTTPException(status_code=400, detail="No OTP request found for this email")
@@ -290,7 +312,7 @@ def verify_otp(req: VerifyOtpRequest):
             raise HTTPException(status_code=400, detail="Invalid or expired OTP code")
             
         # Clean up used OTP
-        supabase.table('otps').delete().eq('id', valid_record['id']).execute()
+        get_supabase_client().table('otps').delete().eq('id', valid_record['id']).execute()
         
         return {"success": True}
     except HTTPException:
@@ -312,11 +334,14 @@ class RegisterNgoRequest(BaseModel):
 
 @app.post("/api/auth/register-ngo")
 def register_ngo(req: RegisterNgoRequest):
+    
+    supabase = get_supabase_client()
     if not supabase:
+
         raise HTTPException(status_code=500, detail="Database not configured")
     try:
         # Check if email exists
-        res = supabase.table('ngos').select('id').eq('email', req.email.lower()).execute()
+        res = get_supabase_client().table('ngos').select('id').eq('email', req.email.lower()).execute()
         if res.data and len(res.data) > 0:
             raise HTTPException(status_code=400, detail="An NGO with this email is already registered")
 
@@ -339,7 +364,7 @@ def register_ngo(req: RegisterNgoRequest):
             "active_teams": 1,
             "show_phone": req.showPhone,
         }
-        supabase.table('ngos').insert(insert_data).execute()
+        get_supabase_client().table('ngos').insert(insert_data).execute()
         return {"success": True, "ngo_id": ngo_id}
     except HTTPException:
         raise
@@ -358,10 +383,13 @@ class RegisterVolunteerRequest(BaseModel):
 
 @app.post("/api/auth/register-volunteer")
 def register_volunteer(req: RegisterVolunteerRequest):
+    
+    supabase = get_supabase_client()
     if not supabase:
+
         raise HTTPException(status_code=500, detail="Database not configured")
     try:
-        res = supabase.table('volunteers').select('id').eq('email', req.email.lower()).execute()
+        res = get_supabase_client().table('volunteers').select('id').eq('email', req.email.lower()).execute()
         if res.data and len(res.data) > 0:
             raise HTTPException(status_code=400, detail="A volunteer with this email is already registered")
 
@@ -382,7 +410,7 @@ def register_volunteer(req: RegisterVolunteerRequest):
             "verified": False,
             "show_phone": req.showPhone,
         }
-        supabase.table('volunteers').insert(insert_data).execute()
+        get_supabase_client().table('volunteers').insert(insert_data).execute()
         return {"success": True, "vol_id": vol_id}
     except HTTPException:
         raise
@@ -391,10 +419,13 @@ def register_volunteer(req: RegisterVolunteerRequest):
 
 @app.post("/api/auth/login-ngo")
 def login_ngo(creds: LoginRequest):
+    
+    supabase = get_supabase_client()
     if not supabase:
+
         raise HTTPException(status_code=500, detail="Database not configured")
     try:
-        res = supabase.table('ngos').select('*').eq('email', creds.email.lower()).execute()
+        res = get_supabase_client().table('ngos').select('*').eq('email', creds.email.lower()).execute()
         if not res.data or len(res.data) == 0:
             raise HTTPException(status_code=401, detail="Invalid email or password")
             
@@ -419,7 +450,7 @@ def login_ngo(creds: LoginRequest):
             "name": user_record['name'],
             "exp": int(time.time()) + (24 * 60 * 60)
         }
-        token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+        token = jwt.encode(payload, get_jwt_secret(), algorithm="HS256")
         
         return {
             "token": token,
@@ -441,10 +472,13 @@ def login_ngo(creds: LoginRequest):
 
 @app.post("/api/auth/login-volunteer")
 def login_volunteer(creds: LoginRequest):
+    
+    supabase = get_supabase_client()
     if not supabase:
+
         raise HTTPException(status_code=500, detail="Database not configured")
     try:
-        res = supabase.table('volunteers').select('*').eq('email', creds.email.lower()).execute()
+        res = get_supabase_client().table('volunteers').select('*').eq('email', creds.email.lower()).execute()
         if not res.data or len(res.data) == 0:
             raise HTTPException(status_code=401, detail="Invalid email or password")
             
@@ -468,7 +502,7 @@ def login_volunteer(creds: LoginRequest):
             "name": user_record['name'],
             "exp": int(time.time()) + (24 * 60 * 60)
         }
-        token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+        token = jwt.encode(payload, get_jwt_secret(), algorithm="HS256")
         
         return {
             "token": token,
@@ -496,7 +530,7 @@ def health_check():
 @app.get("/api/campaigns")
 def get_campaigns():
     try:
-        res = supabase.table('campaigns').select('*').order('created_at', desc=True).execute()
+        res = get_supabase_client().table('campaigns').select('*').order('created_at', desc=True).execute()
         return res.data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -509,7 +543,7 @@ def create_campaign(campaign: CampaignCreate, user: dict = Depends(require_admin
         new_id = f"camp-{int(time.time()*1000)}-{uuid.uuid4().hex[:6]}"
         data = campaign.dict(exclude_unset=True)
         data['id'] = new_id
-        res = supabase.table('campaigns').insert(data).execute()
+        res = get_supabase_client().table('campaigns').insert(data).execute()
         return res.data[0] if res.data else {"id": new_id, **data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -517,7 +551,7 @@ def create_campaign(campaign: CampaignCreate, user: dict = Depends(require_admin
 @app.delete("/api/campaigns/{campaign_id}")
 def delete_campaign(campaign_id: str, user: dict = Depends(require_admin)):
     try:
-        res = supabase.table('campaigns').delete().eq('id', campaign_id).execute()
+        res = get_supabase_client().table('campaigns').delete().eq('id', campaign_id).execute()
         return {"success": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -525,7 +559,7 @@ def delete_campaign(campaign_id: str, user: dict = Depends(require_admin)):
 @app.put("/api/campaigns/{campaign_id}")
 def update_campaign(campaign_id: str, updates: Dict[str, Any], user: dict = Depends(require_admin)):
     try:
-        res = supabase.table('campaigns').update(updates).eq('id', campaign_id).execute()
+        res = get_supabase_client().table('campaigns').update(updates).eq('id', campaign_id).execute()
         return {"success": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -534,7 +568,7 @@ def update_campaign(campaign_id: str, updates: Dict[str, Any], user: dict = Depe
 @app.get("/api/victim_requests")
 def get_victim_requests():
     try:
-        res = supabase.table('victim_requests').select('*').order('created_at', desc=True).execute()
+        res = get_supabase_client().table('victim_requests').select('*').order('created_at', desc=True).execute()
         return res.data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -547,7 +581,7 @@ def create_victim_request(req: VictimRequestCreate):
         new_id = f"VREQ-{int(time.time()*1000)}-{uuid.uuid4().hex[:6]}"
         data = req.dict()
         data['id'] = new_id
-        res = supabase.table('victim_requests').insert(data).execute()
+        res = get_supabase_client().table('victim_requests').insert(data).execute()
         return res.data[0] if res.data else {"id": new_id, **data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -555,7 +589,7 @@ def create_victim_request(req: VictimRequestCreate):
 @app.delete("/api/victim_requests/{req_id}")
 def delete_victim_request(req_id: str, user: dict = Depends(require_admin)):
     try:
-        res = supabase.table('victim_requests').delete().eq('id', req_id).execute()
+        res = get_supabase_client().table('victim_requests').delete().eq('id', req_id).execute()
         return {"success": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -563,7 +597,7 @@ def delete_victim_request(req_id: str, user: dict = Depends(require_admin)):
 @app.put("/api/victim_requests/{req_id}")
 def update_victim_request(req_id: str, updates: Dict[str, Any], user: dict = Depends(require_auth)):
     try:
-        res = supabase.table('victim_requests').update(updates).eq('id', req_id).execute()
+        res = get_supabase_client().table('victim_requests').update(updates).eq('id', req_id).execute()
         return {"success": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -572,7 +606,7 @@ def update_victim_request(req_id: str, updates: Dict[str, Any], user: dict = Dep
 @app.get("/api/ngos")
 def get_ngos():
     try:
-        res = supabase.table('ngos').select('*').order('created_at', desc=True).execute()
+        res = get_supabase_client().table('ngos').select('*').order('created_at', desc=True).execute()
         return res.data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -588,7 +622,7 @@ def create_ngo(req: Request):
 async def create_record(table_name: str, req: Request, user: dict = Depends(require_auth)):
     try:
         data = await req.json()
-        res = supabase.table(table_name).insert(data).execute()
+        res = get_supabase_client().table(table_name).insert(data).execute()
         return res.data[0] if res.data else data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -597,7 +631,7 @@ async def create_record(table_name: str, req: Request, user: dict = Depends(requ
 async def update_record(table_name: str, record_id: str, req: Request, user: dict = Depends(require_auth)):
     try:
         data = await req.json()
-        res = supabase.table(table_name).update(data).eq('id', record_id).execute()
+        res = get_supabase_client().table(table_name).update(data).eq('id', record_id).execute()
         return res.data[0] if res.data else data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -605,7 +639,7 @@ async def update_record(table_name: str, record_id: str, req: Request, user: dic
 @app.delete("/api/db/{table_name}/{record_id}")
 def delete_record(table_name: str, record_id: str, user: dict = Depends(require_auth)):
     try:
-        supabase.table(table_name).delete().eq('id', record_id).execute()
+        get_supabase_client().table(table_name).delete().eq('id', record_id).execute()
         return {"success": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -616,7 +650,7 @@ def get_records(table_name: str, order_by: str = 'created_at'):
         # Ascending for helpline_numbers, desc for everything else
         asc = True if table_name == 'helpline_numbers' else False
         order_col = 'sort_order' if table_name == 'helpline_numbers' else order_by
-        res = supabase.table(table_name).select('*').order(order_col, desc=not asc).execute()
+        res = get_supabase_client().table(table_name).select('*').order(order_col, desc=not asc).execute()
         return res.data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
