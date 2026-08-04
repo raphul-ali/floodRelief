@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client, Client
 import os
 from pydantic import BaseModel
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 import jwt
 import bcrypt
 import resend
@@ -328,7 +328,7 @@ class RegisterNgoRequest(BaseModel):
     logoUrl: Optional[str] = None
     address: str
     operatingZones: List[str]
-    services: List[str]
+    services: Union[List[str], str]
     showPhone: bool
     password: str
 
