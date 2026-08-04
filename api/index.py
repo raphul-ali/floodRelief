@@ -268,7 +268,7 @@ def send_otp(req: SendOtpRequest):
         
         # Send Email via Resend
         resend.Emails.send({
-            "from": "onboarding@resend.dev",
+            "from": "noreply@helpaxom.in",
             "to": [req.email],
             "subject": "Your Assam Flood Relief Verification Code",
             "html": f"<p>Hello,</p><p>Your verification code is: <strong>{code}</strong></p><p>This code will expire in 10 minutes.</p>"
