@@ -197,12 +197,14 @@ export const storageService = {
   },
 
   // --- VICTIM SOS REQUESTS ---
-  getVictimRequestsPaginated: async ({ page = 1, limit = 9, district = '', search = '', isUrgent = null, verified = true } = {}) => {
+  getVictimRequestsPaginated: async ({ page = 1, limit = 9, district = '', search = '', isUrgent = null, urgency = '', status = '', verified = true } = {}) => {
     try {
       let url = `/api/victim_requests?page=${page}&limit=${limit}`;
       if (district && district !== 'ALL') url += `&district=${encodeURIComponent(district)}`;
       if (search) url += `&search=${encodeURIComponent(search)}`;
       if (isUrgent !== null) url += `&is_urgent_rescue=${isUrgent}`;
+      if (urgency && urgency !== 'ALL') url += `&urgency=${encodeURIComponent(urgency)}`;
+      if (status && status !== 'ALL') url += `&status=${encodeURIComponent(status)}`;
       if (verified !== null) url += `&verified=${verified}`;
 
       const res = await apiRequest(url, 'GET');

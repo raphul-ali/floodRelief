@@ -92,6 +92,11 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
   const [serverData, setServerData]           = useState(null);
   const [isServerLoading, setIsServerLoading] = useState(false);
 
+  // Reset page to 1 whenever filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterType, filterUrgency, filterStatus]);
+
   // Fetch true paginated data from FastAPI when page or filters change
   useEffect(() => {
     let isMounted = true;
@@ -103,6 +108,8 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
           page: currentPage,
           limit: 12,
           isUrgent,
+          urgency: filterUrgency,
+          status: filterStatus,
           verified: true
         });
         if (isMounted && res && res.data) {

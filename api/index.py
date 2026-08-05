@@ -596,6 +596,8 @@ def get_victim_requests(
     district: Optional[str] = Query(None),
     verified: Optional[bool] = Query(None),
     is_urgent_rescue: Optional[bool] = Query(None),
+    urgency: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
     search: Optional[str] = Query(None)
 ):
     try:
@@ -613,6 +615,20 @@ def get_victim_requests(
             
         if is_urgent_rescue is not None:
             query = query.eq('is_urgent_rescue', is_urgent_rescue)
+
+        if urgency and urgency.strip() and urgency.upper() != 'ALL':
+            query = query.eq('urgency', urgency.strip().upper())
+
+        if status and status.strip() and status.upper() != 'ALL':
+            st = status.strip().lower()
+            if st == 'active':
+                query = query.or_("status.eq.looking,status.eq.Pending,status.is.null")
+            elif st == 'in progress':
+                query = query.eq('status', 'In Progress')
+            elif st == 'resolved':
+                query = query.or_("status.eq.Rescued,status.eq.Fulfilled")
+            else:
+                query = query.eq('status', status.strip())
             
         if search and search.strip():
             s = search.strip()
