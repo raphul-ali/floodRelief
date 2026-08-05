@@ -107,30 +107,68 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
       ? supplyRequests 
       : victimRequests;
 
-  // Filter computation for SOS requests
-  const filteredRequests = targetRequests.filter(req => {
-    const searchLower = searchTerm.toLowerCase();
-    const matchesSearch = 
-      !searchTerm ||
-      (req.name && req.name.toLowerCase().includes(searchLower)) ||
-      (req.phone && req.phone.includes(searchLower)) ||
-      (req.locationName && req.locationName.toLowerCase().includes(searchLower)) ||
-      (req.id && req.id.toLowerCase().includes(searchLower));
+  const [serverReqData, setServerReqData] = useState(null);
 
-    const matchesStatus = filterStatus === 'ALL' || req.status === filterStatus;
-    const matchesDistrict = filterDistrict === 'ALL' || req.district === filterDistrict;
+  // Fetch server-paginated requests when filters change
+  useEffect(() => {
+    let isMounted = true;
+    const fetchServerRequests = async () => {
+      try {
+        const isUrgent = queueTab === 'CRITICAL_RESCUE' ? true : (queueTab === 'SUPPLY_REQUESTS' ? false : null);
+        const verifiedVal = filterVerification === 'VERIFIED' ? true : (filterVerification === 'UNVERIFIED' ? false : null);
 
-    const matchesUrgency = filterUrgency === 'ALL' || 
-      (filterUrgency === 'CRITICAL' && req.isUrgentRescue) ||
-      (filterUrgency === 'HIGH' && !req.isUrgentRescue && req.urgency === 'HIGH') ||
-      (filterUrgency === 'NORMAL' && !req.isUrgentRescue && req.urgency !== 'HIGH');
+        const res = await storageService.getVictimRequestsPaginated({
+          page: reqCurrentPage,
+          limit: reqItemsPerPage,
+          district: filterDistrict,
+          search: searchTerm,
+          isUrgent,
+          urgency: filterUrgency,
+          status: filterStatus,
+          verified: verifiedVal
+        });
+        if (isMounted && res && res.data) {
+          setServerReqData(res);
+        }
+      } catch (e) {
+        console.error("NGO Dashboard server pagination error:", e);
+      }
+    };
+    fetchServerRequests();
+    return () => { isMounted = false; };
+  }, [reqCurrentPage, queueTab, searchTerm, filterStatus, filterUrgency, filterDistrict, filterVerification]);
 
-    const matchesVerification = filterVerification === 'ALL' ||
-      (filterVerification === 'VERIFIED' && req.verified) ||
-      (filterVerification === 'UNVERIFIED' && !req.verified);
+  const useServerReqPagination = Boolean(serverReqData && serverReqData.pagination);
 
-    return matchesSearch && matchesStatus && matchesDistrict && matchesUrgency && matchesVerification;
-  });
+  // Filtering Logic (Client fallback or server data)
+  const filteredRequests = useServerReqPagination
+    ? serverReqData.data
+    : victimRequests.filter(req => {
+        if (queueTab === 'CRITICAL_RESCUE' && !req.isUrgentRescue) return false;
+        if (queueTab === 'SUPPLY_REQUESTS' && req.isUrgentRescue) return false;
+
+        const searchLower = searchTerm.toLowerCase();
+        const matchesSearch = 
+          !searchTerm ||
+          (req.name && req.name.toLowerCase().includes(searchLower)) ||
+          (req.phone && req.phone.includes(searchLower)) ||
+          (req.villageName && req.villageName.toLowerCase().includes(searchLower)) ||
+          (req.district && req.district.toLowerCase().includes(searchLower));
+
+        const matchesStatus = filterStatus === 'ALL' || req.status === filterStatus;
+        const matchesDistrict = filterDistrict === 'ALL' || req.district === filterDistrict;
+
+        const matchesUrgency = filterUrgency === 'ALL' || 
+          (filterUrgency === 'CRITICAL' && req.isUrgentRescue) ||
+          (filterUrgency === 'HIGH' && !req.isUrgentRescue && req.urgency === 'HIGH') ||
+          (filterUrgency === 'NORMAL' && !req.isUrgentRescue && req.urgency !== 'HIGH');
+
+        const matchesVerification = filterVerification === 'ALL' ||
+          (filterVerification === 'VERIFIED' && req.verified) ||
+          (filterVerification === 'UNVERIFIED' && !req.verified);
+
+        return matchesSearch && matchesStatus && matchesDistrict && matchesUrgency && matchesVerification;
+      });
 
   // Filter computation for Volunteers Directory
   const filteredVolunteers = volunteers.filter(vol => {
@@ -152,9 +190,14 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
   });
 
   // Requests Pagination Calculation
-  const totalReqPages = Math.ceil(filteredRequests.length / reqItemsPerPage) || 1;
+  const totalReqPages = useServerReqPagination
+    ? serverReqData.pagination.total_pages
+    : (Math.ceil(filteredRequests.length / reqItemsPerPage) || 1);
+
   const safeReqPage = Math.min(Math.max(1, reqCurrentPage), totalReqPages);
-  const paginatedRequests = filteredRequests.slice((safeReqPage - 1) * reqItemsPerPage, safeReqPage * reqItemsPerPage);
+  const paginatedRequests = useServerReqPagination
+    ? filteredRequests
+    : filteredRequests.slice((safeReqPage - 1) * reqItemsPerPage, safeReqPage * reqItemsPerPage);
 
   // Volunteers Pagination Calculation
   const totalVolPages = Math.ceil(filteredVolunteers.length / volItemsPerPage) || 1;

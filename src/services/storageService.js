@@ -594,6 +594,69 @@ export const storageService = {
   },
 
   // --- NGO DIRECTORY METHODS ---
+  getNGOsPaginated: async ({ page = 1, limit = 12, district = '', search = '', verified = true } = {}) => {
+    try {
+      let url = `/api/ngos?page=${page}&limit=${limit}`;
+      if (district && district !== 'ALL') url += `&district=${encodeURIComponent(district)}`;
+      if (search) url += `&search=${encodeURIComponent(search)}`;
+      if (verified !== null) url += `&verified=${verified}`;
+
+      const res = await apiRequest(url, 'GET');
+      if (res && res.data && res.pagination) {
+        const mappedData = res.data.map(n => ({
+          id: n.id,
+          name: n.name,
+          contactPerson: n.contact_person,
+          phone: n.phone,
+          email: n.email,
+          logoUrl: n.logo_url,
+          operatingZones: n.operating_zones,
+          services: n.services,
+          address: n.address,
+          verified: n.verified,
+          activeTeams: n.active_teams || 1
+        }));
+        return { data: mappedData, pagination: res.pagination };
+      }
+      return { data: [], pagination: { page: 1, limit, total: 0, total_pages: 1 } };
+    } catch (e) {
+      console.error("Failed to fetch paginated NGOs:", e);
+      return { data: [], pagination: { page: 1, limit, total: 0, total_pages: 1 } };
+    }
+  },
+
+  getVolunteersPaginated: async ({ page = 1, limit = 12, district = '', roleType = '', search = '', verified = true } = {}) => {
+    try {
+      let url = `/api/volunteers?page=${page}&limit=${limit}`;
+      if (district && district !== 'ALL') url += `&district=${encodeURIComponent(district)}`;
+      if (roleType && roleType !== 'ALL') url += `&role_type=${encodeURIComponent(roleType)}`;
+      if (search) url += `&search=${encodeURIComponent(search)}`;
+      if (verified !== null) url += `&verified=${verified}`;
+
+      const res = await apiRequest(url, 'GET');
+      if (res && res.data && res.pagination) {
+        const mappedData = res.data.map(v => ({
+          id: v.id,
+          name: v.name,
+          roleType: v.role_type,
+          phone: v.phone,
+          email: v.email,
+          district: v.district,
+          offerings: v.offerings,
+          socialLink: v.social_link,
+          availableStatus: v.available_status,
+          createdAt: v.created_at,
+          verified: v.verified
+        }));
+        return { data: mappedData, pagination: res.pagination };
+      }
+      return { data: [], pagination: { page: 1, limit, total: 0, total_pages: 1 } };
+    } catch (e) {
+      console.error("Failed to fetch paginated Volunteers:", e);
+      return { data: [], pagination: { page: 1, limit, total: 0, total_pages: 1 } };
+    }
+  },
+
   getNGOs: (includeUnverified = false) => {
     try {
       const list = cloudMemoryCache.ngos || [];

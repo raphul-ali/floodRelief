@@ -695,10 +695,115 @@ def update_victim_request(req_id: str, updates: Dict[str, Any], user: dict = Dep
 
 # --- NGOs Endpoints ---
 @app.get("/api/ngos")
-def get_ngos():
+def get_ngos(
+    page: Optional[int] = Query(None),
+    limit: Optional[int] = Query(12),
+    district: Optional[str] = Query(None),
+    verified: Optional[bool] = Query(None),
+    search: Optional[str] = Query(None)
+):
     try:
-        res = get_supabase_client().table('ngos').select('*').order('created_at', desc=True).execute()
-        return res.data
+        supabase = get_supabase_client()
+        if not supabase:
+            return [] if page is None else {"data": [], "pagination": {"page": 1, "limit": 12, "total": 0, "total_pages": 1}}
+            
+        query = supabase.table('ngos').select('*', count='exact')
+        
+        if district and district.strip() and district.lower() != 'all':
+            query = query.ilike('operating_zones', f"%{district.strip()}%")
+            
+        if verified is not None:
+            query = query.eq('verified', verified)
+            
+        if search and search.strip():
+            s = search.strip()
+            query = query.or_(f"name.ilike.%{s}%,contact_person.ilike.%{s}%,address.ilike.%{s}%")
+            
+        query = query.order('created_at', desc=True)
+        
+        if page is not None:
+            page_val = max(1, page)
+            limit_val = max(1, min(limit or 12, 100))
+            offset = (page_val - 1) * limit_val
+            end_offset = offset + limit_val - 1
+            
+            res = query.range(offset, end_offset).execute()
+            total_count = res.count if (hasattr(res, 'count') and res.count is not None) else len(res.data or [])
+            total_pages = math.ceil(total_count / limit_val) if total_count > 0 else 1
+            
+            return {
+                "data": res.data or [],
+                "pagination": {
+                    "page": page_val,
+                    "limit": limit_val,
+                    "total": total_count,
+                    "total_pages": total_pages,
+                    "has_next": page_val < total_pages,
+                    "has_prev": page_val > 1
+                }
+            }
+        else:
+            res = query.execute()
+            return res.data or []
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# --- Volunteers Endpoints ---
+@app.get("/api/volunteers")
+def get_volunteers(
+    page: Optional[int] = Query(None),
+    limit: Optional[int] = Query(12),
+    district: Optional[str] = Query(None),
+    role_type: Optional[str] = Query(None),
+    verified: Optional[bool] = Query(None),
+    search: Optional[str] = Query(None)
+):
+    try:
+        supabase = get_supabase_client()
+        if not supabase:
+            return [] if page is None else {"data": [], "pagination": {"page": 1, "limit": 12, "total": 0, "total_pages": 1}}
+            
+        query = supabase.table('volunteers').select('*', count='exact')
+        
+        if district and district.strip() and district.lower() != 'all':
+            query = query.eq('district', district.strip())
+
+        if role_type and role_type.strip() and role_type.lower() != 'all':
+            query = query.ilike('role_type', f"%{role_type.strip()}%")
+            
+        if verified is not None:
+            query = query.eq('verified', verified)
+            
+        if search and search.strip():
+            s = search.strip()
+            query = query.or_(f"name.ilike.%{s}%,offerings.ilike.%{s}%")
+            
+        query = query.order('created_at', desc=True)
+        
+        if page is not None:
+            page_val = max(1, page)
+            limit_val = max(1, min(limit or 12, 100))
+            offset = (page_val - 1) * limit_val
+            end_offset = offset + limit_val - 1
+            
+            res = query.range(offset, end_offset).execute()
+            total_count = res.count if (hasattr(res, 'count') and res.count is not None) else len(res.data or [])
+            total_pages = math.ceil(total_count / limit_val) if total_count > 0 else 1
+            
+            return {
+                "data": res.data or [],
+                "pagination": {
+                    "page": page_val,
+                    "limit": limit_val,
+                    "total": total_count,
+                    "total_pages": total_pages,
+                    "has_next": page_val < total_pages,
+                    "has_prev": page_val > 1
+                }
+            }
+        else:
+            res = query.execute()
+            return res.data or []
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
