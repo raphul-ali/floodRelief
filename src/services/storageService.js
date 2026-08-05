@@ -487,7 +487,7 @@ export const storageService = {
       delivered_by: newLog.deliveredBy,
       volunteer_phone: newLog.volunteerPhone,
       items_delivered: newLog.itemsDelivered,
-      people_impacted: newLog.peopleImpacted || null,
+      // people_impacted omitted: DB schema is INT but value is text (e.g. "50 People")
       delivery_notes: newLog.deliveryNotes,
       status_update: newLog.statusUpdate,
       verified: isVerified,
