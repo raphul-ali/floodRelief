@@ -221,9 +221,54 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
             ) : (
               <>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Relief Supplies Delivered *
-                  </label>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="block text-xs font-bold text-slate-700">
+                      Relief Supplies Delivered *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setItemsDelivered('50 Cooked Food Packets, 20 Water Jars (20L), 10 Tarpaulin Sheets, 5 Hygiene Kits')}
+                      className="text-[11px] font-extrabold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>⚡ Prefill Standard Package</span>
+                    </button>
+                  </div>
+
+                  {/* Quick Preset Supply Chips */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 mb-2 space-y-1.5">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
+                      Tap supplies to add:
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {[
+                        '50 Cooked Food Packets',
+                        '20 Water Jars (20L)',
+                        '10 Dry Ration Kits (Rice/Dal)',
+                        '15 Tarpaulin (Tirpal) Sheets',
+                        '20 Hygiene & Sanitation Kits',
+                        '10 Medical & ORS Kits',
+                        '15 Mosquito Nets',
+                        '10 Baby Food & Milk Cans'
+                      ].map((item) => (
+                        <button
+                          key={item}
+                          type="button"
+                          onClick={() => {
+                            setItemsDelivered(prev => {
+                              if (!prev.trim()) return item;
+                              if (prev.includes(item)) return prev;
+                              return `${prev}, ${item}`;
+                            });
+                          }}
+                          className="px-2 py-0.5 text-[11px] font-semibold bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 hover:border-blue-300 rounded-lg transition-all cursor-pointer flex items-center gap-1"
+                        >
+                          <span className="text-blue-500 font-bold">+</span>
+                          <span>{item}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <textarea
                     value={itemsDelivered}
                     onChange={(e) => setItemsDelivered(e.target.value)}

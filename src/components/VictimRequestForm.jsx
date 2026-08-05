@@ -543,13 +543,73 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                 </div>
 
                 {/* Materials & Food */}
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   <div className="flex justify-between items-center">
                     <label className="text-xs font-bold text-slate-700">Materials & Food Needed *</label>
-                    <span className="text-[10px] text-slate-400 font-medium">Separate with commas (,)</span>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({
+                        ...prev,
+                        customNeeds: 'Cooked Meals, Clean Drinking Water, Tarpaulin / Tirpal, Bleaching Powder & Phenyle, Mosquito Nets'
+                      }))}
+                      className="text-[11px] font-extrabold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>⚡ Prefill Standard Relief Kit</span>
+                    </button>
                   </div>
+
+                  {/* Quick Material Selector Chips */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
+                      Tap materials to quick-add / remove:
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {[
+                        'Cooked Meals',
+                        'Clean Drinking Water Jars',
+                        'Dry Ration & Rice Kits',
+                        'Baby Food & Milk Powder',
+                        'Tarpaulin / Tirpal',
+                        'Bleaching Powder & Phenyle',
+                        'Mosquito Nets',
+                        'Sanitary Pads',
+                        'ORS Packets & Medicines',
+                        'Torch & Batteries',
+                        'Water Purifier Tablets',
+                        'Warm Blankets & Clothes'
+                      ].map((item) => {
+                        const currentList = parseNeedsTags(formData.customNeeds);
+                        const isSelected = currentList.some(tag => tag.toLowerCase() === item.toLowerCase());
+
+                        return (
+                          <button
+                            key={item}
+                            type="button"
+                            onClick={() => {
+                              let newList;
+                              if (isSelected) {
+                                newList = currentList.filter(tag => tag.toLowerCase() !== item.toLowerCase());
+                              } else {
+                                newList = [...currentList, item];
+                              }
+                              setFormData(prev => ({ ...prev, customNeeds: newList.join(', ') }));
+                            }}
+                            className={`px-2.5 py-1 text-xs font-bold rounded-lg border transition-all cursor-pointer flex items-center gap-1 ${
+                              isSelected
+                                ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                : 'bg-white text-slate-700 border-slate-200 hover:border-blue-400 hover:bg-blue-50/50'
+                            }`}
+                          >
+                            <span>{isSelected ? '✓' : '+'}</span>
+                            <span>{item}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   <textarea
-                    rows="3"
+                    rows="2"
                     placeholder="e.g. Phenyle, Bleaching Powder, Dettol Soap, Tirpal, Mosquito Nets..."
                     value={formData.customNeeds}
                     onChange={(e) => setFormData(prev => ({ ...prev, customNeeds: e.target.value }))}
@@ -557,8 +617,8 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                     required
                   />
                   {formData.customNeeds && (
-                    <div className="space-y-1 pt-1">
-                      <span className="text-[10px] font-semibold text-slate-500">Generated Supply Tags:</span>
+                    <div className="space-y-1 pt-0.5">
+                      <span className="text-[10px] font-semibold text-slate-500">Selected Relief Needs ({parseNeedsTags(formData.customNeeds).length}):</span>
                       <div className="flex flex-wrap gap-1">
                         {parseNeedsTags(formData.customNeeds).map((tag, idx) => (
                           <span key={idx} className="px-2.5 py-0.5 text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 rounded-full">
