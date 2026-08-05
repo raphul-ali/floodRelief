@@ -17,6 +17,10 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
     return () => window.removeEventListener('flood_lang_changed', handleLangChange);
   }, []);
 
+  const [materialCounts, setMaterialCounts] = useState({});
+  const [customItemName, setCustomItemName] = useState('');
+  const [customItemCount, setCustomItemCount] = useState(1);
+
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -543,82 +547,171 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                 </div>
 
                 {/* Materials & Food */}
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <label className="text-xs font-bold text-slate-700">Materials & Food Needed *</label>
+                    <label className="text-xs font-bold text-slate-700">Materials & Food Needed (With Item Counts) *</label>
                     <button
                       type="button"
-                      onClick={() => setFormData(prev => ({
-                        ...prev,
-                        customNeeds: 'Cooked Meals, Clean Drinking Water, Tarpaulin / Tirpal, Bleaching Powder & Phenyle, Mosquito Nets'
-                      }))}
+                      onClick={() => {
+                        const std = {
+                          'Cooked Meals': 50,
+                          'Clean Drinking Water Jars (20L)': 20,
+                          'Tarpaulin / Tirpal Sheets': 10,
+                          'Bleaching Powder & Phenyle': 5,
+                          'Mosquito Nets': 10
+                        };
+                        setMaterialCounts(std);
+                        const str = Object.entries(std).map(([k, v]) => `${v} ${k}`).join(', ');
+                        setFormData(prev => ({ ...prev, customNeeds: str }));
+                      }}
                       className="text-[11px] font-extrabold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 cursor-pointer"
                     >
-                      <span>⚡ Prefill Standard Relief Kit</span>
+                      <span>⚡ Prefill Standard Kit</span>
                     </button>
                   </div>
 
-                  {/* Quick Material Selector Chips */}
+                  {/* Preset Items Quantity Grid */}
                   <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
                     <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
-                      Tap materials to quick-add / remove:
+                      Select item quantities (enter count):
                     </span>
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
                       {[
-                        'Cooked Meals',
-                        'Clean Drinking Water Jars',
-                        'Dry Ration & Rice Kits',
-                        'Baby Food & Milk Powder',
-                        'Tarpaulin / Tirpal',
-                        'Bleaching Powder & Phenyle',
-                        'Mosquito Nets',
-                        'Sanitary Pads',
-                        'ORS Packets & Medicines',
-                        'Torch & Batteries',
-                        'Water Purifier Tablets',
-                        'Warm Blankets & Clothes'
-                      ].map((item) => {
-                        const currentList = parseNeedsTags(formData.customNeeds);
-                        const isSelected = currentList.some(tag => tag.toLowerCase() === item.toLowerCase());
+                        { name: 'Cooked Meals', unit: 'Packets' },
+                        { name: 'Clean Drinking Water Jars (20L)', unit: 'Jars' },
+                        { name: 'Dry Ration & Rice Kits', unit: 'Kits' },
+                        { name: 'Baby Food & Milk Powder', unit: 'Cans' },
+                        { name: 'Tarpaulin / Tirpal Sheets', unit: 'Sheets' },
+                        { name: 'Bleaching Powder & Phenyle', unit: 'Kits' },
+                        { name: 'Mosquito Nets', unit: 'Nets' },
+                        { name: 'Sanitary Pads', unit: 'Packs' },
+                        { name: 'ORS Packets & Medicines', unit: 'Kits' },
+                        { name: 'Torch & Batteries', unit: 'Units' },
+                        { name: 'Water Purifier Tablets', unit: 'Strips' },
+                        { name: 'Warm Blankets', unit: 'Pieces' }
+                      ].map(({ name, unit }) => {
+                        const count = materialCounts[name] || 0;
+
+                        const updateQty = (val) => {
+                          const validVal = Math.max(0, parseInt(val) || 0);
+                          const updated = { ...materialCounts, [name]: validVal };
+                          setMaterialCounts(updated);
+
+                          const selectedItems = Object.entries(updated)
+                            .filter(([_, c]) => c > 0)
+                            .map(([n, c]) => `${c} ${n}`);
+
+                          setFormData(prev => ({ ...prev, customNeeds: selectedItems.join(', ') }));
+                        };
 
                         return (
-                          <button
-                            key={item}
-                            type="button"
-                            onClick={() => {
-                              let newList;
-                              if (isSelected) {
-                                newList = currentList.filter(tag => tag.toLowerCase() !== item.toLowerCase());
-                              } else {
-                                newList = [...currentList, item];
-                              }
-                              setFormData(prev => ({ ...prev, customNeeds: newList.join(', ') }));
-                            }}
-                            className={`px-2.5 py-1 text-xs font-bold rounded-lg border transition-all cursor-pointer flex items-center gap-1 ${
-                              isSelected
-                                ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                                : 'bg-white text-slate-700 border-slate-200 hover:border-blue-400 hover:bg-blue-50/50'
+                          <div
+                            key={name}
+                            className={`flex items-center justify-between p-2 rounded-xl border text-xs transition-all ${
+                              count > 0 ? 'bg-blue-50/80 border-blue-300 shadow-2xs' : 'bg-white border-slate-200'
                             }`}
                           >
-                            <span>{isSelected ? '✓' : '+'}</span>
-                            <span>{item}</span>
-                          </button>
+                            <div className="min-w-0 pr-2">
+                              <p className={`font-bold truncate text-[11px] ${count > 0 ? 'text-blue-900' : 'text-slate-800'}`}>
+                                {name}
+                              </p>
+                              <p className="text-[9px] text-slate-400 font-medium">{unit}</p>
+                            </div>
+
+                            <div className="flex items-center gap-1 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => updateQty(count - 1)}
+                                className="w-6 h-6 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold flex items-center justify-center cursor-pointer active:scale-95"
+                              >
+                                -
+                              </button>
+                              <input
+                                type="number"
+                                min="0"
+                                value={count}
+                                onChange={(e) => updateQty(e.target.value)}
+                                className="w-12 text-center py-1 bg-white border border-slate-200 rounded-md font-extrabold text-xs text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => updateQty(count + 1)}
+                                className="w-6 h-6 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-extrabold flex items-center justify-center cursor-pointer active:scale-95 shadow-2xs"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
                         );
                       })}
                     </div>
                   </div>
 
-                  <textarea
-                    rows="2"
-                    placeholder="e.g. Phenyle, Bleaching Powder, Dettol Soap, Tirpal, Mosquito Nets..."
-                    value={formData.customNeeds}
-                    onChange={(e) => setFormData(prev => ({ ...prev, customNeeds: e.target.value }))}
-                    className={`${inputBase} resize-none`}
-                    required
-                  />
+                  {/* Add Custom Item with Count */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
+                      Add custom item with count:
+                    </span>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <input
+                        type="text"
+                        placeholder="Custom item name (e.g. Candles, Dettol Soap)"
+                        value={customItemName}
+                        onChange={(e) => setCustomItemName(e.target.value)}
+                        className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-blue-500"
+                      />
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min="1"
+                          placeholder="Count"
+                          value={customItemCount}
+                          onChange={(e) => setCustomItemCount(e.target.value)}
+                          className="w-20 px-2.5 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-center text-slate-900 focus:outline-none focus:border-blue-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!customItemName.trim()) return;
+                            const name = customItemName.trim();
+                            const cnt = Math.max(1, parseInt(customItemCount) || 1);
+                            const updated = { ...materialCounts, [name]: cnt };
+                            setMaterialCounts(updated);
+
+                            const selectedItems = Object.entries(updated)
+                              .filter(([_, c]) => c > 0)
+                              .map(([n, c]) => `${c} ${n}`);
+
+                            setFormData(prev => ({ ...prev, customNeeds: selectedItems.join(', ') }));
+                            setCustomItemName('');
+                            setCustomItemCount(1);
+                          }}
+                          className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shrink-0 cursor-pointer shadow-2xs active:scale-95 transition-all"
+                        >
+                          + Add Item
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Formatted Needs Output Textarea */}
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                      Materials & Quantities Summary:
+                    </label>
+                    <textarea
+                      rows="2"
+                      placeholder="e.g. 50 Cooked Meals, 20 Clean Drinking Water Jars (20L), 10 Tarpaulin Sheets..."
+                      value={formData.customNeeds}
+                      onChange={(e) => setFormData(prev => ({ ...prev, customNeeds: e.target.value }))}
+                      className={`${inputBase} resize-none`}
+                      required
+                    />
+                  </div>
+
                   {formData.customNeeds && (
                     <div className="space-y-1 pt-0.5">
-                      <span className="text-[10px] font-semibold text-slate-500">Selected Relief Needs ({parseNeedsTags(formData.customNeeds).length}):</span>
+                      <span className="text-[10px] font-semibold text-slate-500">Requested Supply Tags ({parseNeedsTags(formData.customNeeds).length}):</span>
                       <div className="flex flex-wrap gap-1">
                         {parseNeedsTags(formData.customNeeds).map((tag, idx) => (
                           <span key={idx} className="px-2.5 py-0.5 text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 rounded-full">
