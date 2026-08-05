@@ -8,7 +8,7 @@ import { storageService, ASSAM_DISTRICTS } from '../services/storageService';
 import { authService } from '../services/authService';
 import DeliveryLogModal from './DeliveryLogModal';
 import DeliveryUpdatesTreeModal from './DeliveryUpdatesTreeModal';
-import { parseNeedsTags } from './VictimRequestForm';
+import { parseNeedsTags } from '../utils/helpers';
 import ExpandableNotes from './ExpandableNotes';
 
 export default function NGODashboard({ victimRequests = [], ngos = [] }) {

@@ -269,10 +269,10 @@ export default function AdminDashboard({ onDataUpdated }) {
   const pendingRecoveryCount = (pendingRecovery || []).filter(r => r && r.status === 'PENDING').length;
   const totalPendingCount = (pendingRequests || []).length + (pendingDeliveries || []).length + (pendingNgos || []).length + (pendingVolunteers || []).length + pendingRecoveryCount;
 
-  const targetRequests = (viewMode === 'ALL_LIVE' ? allRequests : pendingRequests) || [];
-  const targetDeliveries = (viewMode === 'ALL_LIVE' ? allDeliveries : pendingDeliveries) || [];
-  const targetNgos = (viewMode === 'ALL_LIVE' ? allNgos : pendingNgos) || [];
-  const targetVolunteers = (viewMode === 'ALL_LIVE' ? allVolunteers : pendingVolunteers) || [];
+  const targetRequests = (viewMode === 'ALL_LIVE' || sosChipFilter === 'ALL' || sosChipFilter === 'PUBLISHED') ? allRequests : pendingRequests;
+  const targetDeliveries = (viewMode === 'ALL_LIVE' || deliveryChipFilter === 'ALL' || deliveryChipFilter === 'VERIFIED') ? allDeliveries : pendingDeliveries;
+  const targetNgos = (viewMode === 'ALL_LIVE' || ngoChipFilter === 'ALL' || ngoChipFilter === 'VERIFIED' || ngoChipFilter === 'NGO' || ngoChipFilter === 'DONOR') ? allNgos : pendingNgos;
+  const targetVolunteers = (viewMode === 'ALL_LIVE' || volChipFilter === 'ALL' || volChipFilter === 'VERIFIED' || volChipFilter === 'BOAT' || volChipFilter === 'TRANSPORT' || volChipFilter === 'MEDICAL') ? allVolunteers : pendingVolunteers;
 
   // Filtered Datasets
   const filteredSos = targetRequests.filter(req => {
@@ -595,9 +595,30 @@ export default function AdminDashboard({ onDataUpdated }) {
                         </p>
                       </div>
 
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
-                        <p className="text-slate-700"><strong className="text-slate-900">Impacted:</strong> {req.familiesCount > 0 ? `${req.familiesCount} Families` : `${req.peopleCount || 1} People`}</p>
-                        <p className="text-slate-700"><strong className="text-slate-900">Phone:</strong> {req.phone}</p>
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {req.needs && req.needs.map((need, idx) => (
+                          <span key={idx} className="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-md text-[10px] font-semibold">{need}</span>
+                        ))}
+                      </div>
+
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
+                        <div className="grid grid-cols-2 gap-2 pb-2 border-b border-slate-200">
+                           <p className="text-slate-700 flex flex-col"><strong className="text-slate-900 mb-0.5">Demographics:</strong> <span>{req.peopleCount || 1} People ({req.malesCount||0}M, {req.femalesCount||0}F, {req.childrenCount||0}C)</span></p>
+                           <p className="text-slate-700 flex flex-col"><strong className="text-slate-900 mb-0.5">Condition:</strong> <span>Urgency: {req.urgency || 'HIGH'}<br/>{req.groundCondition}</span></p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 pb-2 border-b border-slate-200">
+                           <p className="text-slate-700 flex flex-col"><strong className="text-slate-900 mb-0.5">Contact:</strong> <span>{req.phone}{req.altPhone ? ` / ${req.altPhone}` : ''}</span></p>
+                           <p className="text-slate-700 flex flex-col"><strong className="text-slate-900 mb-0.5">Reported By:</strong> <span>{req.requestedByName} ({req.requestedByRole})<br/>{req.requestedByPhone}</span></p>
+                        </div>
+                        <div className="pt-1">
+                           <p className="text-slate-700"><strong className="text-slate-900">Location Details:</strong> {req.locationName} {req.landmark ? `(Landmark: ${req.landmark})` : ''} {req.pinCode ? `- ${req.pinCode}` : ''}</p>
+                           {req.latitude && req.longitude && (
+                             <a href={`https://www.google.com/maps/search/?api=1&query=${req.latitude},${req.longitude}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-bold flex items-center gap-1 mt-1 hover:underline">
+                               <MapPin className="w-3.5 h-3.5" /> View on Maps ({req.latitude.toFixed(4)}, {req.longitude.toFixed(4)})
+                             </a>
+                           )}
+                           {req.details && <p className="text-slate-700 mt-2 bg-white p-2 border border-slate-200 rounded-lg"><strong className="text-slate-900">Notes:</strong> {req.details}</p>}
+                        </div>
                         {req.details && <ExpandableNotes text={req.details} dark={false} className="mt-1" />}
                       </div>
 
@@ -729,7 +750,12 @@ export default function AdminDashboard({ onDataUpdated }) {
 
                       <div>
                         <h3 className="text-base font-bold text-slate-900">{log.deliveredBy || log.recipientName}</h3>
-                        <p className="text-xs text-slate-500">Items: {log.itemsDelivered}</p>
+                        <div className="mt-2 p-2 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1">
+                          {log.itemsDelivered && <p className="text-slate-700"><strong className="text-slate-900">Items:</strong> {log.itemsDelivered}</p>}
+                          {log.rescuedCount !== undefined && log.rescuedCount !== null && <p className="text-slate-700"><strong className="text-slate-900">Rescued:</strong> {log.rescuedCount} People</p>}
+                          {log.peopleImpacted && <p className="text-slate-700"><strong className="text-slate-900">Impacted:</strong> {log.peopleImpacted}</p>}
+                          {log.deliveryNotes && <p className="text-slate-700 mt-1"><strong className="text-slate-900">Notes:</strong> {log.deliveryNotes}</p>}
+                        </div>
                       </div>
 
                       <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
@@ -818,8 +844,14 @@ export default function AdminDashboard({ onDataUpdated }) {
 
                       <div>
                         <h3 className="text-base font-black text-slate-900">{ngo.name}</h3>
-                        <p className="text-xs text-slate-500 mt-0.5">Contact: {ngo.contactPerson || 'N/A'} • {ngo.phone}</p>
-                        <p className="text-xs text-slate-500">Email: {ngo.email || 'N/A'}</p>
+                        <div className="mt-2 p-2 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1">
+                          <p className="text-slate-700"><strong className="text-slate-900">Contact:</strong> {ngo.contactPerson || 'N/A'} • {ngo.phone}</p>
+                          <p className="text-slate-700"><strong className="text-slate-900">Email:</strong> {ngo.email || 'N/A'}</p>
+                          {ngo.address && <p className="text-slate-700"><strong className="text-slate-900">Address:</strong> {ngo.address}</p>}
+                          {ngo.operatingZones && <p className="text-slate-700"><strong className="text-slate-900">Zones:</strong> {ngo.operatingZones}</p>}
+                          {ngo.services && <p className="text-slate-700"><strong className="text-slate-900">Services:</strong> {ngo.services}</p>}
+                          <p className="text-slate-700"><strong className="text-slate-900">Active Teams:</strong> {ngo.activeTeams || 1}</p>
+                        </div>
                       </div>
 
                       <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
@@ -909,7 +941,17 @@ export default function AdminDashboard({ onDataUpdated }) {
 
                       <div>
                         <h3 className="text-base font-black text-slate-900">{vol.name}</h3>
-                        <p className="text-xs text-slate-500 mt-0.5">District: {vol.district || 'N/A'} • Phone: {vol.phone}</p>
+                        <div className="mt-2 p-2 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1">
+                          <p className="text-slate-700"><strong className="text-slate-900">Contact:</strong> {vol.phone}</p>
+                          <p className="text-slate-700"><strong className="text-slate-900">District:</strong> {vol.district || 'N/A'}</p>
+                          {vol.offerings && <p className="text-slate-700"><strong className="text-slate-900">Offerings:</strong> {vol.offerings}</p>}
+                          {vol.availableStatus && <p className="text-slate-700"><strong className="text-slate-900">Status:</strong> {vol.availableStatus}</p>}
+                          {vol.socialLink && (
+                            <a href={vol.socialLink.startsWith('http') ? vol.socialLink : `https://${vol.socialLink}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-bold hover:underline flex items-center gap-1 mt-1">
+                              <ExternalLink className="w-3 h-3" /> View Social Profile
+                            </a>
+                          )}
+                        </div>
                       </div>
 
                       <div className="flex items-center gap-2 pt-2 border-t border-slate-100">

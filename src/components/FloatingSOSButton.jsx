@@ -17,19 +17,19 @@ export default function FloatingSOSButton({ openModal, openSupplyModal }) {
       {/* Floating Relief Form Button (High Attention Amber Relief Button) */}
       <button
         onClick={openSupplyModal}
-        className="pointer-events-auto btn-relief flex items-center gap-2.5 px-4.5 sm:px-6 py-3 sm:py-3.5 rounded-2xl text-xs sm:text-sm font-black tracking-wider border-2 border-amber-200 animate-relief-glow min-h-[46px] group"
+        className="pointer-events-auto btn-relief flex items-center gap-2.5 px-4.5 sm:px-6 py-3 sm:py-3.5 rounded-2xl text-xs sm:text-sm font-black tracking-wider shadow-md min-h-[46px] group"
       >
-        <Package className="w-5 h-5 text-slate-950 shrink-0 group-hover:scale-110 transition-transform" />
-        <span>{i18nService.t('reliefForm', 'REQUEST RELIEF')}</span>
+        <Package className="w-5 h-5 text-white shrink-0 group-hover:scale-110 transition-transform" />
+        <span className="text-white">{i18nService.t('reliefForm', 'REQUEST RELIEF')}</span>
       </button>
 
       {/* Floating Rescue SOS Button (Urgent SOS Red Rescue Button) */}
       <button
         onClick={openModal}
-        className="pointer-events-auto btn-sos flex items-center gap-2.5 px-4.5 sm:px-6 py-3 sm:py-3.5 rounded-2xl text-xs sm:text-sm font-black tracking-wider border-2 border-red-400 animate-sos-pulse min-h-[46px] group"
+        className="pointer-events-auto btn-sos flex items-center gap-2.5 px-4.5 sm:px-6 py-3 sm:py-3.5 rounded-2xl text-xs sm:text-sm font-black tracking-wider shadow-md min-h-[46px] group"
       >
         <ShieldAlert className="w-5 h-5 text-white shrink-0 group-hover:rotate-12 transition-transform" />
-        <span>{i18nService.t('requestRescue', 'REQUEST RESCUE')}</span>
+        <span className="text-white">{i18nService.t('requestRescue', 'REQUEST RESCUE')}</span>
       </button>
 
     </div>

@@ -100,21 +100,21 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
   };
 
   return (
-    <div className="bg-slate-800 border-2 border-red-500/80 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-app-card space-y-6">
+    <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm space-y-5">
       
       {/* Top Banner Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-red-800/50 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-red-600 rounded-2xl text-white shadow-md">
-            <ShieldAlert className="w-7 h-7" />
+          <div className="p-2.5 bg-red-600 rounded-xl text-white shadow-sm">
+            <ShieldAlert className="w-6 h-6" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="bg-indigo-600 text-white font-black text-[10px] uppercase px-2 py-0.5 rounded tracking-wider flex items-center gap-1 shadow-md">
-                <Zap className="w-3 h-3 fill-white" /> LOW BATTERY OPTIMIZED (10-SEC SOS)
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="bg-amber-50 text-amber-700 border border-amber-200 font-black text-[10px] uppercase px-2 py-0.5 rounded-full tracking-wider flex items-center gap-1">
+                <Zap className="w-3 h-3" /> LOW BATTERY OPTIMIZED (10-SEC SOS)
               </span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-0.5 uppercase">
+            <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight uppercase">
               {i18nService.t('sosTitle', 'NEED EMERGENCY MOTORBOAT RESCUE? SEND SOS NOW')}
             </h2>
           </div>
@@ -122,33 +122,34 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
 
         <a
           href="tel:1070"
-          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs rounded-xl shadow-md transition-colors shrink-0"
+          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs rounded-xl shadow-sm transition-colors shrink-0"
         >
           <Phone className="w-4 h-4" />
           <span>{i18nService.t('govtHelpline', 'CALL ASDMA HELPLINE: 1070')}</span>
         </a>
       </div>
 
-      {/* Error / Rate Limit Alert Banner */}
+      {/* Error Banner */}
       {errorMessage && (
-        <div className="p-3.5 bg-red-950/90 border border-red-500 rounded-xl text-red-200 text-xs font-bold flex items-center gap-2">
-          <AlertOctagon className="w-5 h-5 text-red-400 shrink-0" />
+        <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-bold flex items-center gap-2">
+          <AlertOctagon className="w-4 h-4 text-red-500 shrink-0" />
           <span>{errorMessage}</span>
         </div>
       )}
 
       {submittedSuccess ? (
-        <div className="p-6 bg-slate-950 border border-emerald-500/50 rounded-2xl text-center space-y-4">
-          <div className="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto">
-            <CheckCircle2 className="w-8 h-8" />
+        <div className="p-6 bg-emerald-50 border border-emerald-200 rounded-2xl text-center space-y-4">
+          <div className="w-12 h-12 bg-emerald-100 border border-emerald-300 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+            <CheckCircle2 className="w-7 h-7" />
           </div>
-          <h3 className="text-xl font-black text-white">SOS RESCUE SIGNAL SENT!</h3>
-          <p className="text-xs text-slate-300">
-            Emergency rescue teams have been notified. Keep your phone line free. Emergency contact: <strong className="text-amber-400">{formData.phone}</strong>.
+          <h3 className="text-xl font-black text-slate-900">SOS RESCUE SIGNAL SENT!</h3>
+          <p className="text-xs text-slate-600">
+            Emergency rescue teams have been notified. Keep your phone line free. Emergency contact:{' '}
+            <strong className="text-slate-900">{formData.phone}</strong>.
           </p>
           <button
             onClick={() => setSubmittedSuccess(false)}
-            className="px-4 py-2 bg-slate-800 text-xs font-bold text-slate-300 rounded-xl"
+            className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-700 rounded-xl transition-colors"
           >
             Submit Another SOS
           </button>
@@ -157,33 +158,26 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           
           {/* Inputs Grid: Phone & People Count */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            
-            {/* Phone */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-black text-amber-300 uppercase tracking-wider mb-1.5">
-                Mobile Phone Number *
-              </label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Mobile Phone Number *</label>
               <div className="relative">
-                <Phone className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
+                <Phone className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
                 <input
                   type="tel"
                   required
                   placeholder="e.g. 98640 12345"
                   value={formData.phone}
                   onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  className="w-full pl-10 pr-3.5 py-3 bg-slate-900 border-2 border-amber-500/80 rounded-xl text-white font-black text-base focus:outline-none focus:border-amber-400 font-mono shadow-inner"
+                  className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 font-bold text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-colors"
                 />
               </div>
             </div>
 
-            {/* Number of People Needing Rescue */}
             <div>
-              <label className="block text-xs font-black text-amber-300 uppercase tracking-wider mb-1.5">
-                Number of People Needing Rescue *
-              </label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">People Needing Rescue *</label>
               <div className="relative">
-                <Users className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
+                <Users className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
                 <input
                   type="number"
                   min="1"
@@ -191,43 +185,60 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
                   placeholder="e.g. 5 people stranded"
                   value={formData.peopleCount || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, peopleCount: Math.max(1, parseInt(e.target.value) || 0) }))}
-                  className="w-full pl-10 pr-3.5 py-3 bg-slate-900 border-2 border-slate-600 rounded-xl text-white font-black text-base focus:outline-none focus:border-amber-400 shadow-inner"
+                  className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 font-bold text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-colors"
                 />
               </div>
             </div>
+          </div>
 
+          {/* Village Name */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">Village / Area Name *</label>
+            <div className="relative">
+              <MapPin className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
+              <input
+                type="text"
+                required
+                placeholder="e.g. Kamalabari Village, Majuli"
+                value={formData.villageName}
+                onChange={(e) => setFormData(prev => ({ ...prev, villageName: e.target.value }))}
+                className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-colors"
+              />
+            </div>
           </div>
 
           {/* GPS Location Button */}
-          <div className="flex items-center gap-3 bg-slate-900 p-2.5 rounded-xl border border-slate-700">
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+            <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-slate-500" /> GPS Location (Optional but Recommended)
+            </label>
             <button
               type="button"
               onClick={handleDetectLocation}
               disabled={isLocating}
-              className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition-all min-h-[42px] ${
+              className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 border min-h-[40px] cursor-pointer ${
                 formData.latitude
-                  ? 'bg-emerald-600/30 text-emerald-200 border border-emerald-500'
-                  : 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50'
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                  : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
               }`}
             >
-              <Navigation className={`w-4 h-4 ${isLocating ? 'animate-spin' : ''}`} />
-              <span>{isLocating ? 'Acquiring GPS...' : formData.latitude ? 'GPS Pinned (Click to Refetch)' : 'Tap to Attach GPS Location'}</span>
-            </button>
-            {formData.latitude && (
-              <span className="text-[10px] text-emerald-400 font-mono font-bold px-2 py-1 bg-slate-800 rounded-lg shrink-0 border border-emerald-500/30">
-                GPS Attached
+              <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
+              <span>
+                {isLocating ? 'Acquiring GPS...' : formData.latitude
+                  ? `GPS Attached ✓ (${formData.latitude.toFixed(4)}, ${formData.longitude.toFixed(4)})`
+                  : 'Tap to Attach GPS Location'}
               </span>
-            )}
+            </button>
           </div>
 
           {/* Submit Action */}
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-4 mb-8 sm:mb-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-base uppercase tracking-wider shadow-lg border border-red-500 transition-all flex items-center justify-center gap-3 active:scale-98"
+            className="w-full py-3.5 mb-8 sm:mb-0 rounded-xl text-white bg-red-600 hover:bg-red-700 font-bold text-sm shadow-sm flex items-center justify-center gap-2 transition-colors active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px]"
           >
-            <ShieldAlert className="w-6 h-6" />
-            <span>{isSubmitting ? 'SUBMITTING...' : 'SUBMIT'}</span>
+            <ShieldAlert className="w-5 h-5" />
+            <span>{isSubmitting ? 'SUBMITTING...' : 'SEND EMERGENCY SOS'}</span>
           </button>
 
         </form>
@@ -236,3 +247,5 @@ export default function QuickSOSBanner({ onRequestSubmitted }) {
     </div>
   );
 }
+
+

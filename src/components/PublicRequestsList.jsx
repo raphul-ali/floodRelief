@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import DeliveryUpdatesTreeModal from './DeliveryUpdatesTreeModal';
 import { storageService } from '../services/storageService';
-import { parseNeedsTags } from './VictimRequestForm';
+import { parseNeedsTags } from '../utils/helpers';
 import RippleButton from './ui/RippleButton';
 import ExpandableNotes from './ExpandableNotes';
 

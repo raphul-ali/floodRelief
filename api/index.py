@@ -163,23 +163,28 @@ class CampaignCreate(BaseModel):
     map_link: Optional[str] = None
 
 class VictimRequestCreate(BaseModel):
-    name: str
+    name: Optional[str] = "Unknown"
     phone: str
     alt_phone: Optional[str] = None
-    people_count: int
-    males_count: int
-    females_count: int
-    children_count: int
-    district: str
-    village_name: str
-    pin_code: str
-    landmark: str
-    location_name: str
+    people_count: Optional[int] = 1
+    males_count: Optional[int] = 0
+    females_count: Optional[int] = 0
+    children_count: Optional[int] = 0
+    district: Optional[str] = "Pending"
+    village_name: Optional[str] = "Unknown"
+    pin_code: Optional[str] = None
+    landmark: Optional[str] = None
+    location_name: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
-    is_urgent_rescue: bool
-    needs: List[str]
-    details: str
+    is_urgent_rescue: Optional[bool] = False
+    needs: Optional[List[str]] = []
+    details: Optional[str] = None
+    source: Optional[str] = None
+    ground_condition: Optional[str] = None
+
+    class Config:
+        extra = 'allow'
 
 class DeliveryLogCreate(BaseModel):
     requestId: str
@@ -539,7 +544,7 @@ def login_volunteer(creds: LoginRequest):
 
 @app.get("/api/health")
 def health_check():
-    return {"status": "healthy", "supabase_configured": bool(supabase)}
+    return {"status": "healthy", "supabase_configured": bool(get_supabase_client())}
 
 # --- Campaigns Endpoints ---
 @app.get("/api/campaigns")
