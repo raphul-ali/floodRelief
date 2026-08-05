@@ -458,7 +458,7 @@ export const storageService = {
       remainingCount: logData.remainingCount !== undefined ? parseInt(logData.remainingCount, 10) : null
     };
 
-    const isVerified = isAutoVerified || logData.verified === true;
+    const isVerified = Boolean(isAutoVerified || logData.verified === true);
     const logs = storageService.getDeliveryLogs(true);
     const newLog = {
       logId: "LOG-" + Math.floor(1000 + Math.random() * 9000),
@@ -490,7 +490,7 @@ export const storageService = {
       // people_impacted omitted: DB schema is INT but value is text (e.g. "50 People")
       delivery_notes: newLog.deliveryNotes,
       status_update: newLog.statusUpdate,
-      verified: isVerified,
+      verified: Boolean(isVerified),
       verified_by: newLog.verifiedBy,
       rescued_count: newLog.rescuedCount,
       remaining_count: newLog.remainingCount,

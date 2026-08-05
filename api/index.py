@@ -646,6 +646,9 @@ async def create_delivery_log(req: Request, user: dict = Depends(require_auth)):
         data = await req.json()
         # people_impacted is stored as TEXT in memory but INT in DB schema — drop it to avoid type error
         data.pop('people_impacted', None)
+        # Ensure verified is strictly boolean to prevent 22P02 type mismatch
+        if 'verified' in data:
+            data['verified'] = bool(data['verified']) if not isinstance(data['verified'], dict) else True
         # Attempt insert; if FK violation (request_id not yet in DB), insert without the FK
         try:
             res = get_supabase_client().table('delivery_logs').insert(data).execute()

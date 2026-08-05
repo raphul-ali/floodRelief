@@ -5,7 +5,7 @@ import { authService } from '../services/authService';
 
 export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmitted }) {
   const currentUser = authService.getCurrentUser();
-  const isNgoAuthenticated = currentUser.role === 'NGO' && currentUser.user;
+  const isNgoAuthenticated = Boolean(currentUser.role === 'NGO' && currentUser.user);
 
   const [deliveredBy, setDeliveredBy] = useState(
     isNgoAuthenticated ? currentUser.user.name : (ngos[0]?.name || '')
