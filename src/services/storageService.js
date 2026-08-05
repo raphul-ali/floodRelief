@@ -197,6 +197,50 @@ export const storageService = {
   },
 
   // --- VICTIM SOS REQUESTS ---
+  getVictimRequestsPaginated: async ({ page = 1, limit = 9, district = '', search = '', isUrgent = null, verified = true } = {}) => {
+    try {
+      let url = `/api/victim_requests?page=${page}&limit=${limit}`;
+      if (district && district !== 'ALL') url += `&district=${encodeURIComponent(district)}`;
+      if (search) url += `&search=${encodeURIComponent(search)}`;
+      if (isUrgent !== null) url += `&is_urgent_rescue=${isUrgent}`;
+      if (verified !== null) url += `&verified=${verified}`;
+
+      const res = await apiRequest(url, 'GET');
+      if (res && res.data && res.pagination) {
+        const mappedData = res.data.map(v => ({
+          id: v.id,
+          createdAt: v.created_at,
+          name: v.name,
+          phone: v.phone,
+          altPhone: v.alt_phone,
+          peopleCount: v.people_count,
+          malesCount: v.males_count,
+          femalesCount: v.females_count,
+          childrenCount: v.children_count,
+          familiesCount: v.families_count,
+          district: v.district,
+          villageName: v.village_name,
+          pinCode: v.pin_code,
+          landmark: v.landmark,
+          locationName: v.location_name,
+          latitude: v.latitude,
+          longitude: v.longitude,
+          isUrgentRescue: v.is_urgent_rescue,
+          needs: v.needs,
+          groundCondition: v.ground_condition || (v.is_urgent_rescue ? 'SUBMERGED' : 'DRY_LAND'),
+          details: v.details,
+          status: v.status,
+          verified: v.verified
+        }));
+        return { data: mappedData, pagination: res.pagination };
+      }
+      return { data: [], pagination: { page: 1, limit, total: 0, total_pages: 1 } };
+    } catch (e) {
+      console.error("Failed to fetch paginated requests:", e);
+      return { data: [], pagination: { page: 1, limit, total: 0, total_pages: 1 } };
+    }
+  },
+
   getVictimRequests: (includeUnverified = false) => {
     try {
       const list = cloudMemoryCache.victims || [];

@@ -17,10 +17,6 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
     return () => window.removeEventListener('flood_lang_changed', handleLangChange);
   }, []);
 
-  const [materialCounts, setMaterialCounts] = useState({});
-  const [customItemName, setCustomItemName] = useState('');
-  const [customItemCount, setCustomItemCount] = useState(1);
-
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -37,7 +33,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
     longitude: null,
     isUrgentRescue: initialUrgent,
     groundCondition: initialUrgent ? 'SUBMERGED' : 'DRY_LAND',
-    customNeeds: initialUrgent ? '' : 'Cooked Meals, Clean Drinking Water',
+    customNeeds: '',
     details: '',
     urgency: 'HIGH'
   });
@@ -47,7 +43,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
       ...prev,
       isUrgentRescue: initialUrgent,
       groundCondition: initialUrgent ? 'SUBMERGED' : 'DRY_LAND',
-      customNeeds: initialUrgent ? '' : 'Cooked Meals, Clean Drinking Water',
+      customNeeds: '',
       urgency: initialUrgent ? 'CRITICAL' : 'HIGH'
     }));
   }, [initialUrgent]);
@@ -58,6 +54,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
   const [submittedSuccess, setSubmittedSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [attachGps, setAttachGps] = useState(true);
+  const [agreeTerms, setAgreeTerms] = useState(false);
 
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
@@ -97,6 +94,10 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
     }
     if (attachGps && (!formData.latitude || !formData.longitude)) {
       setErrorMessage("GPS Location is required. Click 'Detect GPS Location' or uncheck 'Attach GPS' if unavailable.");
+      return;
+    }
+    if (!agreeTerms) {
+      setErrorMessage("Please check the confirmation box to verify that your submitted details are 100% genuine and truthful.");
       return;
     }
 
@@ -145,19 +146,22 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
   /* ─── Admin-card palette constants ─────────────────────────────── */
   const isRescue = formData.isUrgentRescue;
 
-  /* ─── Input base class (matches admin card bg-slate-50 inputs) ─── */
-  const inputBase = 'w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-colors';
-  const labelBase = 'block text-xs font-semibold text-slate-700 mb-1.5';
+  /* ─── Input base class for mobile & desktop (text-base on mobile prevents iOS auto-zoom) ─── */
+  const inputBase = 'w-full px-3.5 py-3 sm:py-2.5 bg-white border border-slate-300 sm:border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 text-base sm:text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-colors min-h-[44px]';
+  const labelBase = 'block text-xs sm:text-xs font-bold text-slate-700 mb-1';
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-6 max-sm:pb-24 max-sm:pt-4 bg-black/40 backdrop-blur-sm overflow-y-auto">
-      {/* Modal shell — same card style as Admin Dashboard cards */}
-      <div className="relative w-full max-w-2xl bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden my-auto max-h-[88vh] sm:max-h-[90vh] flex flex-col animate-slide-up">
+    <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/60 backdrop-blur-sm overflow-y-auto">
+      {/* Modal shell — Bottom sheet on mobile, rounded card on desktop */}
+      <div className="relative w-full max-w-2xl bg-white border-t sm:border border-slate-200 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[92vh] sm:max-h-[90vh] flex flex-col animate-slide-up">
+
+        {/* Mobile Pull Handle Indicator */}
+        <div className="w-12 h-1 bg-slate-300 rounded-full mx-auto mt-2.5 mb-1 sm:hidden shrink-0" />
 
         {/* ── Header ────────────────────────────────────────────────── */}
-        <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 border-b border-slate-200 bg-white shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200 bg-white shrink-0">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-xl shrink-0 ${isRescue ? 'bg-red-600' : 'bg-blue-600'}`}>
+            <div className={`p-2.5 rounded-2xl shrink-0 ${isRescue ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-blue-600 text-white shadow-md shadow-blue-600/20'}`}>
               {isRescue ? <Siren className="w-5 h-5 text-white" /> : <Package className="w-5 h-5 text-white" />}
             </div>
             <div>
@@ -166,7 +170,7 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                   ? i18nService.t('emergencyRescueSos', 'EMERGENCY RESCUE SOS')
                   : i18nService.t('floodReliefRequest', 'FLOOD RELIEF & SUPPLY REQUEST')}
               </h3>
-              <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+              <p className="text-[11px] text-slate-500 font-semibold mt-0.5">
                 {isRescue
                   ? i18nService.t('sosSubtitle', 'Transmitting victim location to rescue boats')
                   : i18nService.t('requestRegisteredSub', 'Published to NGOs & Volunteers for food & materials')}
@@ -176,42 +180,13 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
           <RippleButton
             darkRipple
             onClick={onClose}
-            className="p-2 text-slate-500 hover:text-slate-900 rounded-full hover:bg-slate-100 transition-all duration-200 active:scale-95 min-h-[40px] min-w-[40px] flex items-center justify-center cursor-pointer"
+            className="p-2 text-slate-400 hover:text-slate-900 rounded-full hover:bg-slate-100 transition-all duration-200 active:scale-95 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
           >
             <X className="w-5 h-5" />
           </RippleButton>
         </div>
 
-        {/* ── Form-type tab switcher (matches admin chip bar) ───────── */}
-        <div className="bg-slate-50 border-b border-slate-200 px-4 py-2.5 flex items-center gap-2 shrink-0">
-          <RippleButton
-            type="button"
-            darkRipple={!isRescue}
-            onClick={() => setFormData(prev => ({ ...prev, isUrgentRescue: true, needs: ['Emergency Motorboat Rescue & Life Evacuation'] }))}
-            className={`flex-1 py-2 px-3 rounded-full text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer whitespace-nowrap ${
-              isRescue
-                ? 'bg-red-600 text-white shadow-sm'
-                : 'bg-red-50 border border-red-200 text-red-600 hover:bg-red-100'
-            }`}
-          >
-            <Siren className="w-3.5 h-3.5" />
-            <span>{i18nService.t('emergencyBoatRescue', 'EMERGENCY BOAT RESCUE')}</span>
-          </RippleButton>
 
-          <RippleButton
-            type="button"
-            darkRipple={isRescue}
-            onClick={() => setFormData(prev => ({ ...prev, isUrgentRescue: false, needs: ['Cooked Meals & Food Packets', 'Clean Drinking Water Jars'] }))}
-            className={`flex-1 py-2 px-3 rounded-full text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer whitespace-nowrap ${
-              !isRescue
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-100'
-            }`}
-          >
-            <Package className="w-3.5 h-3.5" />
-            <span>{i18nService.t('foodMaterialRelief', 'FOOD & MATERIAL RELIEF')}</span>
-          </RippleButton>
-        </div>
 
         {/* ── Error banner ──────────────────────────────────────────── */}
         {errorMessage && (
@@ -546,172 +521,26 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
                   />
                 </div>
 
-                {/* Materials & Food */}
-                <div className="space-y-3">
+                {/* Materials & Food (100% Free Text Input) */}
+                <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <label className="text-xs font-bold text-slate-700">Materials & Food Needed (With Item Counts) *</label>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const std = {
-                          'Cooked Meals': 50,
-                          'Clean Drinking Water Jars (20L)': 20,
-                          'Tarpaulin / Tirpal Sheets': 10,
-                          'Bleaching Powder & Phenyle': 5,
-                          'Mosquito Nets': 10
-                        };
-                        setMaterialCounts(std);
-                        const str = Object.entries(std).map(([k, v]) => `${v} ${k}`).join(', ');
-                        setFormData(prev => ({ ...prev, customNeeds: str }));
-                      }}
-                      className="text-[11px] font-extrabold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <span>⚡ Prefill Standard Kit</span>
-                    </button>
+                    <label className="text-xs font-bold text-slate-700">Materials & Food Needed *</label>
+                    <span className="text-[10px] text-slate-400 font-medium">Type freely in Assamese or English</span>
                   </div>
-
-                  {/* Preset Items Quantity Grid */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
-                      Select item quantities (enter count):
-                    </span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
-                      {[
-                        { name: 'Cooked Meals', unit: 'Packets' },
-                        { name: 'Clean Drinking Water Jars (20L)', unit: 'Jars' },
-                        { name: 'Dry Ration & Rice Kits', unit: 'Kits' },
-                        { name: 'Baby Food & Milk Powder', unit: 'Cans' },
-                        { name: 'Tarpaulin / Tirpal Sheets', unit: 'Sheets' },
-                        { name: 'Bleaching Powder & Phenyle', unit: 'Kits' },
-                        { name: 'Mosquito Nets', unit: 'Nets' },
-                        { name: 'Sanitary Pads', unit: 'Packs' },
-                        { name: 'ORS Packets & Medicines', unit: 'Kits' },
-                        { name: 'Torch & Batteries', unit: 'Units' },
-                        { name: 'Water Purifier Tablets', unit: 'Strips' },
-                        { name: 'Warm Blankets', unit: 'Pieces' }
-                      ].map(({ name, unit }) => {
-                        const count = materialCounts[name] || 0;
-
-                        const updateQty = (val) => {
-                          const validVal = Math.max(0, parseInt(val) || 0);
-                          const updated = { ...materialCounts, [name]: validVal };
-                          setMaterialCounts(updated);
-
-                          const selectedItems = Object.entries(updated)
-                            .filter(([_, c]) => c > 0)
-                            .map(([n, c]) => `${c} ${n}`);
-
-                          setFormData(prev => ({ ...prev, customNeeds: selectedItems.join(', ') }));
-                        };
-
-                        return (
-                          <div
-                            key={name}
-                            className={`flex items-center justify-between p-2 rounded-xl border text-xs transition-all ${
-                              count > 0 ? 'bg-blue-50/80 border-blue-300 shadow-2xs' : 'bg-white border-slate-200'
-                            }`}
-                          >
-                            <div className="min-w-0 pr-2">
-                              <p className={`font-bold truncate text-[11px] ${count > 0 ? 'text-blue-900' : 'text-slate-800'}`}>
-                                {name}
-                              </p>
-                              <p className="text-[9px] text-slate-400 font-medium">{unit}</p>
-                            </div>
-
-                            <div className="flex items-center gap-1 shrink-0">
-                              <button
-                                type="button"
-                                onClick={() => updateQty(count - 1)}
-                                className="w-6 h-6 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold flex items-center justify-center cursor-pointer active:scale-95"
-                              >
-                                -
-                              </button>
-                              <input
-                                type="number"
-                                min="0"
-                                value={count}
-                                onChange={(e) => updateQty(e.target.value)}
-                                className="w-12 text-center py-1 bg-white border border-slate-200 rounded-md font-extrabold text-xs text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => updateQty(count + 1)}
-                                className="w-6 h-6 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-extrabold flex items-center justify-center cursor-pointer active:scale-95 shadow-2xs"
-                              >
-                                +
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Add Custom Item with Count */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
-                      Add custom item with count:
-                    </span>
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <input
-                        type="text"
-                        placeholder="Custom item name (e.g. Candles, Dettol Soap)"
-                        value={customItemName}
-                        onChange={(e) => setCustomItemName(e.target.value)}
-                        className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-blue-500"
-                      />
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="number"
-                          min="1"
-                          placeholder="Count"
-                          value={customItemCount}
-                          onChange={(e) => setCustomItemCount(e.target.value)}
-                          className="w-20 px-2.5 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-center text-slate-900 focus:outline-none focus:border-blue-500"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (!customItemName.trim()) return;
-                            const name = customItemName.trim();
-                            const cnt = Math.max(1, parseInt(customItemCount) || 1);
-                            const updated = { ...materialCounts, [name]: cnt };
-                            setMaterialCounts(updated);
-
-                            const selectedItems = Object.entries(updated)
-                              .filter(([_, c]) => c > 0)
-                              .map(([n, c]) => `${c} ${n}`);
-
-                            setFormData(prev => ({ ...prev, customNeeds: selectedItems.join(', ') }));
-                            setCustomItemName('');
-                            setCustomItemCount(1);
-                          }}
-                          className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shrink-0 cursor-pointer shadow-2xs active:scale-95 transition-all"
-                        >
-                          + Add Item
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Formatted Needs Output Textarea */}
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                      Materials & Quantities Summary:
-                    </label>
-                    <textarea
-                      rows="2"
-                      placeholder="e.g. 50 Cooked Meals, 20 Clean Drinking Water Jars (20L), 10 Tarpaulin Sheets..."
-                      value={formData.customNeeds}
-                      onChange={(e) => setFormData(prev => ({ ...prev, customNeeds: e.target.value }))}
-                      className={`${inputBase} resize-none`}
-                      required
-                    />
-                  </div>
-
+                  <textarea
+                    rows="3"
+                    placeholder="Type items freely e.g. 50 Cooked Meals, 20 Water Jars, 10 Tirpal (বা ১০০ টা ভাতৰ পেকেট, ২০ টা খোৱা পানী, ১০ টা তিৰপাল)..."
+                    value={formData.customNeeds}
+                    onChange={(e) => setFormData(prev => ({ ...prev, customNeeds: e.target.value }))}
+                    className={`${inputBase} resize-none`}
+                    required
+                  />
                   {formData.customNeeds && (
-                    <div className="space-y-1 pt-0.5">
-                      <span className="text-[10px] font-semibold text-slate-500">Requested Supply Tags ({parseNeedsTags(formData.customNeeds).length}):</span>
+                    <div className="space-y-1 pt-1">
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span className="font-bold text-slate-600">Auto-Separated Relief Tags:</span>
+                        <span className="text-slate-400 font-medium">{parseNeedsTags(formData.customNeeds).length} items detected</span>
+                      </div>
                       <div className="flex flex-wrap gap-1">
                         {parseNeedsTags(formData.customNeeds).map((tag, idx) => (
                           <span key={idx} className="px-2.5 py-0.5 text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 rounded-full">
@@ -738,15 +567,36 @@ export default function VictimRequestForm({ onClose, onRequestSubmitted, initial
               </div>
             )}
 
-            {/* ── Submit Button ─────────────────────────────────────── */}
-            <div className="pt-2 pb-12 sm:pb-2 mb-6 sm:mb-0">
+            {/* Terms & Truth Declaration Checkbox */}
+            <div className="bg-amber-50/90 border border-amber-200 rounded-2xl p-3.5 space-y-1.5 my-3">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  required
+                  checked={agreeTerms}
+                  onChange={(e) => setAgreeTerms(e.target.checked)}
+                  className="w-4 h-4 rounded border-amber-300 text-blue-600 focus:ring-blue-500 mt-0.5 shrink-0 cursor-pointer"
+                />
+                <span className="text-xs text-slate-700 font-semibold leading-relaxed">
+                  I hereby confirm that all information entered above is 100% genuine, true, and correct to the best of my knowledge. I understand that submitting false or fake emergency requests is strictly prohibited.
+                </span>
+              </label>
+              {!agreeTerms && (
+                <p className="text-[11px] font-bold text-red-600 pl-7">
+                  * Required: Please check this box to confirm information is genuine before submitting.
+                </p>
+              )}
+            </div>
+
+            {/* ── Submit Button (Disabled until truth declaration is checked) ───────── */}
+            <div className="sticky bottom-0 bg-gradient-to-t from-white via-white to-white/90 pt-3 pb-6 sm:pb-3 border-t border-slate-100 shrink-0 -mx-4 sm:-mx-5 px-4 sm:px-5 mt-4">
               <RippleButton
                 type="submit"
-                disabled={isSubmitting}
-                className={`w-full py-3.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px] shadow-sm ${
+                disabled={isSubmitting || !agreeTerms}
+                className={`w-full py-3.5 sm:py-3.5 rounded-2xl font-black text-sm sm:text-base text-white flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed min-h-[50px] shadow-lg ${
                   isRescue
-                    ? 'bg-red-600 hover:bg-red-700'
-                    : 'bg-emerald-600 hover:bg-emerald-700'
+                    ? 'bg-red-600 hover:bg-red-700 shadow-red-600/30'
+                    : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/30'
                 }`}
               >
                 {isSubmitting ? (

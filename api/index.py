@@ -1,7 +1,8 @@
-from fastapi import FastAPI, HTTPException, Request, Depends
+from fastapi import FastAPI, HTTPException, Request, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client, Client
 import os
+import math
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any, Union
 import jwt
@@ -589,11 +590,62 @@ def update_campaign(campaign_id: str, updates: Dict[str, Any], user: dict = Depe
 
 # --- Victim Requests Endpoints ---
 @app.get("/api/victim_requests")
-def get_victim_requests():
+def get_victim_requests(
+    page: Optional[int] = Query(None),
+    limit: Optional[int] = Query(9),
+    district: Optional[str] = Query(None),
+    verified: Optional[bool] = Query(None),
+    is_urgent_rescue: Optional[bool] = Query(None),
+    search: Optional[str] = Query(None)
+):
     try:
-        res = get_supabase_client().table('victim_requests').select('*').order('created_at', desc=True).execute()
-        return res.data
+        supabase = get_supabase_client()
+        if not supabase:
+            return [] if page is None else {"data": [], "pagination": {"page": 1, "limit": 9, "total": 0, "total_pages": 1, "has_next": False, "has_prev": False}}
+            
+        query = supabase.table('victim_requests').select('*', count='exact')
+        
+        if district and district.strip() and district.lower() != 'all':
+            query = query.eq('district', district.strip())
+            
+        if verified is not None:
+            query = query.eq('verified', verified)
+            
+        if is_urgent_rescue is not None:
+            query = query.eq('is_urgent_rescue', is_urgent_rescue)
+            
+        if search and search.strip():
+            s = search.strip()
+            query = query.or_(f"village_name.ilike.%{s}%,name.ilike.%{s}%,landmark.ilike.%{s}%")
+            
+        query = query.order('created_at', desc=True)
+        
+        if page is not None:
+            page_val = max(1, page)
+            limit_val = max(1, min(limit or 9, 100))
+            offset = (page_val - 1) * limit_val
+            end_offset = offset + limit_val - 1
+            
+            res = query.range(offset, end_offset).execute()
+            total_count = res.count if (hasattr(res, 'count') and res.count is not None) else len(res.data or [])
+            total_pages = math.ceil(total_count / limit_val) if total_count > 0 else 1
+            
+            return {
+                "data": res.data or [],
+                "pagination": {
+                    "page": page_val,
+                    "limit": limit_val,
+                    "total": total_count,
+                    "total_pages": total_pages,
+                    "has_next": page_val < total_pages,
+                    "has_prev": page_val > 1
+                }
+            }
+        else:
+            res = query.execute()
+            return res.data or []
     except Exception as e:
+        print(f"Error fetching victim requests: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/victim_requests")

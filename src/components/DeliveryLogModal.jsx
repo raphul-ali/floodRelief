@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Package, X, CheckCircle2, AlertTriangle, Send, Phone, MessageSquare, ShieldCheck, Sparkles } from 'lucide-react';
 import { storageService } from '../services/storageService';
 import { authService } from '../services/authService';
+import { parseNeedsTags } from '../utils/helpers';
 
 export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmitted }) {
   const currentUser = authService.getCurrentUser();
@@ -14,12 +15,12 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
     isNgoAuthenticated ? (currentUser.user.phone || '') : ''
   );
   const [itemsDelivered, setItemsDelivered] = useState('');
-  const [supplyQuantities, setSupplyQuantities] = useState({});
   const [peopleImpacted, setPeopleImpacted] = useState('');
   const [rescuedCount, setRescuedCount] = useState('');
   const [remainingCount, setRemainingCount] = useState('');
   const [deliveryNotes, setDeliveryNotes] = useState('');
   const [statusUpdate, setStatusUpdate] = useState('In Progress');
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,6 +49,10 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
     }
     if (isRescue && !remainingCount.toString().trim()) {
       setError('Please enter the number of people remaining. Enter 0 if everyone was rescued.');
+      return;
+    }
+    if (!agreeTerms) {
+      setError('Please check the confirmation box to verify that your reported delivery details are genuine and true.');
       return;
     }
 
@@ -87,13 +92,16 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto font-sans">
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 text-slate-900 relative my-auto">
+    <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto font-sans">
+      <div className="bg-white border-t sm:border border-slate-200 rounded-t-3xl sm:rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 sm:space-y-5 text-slate-900 relative max-h-[92vh] sm:max-h-[90vh] flex flex-col overflow-y-auto">
         
+        {/* Mobile Pull Indicator */}
+        <div className="w-12 h-1 bg-slate-300 rounded-full mx-auto -mt-1 sm:hidden shrink-0" />
+
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -108,33 +116,12 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
               {isRescue ? 'Post Rescue Update' : 'Post Relief Update'}
             </h3>
             <p className="text-xs text-slate-500 font-medium">
-              Target: <strong className="text-slate-900">{request.name}</strong> ({request.id})
+              Target: <strong className="text-slate-900">{request.name}</strong>
             </p>
           </div>
         </div>
 
-        {/* Info Banner */}
-        {isNgoAuthenticated ? (
-          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 text-xs text-emerald-900 flex items-start gap-3">
-            <Sparkles className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-            <div>
-              <p className="font-bold text-emerald-800">Verified NGO Direct Dispatch</p>
-              <p className="text-emerald-700 mt-0.5">
-                Logged in as <strong className="underline">{currentUser.user.name}</strong>. Your relief updates will be <strong className="font-bold">auto-published directly</strong> to the impact tree.
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3.5 text-xs text-blue-900 flex items-start gap-3">
-            <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-            <div>
-              <p className="font-bold text-blue-800">Manual Admin Verification Active</p>
-              <p className="text-blue-700 mt-0.5">
-                Public submissions are reviewed by the Admin Control Room before publishing.
-              </p>
-            </div>
-          </div>
-        )}
+
 
         {error && (
           <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-semibold flex items-center gap-2">
@@ -222,125 +209,61 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
             ) : (
               <>
                 <div>
-                  <div className="flex justify-between items-center mb-1.5">
-                    <label className="block text-xs font-bold text-slate-700">
-                      Relief Supplies Delivered *
-                    </label>
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const std = {
-                            'Cooked Food Packets': 50,
-                            'Water Jars (20L)': 20,
-                            'Dry Ration Kits (Rice/Dal)': 10,
-                            'Tarpaulin (Tirpal) Sheets': 15,
-                            'Hygiene & Sanitation Kits': 10
-                          };
-                          setSupplyQuantities(std);
-                          const str = Object.entries(std).map(([k, v]) => `${v} ${k}`).join(', ');
-                          setItemsDelivered(str);
-                        }}
-                        className="text-[11px] font-extrabold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 cursor-pointer"
-                      >
-                        <span>⚡ Prefill Standard Package</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSupplyQuantities({});
-                          setItemsDelivered('');
-                        }}
-                        className="text-[11px] font-bold text-slate-400 hover:text-slate-600 hover:underline cursor-pointer"
-                      >
-                        Reset All to 0
-                      </button>
-                    </div>
-                  </div>
+                  {/* Requested Needs Section for Target Request (Uncluttered, Spacious Card) */}
+                  {request.needs && parseNeedsTags(request.needs).length > 0 && (
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 sm:p-4 mb-4 space-y-2.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[11px] font-black uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+                          <Package className="w-3.5 h-3.5 text-slate-500" />
+                          <span>Victim's Requested Supplies</span>
+                        </span>
 
-                  {/* Quantity Input Grid */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2 mb-2">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
-                      Enter quantities delivered (0 = none):
-                    </span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
-                      {[
-                        { name: 'Cooked Food Packets', unit: 'Packets' },
-                        { name: 'Water Jars (20L)', unit: 'Jars' },
-                        { name: 'Dry Ration Kits (Rice/Dal)', unit: 'Kits' },
-                        { name: 'Tarpaulin (Tirpal) Sheets', unit: 'Sheets' },
-                        { name: 'Hygiene & Sanitation Kits', unit: 'Kits' },
-                        { name: 'Medical & ORS Kits', unit: 'Kits' },
-                        { name: 'Mosquito Nets', unit: 'Nets' },
-                        { name: 'Baby Food & Milk Cans', unit: 'Cans' }
-                      ].map(({ name, unit }) => {
-                        const count = supplyQuantities[name] || 0;
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const tags = parseNeedsTags(request.needs);
+                            setItemsDelivered(tags.join(', '));
+                          }}
+                          className="px-2.5 py-1 text-[11px] font-extrabold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-xl transition-all cursor-pointer flex items-center gap-1 active:scale-95 shrink-0"
+                        >
+                          <span>Copy All</span>
+                        </button>
+                      </div>
 
-                        const updateQty = (newVal) => {
-                          const validVal = Math.max(0, parseInt(newVal) || 0);
-                          const updated = { ...supplyQuantities, [name]: validVal };
-                          setSupplyQuantities(updated);
-
-                          const selectedItems = Object.entries(updated)
-                            .filter(([_, c]) => c > 0)
-                            .map(([n, c]) => `${c} ${n}`);
-
-                          setItemsDelivered(selectedItems.join(', '));
-                        };
-
-                        return (
-                          <div
-                            key={name}
-                            className={`flex items-center justify-between p-2 rounded-xl border text-xs transition-all ${
-                              count > 0 ? 'bg-emerald-50/70 border-emerald-300 shadow-2xs' : 'bg-white border-slate-200'
-                            }`}
+                      {/* Item Tags Chips — Tap individual item to append */}
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
+                        {parseNeedsTags(request.needs).map((item, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => {
+                              setItemsDelivered(prev => {
+                                if (!prev.trim()) return item;
+                                if (prev.includes(item)) return prev;
+                                return `${prev}, ${item}`;
+                              });
+                            }}
+                            className="px-2.5 py-1.5 bg-white hover:bg-blue-50 text-slate-800 hover:text-blue-900 border border-slate-200 hover:border-blue-300 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
+                            title="Tap to add this item to delivery log"
                           >
-                            <div className="min-w-0 pr-2">
-                              <p className={`font-bold truncate text-[11px] ${count > 0 ? 'text-emerald-900' : 'text-slate-800'}`}>
-                                {name}
-                              </p>
-                              <p className="text-[9px] text-slate-400 font-medium">{unit}</p>
-                            </div>
-
-                            <div className="flex items-center gap-1 shrink-0">
-                              <button
-                                type="button"
-                                onClick={() => updateQty(count - 1)}
-                                className="w-6 h-6 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold flex items-center justify-center cursor-pointer active:scale-95"
-                              >
-                                -
-                              </button>
-                              <input
-                                type="number"
-                                min="0"
-                                value={count}
-                                onChange={(e) => updateQty(e.target.value)}
-                                className="w-12 text-center py-1 bg-white border border-slate-200 rounded-md font-extrabold text-xs text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => updateQty(count + 1)}
-                                className="w-6 h-6 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold flex items-center justify-center cursor-pointer active:scale-95 shadow-2xs"
-                              >
-                                +
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
+                            <span className="text-blue-600 font-extrabold text-xs">+</span>
+                            <span>{item}</span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  <div className="mt-2">
-                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                      Compiled Delivery Summary (Generated from item quantities above):
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                      Relief Supplies Delivered *
                     </label>
                     <textarea
                       value={itemsDelivered}
-                      readOnly
-                      placeholder="Enter quantities above to build delivery log..."
-                      rows="2"
-                      className="w-full bg-slate-100/90 border border-slate-300 rounded-xl p-3 text-sm text-slate-700 font-semibold focus:outline-none cursor-not-allowed resize-none"
+                      onChange={(e) => setItemsDelivered(e.target.value)}
+                      placeholder="Specify exact supplies delivered for this request (e.g. 50 Cooked Food Packets, 20 Water Jars)..."
+                      rows={3}
+                      className="w-full bg-white border border-slate-200 rounded-2xl p-3.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 min-h-[90px]"
                       required={!isRescue}
                     />
                   </div>
@@ -390,6 +313,27 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
               </select>
             </div>
 
+            {/* Terms & Truth Declaration Checkbox */}
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 my-3 space-y-1.5">
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  required
+                  checked={agreeTerms}
+                  onChange={(e) => setAgreeTerms(e.target.checked)}
+                  className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 mt-0.5 shrink-0 cursor-pointer"
+                />
+                <span className="text-xs text-slate-700 font-semibold leading-relaxed">
+                  I confirm that the relief/rescue delivery updates reported above are 100% genuine, true, and verified on the ground.
+                </span>
+              </label>
+              {!agreeTerms && (
+                <p className="text-[11px] font-bold text-red-600 pl-6">
+                  * Required: Please check this box to verify delivery details before posting.
+                </p>
+              )}
+            </div>
+
             {/* Submit */}
             <div className="pt-2 flex items-center justify-end gap-3 border-t border-slate-100">
               <button
@@ -401,8 +345,8 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
               </button>
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="px-5 py-2.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm flex items-center gap-2 transition-colors"
+                disabled={isSubmitting || !agreeTerms}
+                className="px-5 py-2.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-sm flex items-center gap-2 transition-colors cursor-pointer"
               >
                 <Send className="w-4 h-4" />
                 <span>{isNgoAuthenticated ? 'POST INSTANT UPDATE' : 'POST UPDATE'}</span>

@@ -7,14 +7,15 @@ export const parseNeedsTags = (needs) => {
       try {
         const arr = JSON.parse(str);
         if (Array.isArray(arr)) {
-          arr.forEach(a => { if (a) tags.push(a.trim()); });
+          arr.forEach(a => { if (a && typeof a === 'string') tags.push(a.trim()); });
           return;
         }
       } catch(e) {}
     }
     if (typeof str === 'string') {
-      str.split(',').forEach(s => {
-        const trimmed = s.trim();
+      // Split by commas, newlines, semicolons, pipes, bullets, or Assamese dandi (।)
+      str.split(/[,;\n|•*।]/).forEach(s => {
+        const trimmed = s.trim().replace(/^[-–—]\s*/, '');
         if (trimmed) tags.push(trimmed);
       });
     }

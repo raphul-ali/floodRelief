@@ -89,7 +89,36 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
     return () => window.removeEventListener('flood_data_changed', fetchLogs);
   }, [propDeliveryLogs]);
 
-  // Filtering Logic
+  const [serverData, setServerData]           = useState(null);
+  const [isServerLoading, setIsServerLoading] = useState(false);
+
+  // Fetch true paginated data from FastAPI when page or filters change
+  useEffect(() => {
+    let isMounted = true;
+    const loadServerPage = async () => {
+      setIsServerLoading(true);
+      try {
+        const isUrgent = filterType === 'RESCUE' ? true : (filterType === 'SUPPLY' ? false : null);
+        const res = await storageService.getVictimRequestsPaginated({
+          page: currentPage,
+          limit: 12,
+          isUrgent,
+          verified: true
+        });
+        if (isMounted && res && res.data) {
+          setServerData(res);
+        }
+      } catch (e) {
+        console.error("Server pagination fetch error:", e);
+      } finally {
+        if (isMounted) setIsServerLoading(false);
+      }
+    };
+    loadServerPage();
+    return () => { isMounted = false; };
+  }, [currentPage, filterType, filterUrgency, filterStatus]);
+
+  // Filtering Logic (Client fallback or server data)
   const filteredRequests = victimRequests.filter(req => {
     // 1. Type
     if (filterType === 'SUPPLY' && req.isUrgentRescue === true) return false;
@@ -113,11 +142,16 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
   });
 
   const ITEMS_PER_PAGE = 12;
-  const totalPages     = Math.ceil(filteredRequests.length / ITEMS_PER_PAGE);
-  const currentRequests = filteredRequests.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  const useServerPagination = Boolean(serverData && serverData.pagination);
+  const totalPages = useServerPagination
+    ? serverData.pagination.total_pages
+    : Math.ceil(filteredRequests.length / ITEMS_PER_PAGE);
+
+  const currentRequests = useServerPagination
+    ? serverData.data
+    : filteredRequests.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+  const isPageLoading = isLoading || isServerLoading;
 
   /* ── Render ────────────────────────────────────────────────────────────── */
   return (
@@ -199,7 +233,7 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
       </div>
 
       {/* Loading */}
-      {isLoading ? (
+      {isPageLoading ? (
         <div className="space-y-4">
           <div className="flex items-center gap-2.5 text-sm font-semibold text-amber-700 bg-amber-50 p-4 rounded-2xl border border-amber-200 shadow-flat animate-pulse">
             <Loader2 className="w-4 h-4 animate-spin text-amber-500 shrink-0" />
@@ -342,15 +376,26 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
                       +91 ×××× {req.phone ? req.phone.slice(-4) : 'XXXX'}
                     </span>
 
-                    <RippleButton
-                      variant="emerald"
-                      onClick={() => setActiveTreeRequest(req)}
-                      className="py-2 px-4 rounded-full text-xs font-black tracking-wider uppercase gap-2 hover:shadow-md active:scale-95 transition-all shadow-sm"
-                    >
-                      <Activity className="w-3.5 h-3.5 shrink-0" />
-                      <span>View Updates</span>
-                      <ArrowUpRight className="w-3.5 h-3.5 opacity-80 shrink-0" />
-                    </RippleButton>
+                    {(() => {
+                      const updateCount = (deliveryLogs || []).filter(l => (l.requestId || l.request_id) === req.id).length;
+                      return (
+                        <RippleButton
+                          variant="emerald"
+                          onClick={() => setActiveTreeRequest(req)}
+                          className="py-2 px-3.5 rounded-full text-xs font-black tracking-wider uppercase gap-1.5 hover:shadow-md active:scale-95 transition-all shadow-sm relative flex items-center"
+                        >
+                          <Activity className="w-3.5 h-3.5 shrink-0" />
+                          <span>View Updates</span>
+                          {updateCount > 0 ? (
+                            <span className="ml-0.5 px-2 py-0.5 text-[11px] font-black bg-red-600 text-white rounded-full leading-none shadow-2xs animate-pulse">
+                              {updateCount}
+                            </span>
+                          ) : (
+                            <ArrowUpRight className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                          )}
+                        </RippleButton>
+                      );
+                    })()}
                   </div>
                 </div>
               );

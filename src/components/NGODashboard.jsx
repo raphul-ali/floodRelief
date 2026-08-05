@@ -644,13 +644,23 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                             </button>
                           )}
 
-                          <button
-                            onClick={() => setActiveTreeRequest(req)}
-                            className="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-colors"
-                          >
-                            <Activity className="w-3.5 h-3.5 text-blue-600" />
-                            <span>Updates</span>
-                          </button>
+                          {(() => {
+                            const updateCount = (deliveryLogs || []).filter(l => (l.requestId || l.request_id) === req.id).length;
+                            return (
+                              <button
+                                onClick={() => setActiveTreeRequest(req)}
+                                className="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                              >
+                                <Activity className="w-3.5 h-3.5 text-blue-600" />
+                                <span>Updates</span>
+                                {updateCount > 0 && (
+                                  <span className="px-1.5 py-0.5 text-[10px] font-black bg-red-600 text-white rounded-full leading-none shadow-2xs animate-pulse">
+                                    {updateCount}
+                                  </span>
+                                )}
+                              </button>
+                            );
+                          })()}
                         </div>
 
                       </div>
