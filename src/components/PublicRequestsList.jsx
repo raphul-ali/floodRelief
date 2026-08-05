@@ -231,7 +231,7 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
                 <option value="ALL">All Statuses</option>
                 <option value="Active">Active (Waiting)</option>
                 <option value="In Progress">In Progress</option>
-                <option value="Resolved">Resolved / Fulfilled</option>
+                <option value="Resolved">Rescued / Fully Resolved</option>
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
             </div>

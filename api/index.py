@@ -625,8 +625,8 @@ def get_victim_requests(
                 query = query.or_("status.eq.looking,status.eq.Pending,status.is.null")
             elif st == 'in progress':
                 query = query.eq('status', 'In Progress')
-            elif st == 'resolved':
-                query = query.or_("status.eq.Rescued,status.eq.Fulfilled")
+            elif st in ['resolved', 'rescued', 'fulfilled', 'rescued / fully resolved', 'rescued/fully resolved']:
+                query = query.or_("status.eq.Rescued,status.eq.Fulfilled,status.eq.Rescued / Fully Resolved")
             else:
                 query = query.eq('status', status.strip())
             

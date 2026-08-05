@@ -495,7 +495,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                 <option value="ALL">All Statuses</option>
                 <option value="Pending">Pending Response</option>
                 <option value="In Progress">Team Dispatched</option>
-                <option value="Rescued">Safely Rescued</option>
+                <option value="Rescued">Rescued / Fully Resolved</option>
               </select>
             )}
 
