@@ -654,7 +654,9 @@ async def create_record(table_name: str, req: Request, user: dict = Depends(requ
 async def update_record(table_name: str, record_id: str, req: Request, user: dict = Depends(require_auth)):
     try:
         data = await req.json()
-        res = get_supabase_client().table(table_name).update(data).eq('id', record_id).execute()
+        # delivery_logs uses log_id as PK, not id
+        pk_col = 'log_id' if table_name == 'delivery_logs' else 'id'
+        res = get_supabase_client().table(table_name).update(data).eq(pk_col, record_id).execute()
         return res.data[0] if res.data else data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -662,7 +664,9 @@ async def update_record(table_name: str, record_id: str, req: Request, user: dic
 @app.delete("/api/db/{table_name}/{record_id}")
 def delete_record(table_name: str, record_id: str, user: dict = Depends(require_auth)):
     try:
-        get_supabase_client().table(table_name).delete().eq('id', record_id).execute()
+        # delivery_logs uses log_id as PK, not id
+        pk_col = 'log_id' if table_name == 'delivery_logs' else 'id'
+        get_supabase_client().table(table_name).delete().eq(pk_col, record_id).execute()
         return {"success": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

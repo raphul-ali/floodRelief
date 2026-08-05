@@ -33,6 +33,7 @@ export default function App() {
   const [modalUrgentMode, setModalUrgentMode] = useState(true);
   
   const [victimRequests, setVictimRequests] = useState([]);
+  const [deliveryLogs, setDeliveryLogs] = useState([]);
   const [ngos, setNgos] = useState([]);
   const [volunteers, setVolunteers] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
@@ -68,6 +69,7 @@ export default function App() {
 
   const loadData = () => {
     setVictimRequests(storageService.getVictimRequests());
+    setDeliveryLogs(storageService.getDeliveryLogs());
     setNgos(storageService.getNGOs());
     setVolunteers(storageService.getVolunteers());
     setCampaigns(storageService.getCampaigns());
@@ -367,7 +369,7 @@ export default function App() {
         )}
 
         {activeTab === 'public_requests' && (
-          <PublicRequestsList victimRequests={victimRequests} deliveryLogs={storageService.getDeliveryLogs()} isLoading={isLoadingData} />
+          <PublicRequestsList victimRequests={victimRequests} deliveryLogs={deliveryLogs} isLoading={isLoadingData} />
         )}
 
         {activeTab === 'ngos' && (
