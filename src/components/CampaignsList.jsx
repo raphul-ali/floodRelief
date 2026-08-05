@@ -18,7 +18,7 @@ export default function CampaignsList({ campaigns }) {
           Relief Campaigns
         </h2>
         <p className="hidden sm:block text-sm text-slate-500 max-w-xl">
-          Join or support ongoing relief campaigns organized by our trusted partners and government agencies.
+          Join or support ongoing relief campaigns organized by verified NGOs and government agencies.
         </p>
       </div>
 

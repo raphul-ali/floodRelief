@@ -24,18 +24,21 @@ export default function Header({
     return () => window.removeEventListener('flood_lang_changed', h);
   }, []);
 
+  const isGuest = currentAuth.role === 'GUEST';
+  const homeTab = isGuest ? 'home' : 'dashboard';
+
   const tabs = [
-    { key: 'home', label: 'Home', Icon: Home },
-    ...(currentAuth.role !== 'GUEST'
-      ? [{ key: 'dashboard', label: 'Dashboard', Icon: Package }]
-      : [{ key: 'public_requests', label: 'Requests', Icon: FileText, count: requestsCount }]),
+    ...(isGuest
+      ? [{ key: 'home', label: 'Home', Icon: Home }]
+      : [{ key: 'dashboard', label: 'Dashboard', Icon: Package }]),
+    { key: 'public_requests', label: 'Requests', Icon: FileText, count: requestsCount },
     { key: 'ngos', label: 'NGOs & Volunteers', Icon: HeartHandshake },
     { key: 'emergency', label: 'Emergency', Icon: Siren, danger: true },
   ];
 
   const userName = currentAuth.role === 'ADMIN'
     ? 'Admin'
-    : currentAuth.user?.name || currentAuth.user?.email?.split('@')[0] || 'Partner';
+    : currentAuth.user?.name || currentAuth.user?.email?.split('@')[0] || 'User';
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 w-full" style={{ boxShadow: '0 1px 6px rgba(0,0,0,0.07)' }}>
@@ -46,18 +49,18 @@ export default function Header({
 
           {/* Back Button & Logo */}
           <div className="flex items-center gap-1 sm:gap-2.5">
-            {activeTab !== 'home' && (
+            {activeTab !== homeTab && (
               <button
-                onClick={() => setActiveTab('home')}
+                onClick={() => setActiveTab(homeTab)}
                 className="flex items-center p-1 -ml-2 text-gray-600 hover:text-gray-900 transition-colors cursor-pointer pr-2"
-                title="Go to Home"
+                title={isGuest ? "Go to Home" : "Go to Dashboard"}
               >
                 <ChevronLeft className="w-6 h-6 text-slate-700" />
                 <span className="text-sm font-bold text-slate-800 -ml-0.5">Back</span>
               </button>
             )}
             <div
-              onClick={() => setActiveTab('home')}
+              onClick={() => setActiveTab(homeTab)}
               className="flex items-center gap-2.5 cursor-pointer shrink-0"
             >
               <img

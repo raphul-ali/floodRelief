@@ -77,7 +77,7 @@ const translations = {
     callNgo: 'Call NGO',
     callVolunteer: 'Call Volunteer',
     whatsApp: 'WhatsApp',
-    numberHidden: 'Number Protected (NGO Partners Only)',
+    numberHidden: 'Number Protected (Verified NGOs Only)',
     operatingLocation: 'District / Operating Location',
     registerNgoBtn: '+ REGISTER NGO',
     offerBoatCarBtn: '+ OFFER BOAT / CAR / LOGISTICS',
@@ -105,7 +105,7 @@ const translations = {
     registerSubmit: 'SUBMIT FOR ADMIN APPROVAL',
 
     // Footer
-    partnerLogin: 'Partner Portal Login',
+    partnerLogin: 'Portal Login',
     openSourceNetwork: 'HELP AXOM — Unity. Relief. Rebuild.',
     copyright: '© 2026 HELP AXOM. Unity. Relief. Rebuild. Independent Community Network.'
   },
@@ -178,7 +178,7 @@ const translations = {
     callNgo: 'কল কৰক',
     callVolunteer: 'স্বেচ্ছাসেৱকক কল কৰক',
     whatsApp: 'হোৱাটছএপ',
-    numberHidden: 'নম্বৰ সংৰক্ষিত (কেৱল অংশীদাৰ সংস্থা)',
+    numberHidden: 'নম্বৰ সংৰক্ষিত (কেৱল সত্যাাপিত সংস্থা)',
     operatingLocation: 'জিলা / কৰ্মক্ষেত্ৰ',
     registerNgoBtn: '+ সংস্থা পঞ্জীয়ন কৰক',
     offerBoatCarBtn: '+ নাও / গাড়ী / লজিষ্টিক দিয়ক',
@@ -206,7 +206,7 @@ const translations = {
     registerSubmit: 'অনুমোদনৰ বাবে জমা দিয়ক',
 
     // Footer
-    partnerLogin: 'অংশীদাৰ প’ৰ্টেল লগইন',
+    partnerLogin: 'প’ৰ্টেল লগইন',
     openSourceNetwork: 'হেল্প অসম — একতা। ৰাহাত। পুনৰ্নিৰ্মাণ।',
     copyright: '© ২০২৬ হেল্প অসম (HELP AXOM)। একতা। ৰাহাত। পুনৰ্নিৰ্মাণ।'
   },
@@ -279,7 +279,7 @@ const translations = {
     callNgo: 'कॉल करें',
     callVolunteer: 'स्वयंसेवक को कॉल करें',
     whatsApp: 'व्हाट्सएप',
-    numberHidden: 'नंबर सुरक्षित (केवल भागीदार एनजीओ)',
+    numberHidden: 'नंबर सुरक्षित (केवल सत्यापित एनजीओ)',
     operatingLocation: 'जिला / कार्य क्षेत्र',
     registerNgoBtn: '+ एनजीओ पंजीकृत करें',
     offerBoatCarBtn: '+ नाव / कार / लॉजिस्टिक्स दें',
@@ -307,7 +307,7 @@ const translations = {
     registerSubmit: 'अनुमोदन के लिए जमा करें',
 
     // Footer
-    partnerLogin: 'भागीदार पोर्टल लॉगिन',
+    partnerLogin: 'पोर्टल लॉगिन',
     openSourceNetwork: 'HELP AXOM — एकता। राहत। पुनर्निर्माण।',
     copyright: '© 2026 HELP AXOM. एकता। राहत। पुनर्निर्माण। स्वतंत्र सामुदायिक राहत नेटवर्क।'
   }

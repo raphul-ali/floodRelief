@@ -308,8 +308,8 @@ export default function DeliveryLogModal({ request, ngos = [], onClose, onSubmit
                 onChange={(e) => setStatusUpdate(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500 font-medium"
               >
-                <option value="In Progress">In Progress (Partially Fulfilled)</option>
-                <option value="Rescued">Rescued / Fully Resolved</option>
+                <option value="In Progress">In Progress / Partially Completed</option>
+                <option value="Completed">Completed (Rescued / Resolved)</option>
               </select>
             </div>
 

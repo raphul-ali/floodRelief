@@ -132,18 +132,23 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
     if (filterType === 'RESCUE' && req.isUrgentRescue !== true) return false;
     
     // 2. Urgency
-    if (filterUrgency !== 'ALL' && req.urgency !== filterUrgency) return false;
+    if (filterUrgency !== 'ALL') {
+      if (filterUrgency === 'CRITICAL' && !req.isUrgentRescue) return false;
+      if (filterUrgency === 'HIGH' && (req.isUrgentRescue || req.urgency !== 'HIGH')) return false;
+      if (filterUrgency === 'MEDIUM' && (req.isUrgentRescue || req.urgency !== 'MEDIUM')) return false;
+      if (filterUrgency === 'LOW' && (req.isUrgentRescue || req.urgency !== 'LOW')) return false;
+    }
     
     // 3. Status
     if (filterStatus !== 'ALL') {
-      const statusStr = (req.status || '').toLowerCase();
-      const isResolved = statusStr === 'rescued' || statusStr === 'fulfilled';
-      const isInProgress = statusStr === 'in progress';
-      const isActive = !isResolved && !isInProgress;
+      const statusStr = (req.status || 'Pending').toLowerCase();
+      const isCompleted = statusStr === 'rescued' || statusStr === 'fulfilled' || statusStr === 'resolved' || statusStr === 'completed';
+      const isInProgress = statusStr === 'in progress' || statusStr === 'partially completed';
+      const isPending = !isCompleted && !isInProgress;
 
-      if (filterStatus === 'Active' && !isActive) return false;
+      if ((filterStatus === 'Pending' || filterStatus === 'Active') && !isPending) return false;
       if (filterStatus === 'In Progress' && !isInProgress) return false;
-      if (filterStatus === 'Resolved' && !isResolved) return false;
+      if ((filterStatus === 'Completed' || filterStatus === 'Resolved') && !isCompleted) return false;
     }
     return true;
   });
@@ -183,7 +188,7 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
         </h2>
         <p className="hidden sm:block text-sm text-slate-500 max-w-2xl leading-relaxed">
           Live tracking of all rescue and relief requests. Contact details are hidden to protect privacy.
-          Registered NGOs and volunteers can view full details in the Partner Dashboard.
+          Registered NGOs and volunteers can view full details in their Dashboard.
         </p>
 
         {/* Filters (Sticky on Mobile) */}
@@ -212,11 +217,9 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
                 className="bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl sm:rounded-lg pl-2.5 pr-8 sm:pl-3 sm:pr-8 py-2 sm:py-1.5 focus:ring-2 focus:ring-blue-500 outline-none w-full appearance-none shadow-sm"
               >
                 <option value="ALL">All Urgencies</option>
-                <option value="CRITICAL">Critical</option>
-                <option value="URGENT">Urgent</option>
+                <option value="CRITICAL">Critical Rescue</option>
                 <option value="HIGH">High</option>
                 <option value="MEDIUM">Medium</option>
-                <option value="NEEDED">Needed</option>
                 <option value="LOW">Low</option>
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
@@ -229,9 +232,9 @@ export default function PublicRequestsList({ victimRequests = [], deliveryLogs: 
                 className="bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl sm:rounded-lg pl-2.5 pr-8 sm:pl-3 sm:pr-8 py-2 sm:py-1.5 focus:ring-2 focus:ring-blue-500 outline-none w-full appearance-none shadow-sm"
               >
                 <option value="ALL">All Statuses</option>
-                <option value="Active">Active (Waiting)</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Resolved">Rescued / Fully Resolved</option>
+                <option value="Pending">Pending / Waiting</option>
+                <option value="In Progress">In Progress / Partially Completed</option>
+                <option value="Completed">Completed</option>
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
             </div>

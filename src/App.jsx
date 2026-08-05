@@ -58,11 +58,17 @@ export default function App() {
 
     if (!isSecretPath) {
       const hash = window.location.hash.replace('#', '');
+      const userRole = authService.getCurrentUser().role;
+      const isGuest = userRole === 'GUEST';
       const validTabs = ['home', 'dashboard', 'map', 'emergency', 'public_requests', 'ngos', 'transport', 'campaigns'];
       if (validTabs.includes(hash)) {
-        setActiveTab(hash);
-      } else if (!hash && authService.getCurrentUser().role === 'GUEST') {
-        setActiveTab('home');
+        if (hash === 'home' && !isGuest) {
+          setActiveTab('dashboard');
+        } else {
+          setActiveTab(hash);
+        }
+      } else {
+        setActiveTab(isGuest ? 'home' : 'dashboard');
       }
     }
   };
@@ -81,6 +87,12 @@ export default function App() {
     const pendingRecs = storageService.getPendingAccountRecoveryRequests().length;
     setPendingCount(pendingReqs + pendingLogs + pendingNgos + pendingVols + pendingRecs);
   };
+
+  useEffect(() => {
+    if (currentAuth.role !== 'GUEST' && activeTab === 'home') {
+      setActiveTab('dashboard');
+    }
+  }, [currentAuth.role, activeTab]);
 
   useEffect(() => {
     checkPath();
@@ -102,6 +114,8 @@ export default function App() {
       setCurrentAuth(user);
       if (user.role === 'GUEST') {
         setActiveTab('home');
+      } else {
+        setActiveTab('dashboard');
       }
     };
     const handleLangChanged = () => setLangState(i18nService.getLanguage());
@@ -284,8 +298,10 @@ export default function App() {
 
   // PUBLIC WEBSITE VIEW
   const handleTabChange = (tabName) => {
-    setActiveTab(tabName);
-    window.location.hash = tabName;
+    const isGuest = currentAuth.role === 'GUEST';
+    const targetTab = (!isGuest && tabName === 'home') ? 'dashboard' : tabName;
+    setActiveTab(targetTab);
+    window.location.hash = targetTab;
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'auto' });
     }, 10);
@@ -340,7 +356,7 @@ export default function App() {
                   onClick={() => setIsLoginModalOpen(true)}
                   className="mt-4 px-6 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl shadow-lg active:scale-95 transition-all"
                 >
-                  Partner Login
+                  Login
                 </button>
               </div>
             )}
@@ -358,7 +374,7 @@ export default function App() {
           <EmergencyServices />
         )}
 
-        {activeTab === 'home' && (
+        {activeTab === 'home' && currentAuth.role === 'GUEST' && (
           <GuestHome 
             victimRequests={victimRequests} 
             ngos={ngos}

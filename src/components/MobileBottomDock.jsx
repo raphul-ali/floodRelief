@@ -12,18 +12,18 @@ export default function MobileBottomDock({
 
   const tabs = [
     {
-      key:      'home',
-      label:    'Home',
-      Icon:     Home,
-      isActive: activeTab === 'home',
+      key:      isGuest ? 'home' : 'dashboard',
+      label:    isGuest ? 'Home' : 'Dashboard',
+      Icon:     isGuest ? Home : Package,
+      isActive: isGuest ? activeTab === 'home' : activeTab === 'dashboard',
       danger:   false,
     },
     {
-      key:      isGuest ? 'public_requests' : 'dashboard',
-      label:    isGuest ? 'Requests' : 'Dashboard',
-      Icon:     isGuest ? FileText : Package,
-      isActive: isGuest ? activeTab === 'public_requests' : activeTab === 'dashboard',
-      badge:    isGuest && requestsCount > 0 ? requestsCount : null,
+      key:      'public_requests',
+      label:    'Requests',
+      Icon:     FileText,
+      isActive: activeTab === 'public_requests',
+      badge:    requestsCount > 0 ? requestsCount : null,
       danger:   false,
     },
     {

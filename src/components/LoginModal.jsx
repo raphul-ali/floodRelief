@@ -359,12 +359,12 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
             </div>
             <div>
               <h2 className="text-base font-semibold text-gray-900 leading-none">
-                {activeMode === 'REGISTER' ? 'Create Account' : 'Partner Login'}
+                {activeMode === 'REGISTER' ? 'Create Account' : 'Volunteer & NGO Login'}
               </h2>
               <p className="text-xs text-gray-500 mt-0.5">
                 {activeMode === 'REGISTER'
                   ? 'Join as NGO or Relief Helper'
-                  : 'Access the partner portal'}
+                  : 'Access your account'}
               </p>
             </div>
           </div>
@@ -424,7 +424,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                     <HeartHandshake className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <p className="text-[12px] font-bold leading-none">NGO Partner</p>
+                    <p className="text-[12px] font-bold leading-none">NGO Organization</p>
                     <p className="text-[10px] text-gray-500 mt-0.5">Organization</p>
                   </div>
                 </button>
@@ -896,7 +896,7 @@ export default function LoginModal({ onClose, onLoggedIn, initialMode = 'NGO_LOG
                           {regShowPhone ? (
                             <span className="text-amber-700">Public: Victims & volunteers can view and call your NGO directly.</span>
                           ) : (
-                            <span className="text-emerald-700">Protected: Phone number will be hidden from public guests and only visible to verified NGO partners & Control Room.</span>
+                            <span className="text-emerald-700">Protected: Phone number will be hidden from public guests and only visible to verified NGOs & Control Room.</span>
                           )}
                         </p>
                       </div>

@@ -383,7 +383,7 @@ export default function AdminDashboard({ onDataUpdated }) {
   const sidebarNavItems = [
     { id: 'sos', label: 'SOS Requests', icon: ShieldAlert, count: (pendingRequests || []).length, color: 'text-red-600 bg-red-50' },
     { id: 'deliveries', label: 'Relief Logs', icon: Package, count: (pendingDeliveries || []).length, color: 'text-amber-600 bg-amber-50' },
-    { id: 'ngos', label: 'NGO Partners', icon: HeartHandshake, count: (pendingNgos || []).length, color: 'text-blue-600 bg-blue-50' },
+    { id: 'ngos', label: 'NGO Organizations', icon: HeartHandshake, count: (pendingNgos || []).length, color: 'text-blue-600 bg-blue-50' },
     { id: 'volunteers', label: 'Relief Helpers', icon: UserCheck, count: (pendingVolunteers || []).length, color: 'text-purple-600 bg-purple-50' },
     { id: 'campaigns', label: 'Campaigns', icon: Megaphone, count: null },
     { id: 'recovery', label: 'Account Recovery', icon: Key, count: pendingRecoveryCount, color: 'text-cyan-600 bg-cyan-50' },
@@ -539,10 +539,10 @@ export default function AdminDashboard({ onDataUpdated }) {
 
               {[
                 { id: 'ALL', label: `All SOS (${targetRequests.length})` },
-                { id: 'PENDING', label: `⚠️ Pending Approval (${targetRequests.filter(r => !r.verified).length})` },
-                { id: 'BOAT', label: `🚤 Boat Rescue (${targetRequests.filter(r => r.isUrgentRescue).length})` },
-                { id: 'SUPPLY', label: `📦 Relief Supply (${targetRequests.filter(r => !r.isUrgentRescue).length})` },
-                { id: 'PUBLISHED', label: `✓ Published Live (${targetRequests.filter(r => r.verified).length})` },
+                { id: 'PENDING', label: `Pending Approval (${targetRequests.filter(r => !r.verified).length})` },
+                { id: 'BOAT', label: `Boat Rescue (${targetRequests.filter(r => r.isUrgentRescue).length})` },
+                { id: 'SUPPLY', label: `Relief Supply (${targetRequests.filter(r => !r.isUrgentRescue).length})` },
+                { id: 'PUBLISHED', label: `Published Live (${targetRequests.filter(r => r.verified).length})` },
               ].map(chip => (
                 <button
                   key={chip.id}
@@ -801,11 +801,11 @@ export default function AdminDashboard({ onDataUpdated }) {
                 <Filter className="w-3.5 h-3.5" /> Filter:
               </span>
               {[
-                { id: 'ALL', label: `All Partners (${targetNgos.length})` },
-                { id: 'PENDING', label: `⏳ Pending Approval (${targetNgos.filter(n => !n.verified).length})` },
-                { id: 'NGO', label: `🏢 Registered NGOs (${targetNgos.filter(n => !n.ngoType || n.ngoType.includes('Registered NGO')).length})` },
-                { id: 'DONOR', label: `🍲 Food Donors (${targetNgos.filter(n => n.ngoType && n.ngoType.includes('Donor')).length})` },
-                { id: 'VERIFIED', label: `✓ Verified Partners (${targetNgos.filter(n => n.verified).length})` },
+                { id: 'ALL', label: `All Organizations (${targetNgos.length})` },
+                { id: 'PENDING', label: `Pending Approval (${targetNgos.filter(n => !n.verified).length})` },
+                { id: 'NGO', label: `Registered NGOs (${targetNgos.filter(n => !n.ngoType || n.ngoType.includes('Registered NGO')).length})` },
+                { id: 'DONOR', label: `Food Donors (${targetNgos.filter(n => n.ngoType && n.ngoType.includes('Donor')).length})` },
+                { id: 'VERIFIED', label: `Verified (${targetNgos.filter(n => n.verified).length})` },
               ].map(chip => (
                 <button
                   key={chip.id}
@@ -876,7 +876,7 @@ export default function AdminDashboard({ onDataUpdated }) {
 
                 {/* PAGINATION BAR */}
                 <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-start sm:justify-between gap-3 text-xs mb-36 sm:mb-6 pb-10 sm:pb-4">
-                  <span className="font-bold text-slate-700">Page {safeNgoPage} of {totalNgoPages} ({filteredNgos.length} Partners)</span>
+                  <span className="font-bold text-slate-700">Page {safeNgoPage} of {totalNgoPages} ({filteredNgos.length} Total)</span>
                   <div className="flex items-center justify-start sm:justify-center gap-2 w-full sm:w-auto pr-36 sm:pr-0">
                     <button disabled={safeNgoPage <= 1} onClick={() => setNgoCurrentPage(p => Math.max(1, p - 1))} className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl font-bold disabled:opacity-50">Previous</button>
                     <button disabled={safeNgoPage >= totalNgoPages} onClick={() => setNgoCurrentPage(p => Math.min(totalNgoPages, p + 1))} className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl font-bold disabled:opacity-50">Next</button>

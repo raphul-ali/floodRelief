@@ -19,7 +19,7 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
   const [activeCategory, setActiveCategory] = useState('ALL'); // 'ALL' | 'NGOS' | 'VOLUNTEERS' | 'BOATS_CARS'
   const [searchQuery, setSearchQuery] = useState('');
 
-  const isAuthorizedPartner = currentAuth.role === 'NGO' || currentAuth.role === 'VOLUNTEER' || currentAuth.role === 'ADMIN';
+  const isAuthorizedUser = currentAuth.role === 'NGO' || currentAuth.role === 'VOLUNTEER' || currentAuth.role === 'ADMIN';
 
   // Filtering
   const cleanQuery = searchQuery.toLowerCase().trim();
@@ -122,14 +122,14 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
             <div className="flex items-center gap-2 flex-wrap">
               <span className="status-chip status-chip-info text-[10px] sm:text-xs py-0.5 sm:py-1">
                 <HeartHandshake className="w-3 h-3" />
-                Partner Directory
+                Directory
               </span>
               <span className="status-chip status-chip-neutral text-[10px] sm:text-xs py-0.5 sm:py-1">
-                {ngos.length + volunteers.length} Partners
+                {ngos.length + volunteers.length} Verified
               </span>
             </div>
             <h2 className="text-lg sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
-              Relief Coordinators &amp; Partners
+              Relief Coordinators &amp; Volunteers
             </h2>
             <p className="hidden sm:block text-sm text-slate-500 max-w-xl">
               Direct contact directory for NGOs, rescue boat owners, 4×4 vehicles, trucks, and medical volunteers.
@@ -227,7 +227,7 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
 
             {/* Call buttons */}
             <div className="px-4 pb-4 pt-3 border-t border-slate-100 flex gap-2">
-              {(ngo.showPhone !== false || isAuthorizedPartner) ? (
+              {(ngo.showPhone !== false || isAuthorizedUser) ? (
                 <>
                   <a href={`tel:${ngo.phone?.replace(/[^0-9]/g, '')}`}
                     className="ripple-btn btn-base btn-emerald flex-1 py-2.5 px-3 rounded-full text-xs font-bold gap-1.5 min-h-[42px]">
@@ -242,7 +242,7 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
               ) : (
                 <div className="flex-1 py-2.5 px-3 bg-slate-50 border border-slate-200 text-slate-400 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 min-h-[42px] italic">
                   <Phone className="w-4 h-4 opacity-40" />
-                  <span>NGO Partners Only</span>
+                  <span>Verified NGOs Only</span>
                 </div>
               )}
             </div>
@@ -310,10 +310,10 @@ export default function NGODirectory({ ngos = [], volunteers = [], openLoginModa
             </div>
             <div>
               <h3 className="text-base font-black text-slate-800">
-                No partners in this category
+                No verified entries in this category
               </h3>
               <p className="text-sm text-slate-500 max-w-md mx-auto mt-1">
-                {searchQuery ? `No partners found for "${searchQuery}".` : 'No registered partners in this category yet.'} Are you an NGO or volunteer?
+                {searchQuery ? `No results found for "${searchQuery}".` : 'No registered NGOs or volunteers in this category yet.'} Are you an NGO or volunteer?
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-2">

@@ -155,13 +155,23 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
           (req.villageName && req.villageName.toLowerCase().includes(searchLower)) ||
           (req.district && req.district.toLowerCase().includes(searchLower));
 
-        const matchesStatus = filterStatus === 'ALL' || req.status === filterStatus;
+        const statusLower = (req.status || 'Pending').toLowerCase();
+        const isCompleted = statusLower === 'rescued' || statusLower === 'fulfilled' || statusLower === 'resolved' || statusLower === 'completed';
+        const isInProgress = statusLower === 'in progress' || statusLower === 'partially completed';
+        const isPending = !isCompleted && !isInProgress;
+
+        let matchesStatus = true;
+        if (filterStatus === 'Pending') matchesStatus = isPending;
+        else if (filterStatus === 'In Progress') matchesStatus = isInProgress;
+        else if (filterStatus === 'Completed' || filterStatus === 'Rescued') matchesStatus = isCompleted;
+
         const matchesDistrict = filterDistrict === 'ALL' || req.district === filterDistrict;
 
         const matchesUrgency = filterUrgency === 'ALL' || 
           (filterUrgency === 'CRITICAL' && req.isUrgentRescue) ||
-          (filterUrgency === 'HIGH' && !req.isUrgentRescue && req.urgency === 'HIGH') ||
-          (filterUrgency === 'NORMAL' && !req.isUrgentRescue && req.urgency !== 'HIGH');
+          (filterUrgency === 'HIGH' && (req.isUrgentRescue || req.urgency === 'HIGH')) ||
+          (filterUrgency === 'MEDIUM' && (!req.isUrgentRescue && req.urgency === 'MEDIUM')) ||
+          (filterUrgency === 'LOW' && (!req.isUrgentRescue && req.urgency === 'LOW'));
 
         const matchesVerification = filterVerification === 'ALL' ||
           (filterVerification === 'VERIFIED' && req.verified) ||
@@ -293,7 +303,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold uppercase tracking-wider">
                     <Sparkles className="w-3 h-3 text-emerald-500" />
-                    Verified Relief Partner
+                    Verified
                   </span>
                 </div>
               </div>
@@ -493,9 +503,9 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                 className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-bold focus:outline-none focus:border-blue-500 min-h-[38px]"
               >
                 <option value="ALL">All Statuses</option>
-                <option value="Pending">Pending Response</option>
-                <option value="In Progress">Team Dispatched</option>
-                <option value="Rescued">Rescued / Fully Resolved</option>
+                <option value="Pending">Pending / Waiting</option>
+                <option value="In Progress">In Progress / Partially Completed</option>
+                <option value="Completed">Completed</option>
               </select>
             )}
 
@@ -505,10 +515,11 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
               onChange={(e) => { setFilterUrgency(e.target.value); setReqCurrentPage(1); }}
               className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-bold focus:outline-none focus:border-blue-500 min-h-[38px]"
             >
-              <option value="ALL">All Urgency Levels</option>
-              <option value="CRITICAL">🚨 Critical Rescue</option>
-              <option value="HIGH">⚠️ High Priority Supply</option>
-              <option value="NORMAL"> Standard Demand</option>
+              <option value="ALL">All Urgencies</option>
+              <option value="CRITICAL">Critical Rescue</option>
+              <option value="HIGH">High</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="LOW">Low</option>
             </select>
 
             {/* Verification Status Filter */}
@@ -518,8 +529,8 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
               className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-bold focus:outline-none focus:border-blue-500 min-h-[38px]"
             >
               <option value="ALL">All Verification States</option>
-              <option value="VERIFIED">✓ Verified Only</option>
-              <option value="UNVERIFIED">⏳ Pending Verification</option>
+              <option value="VERIFIED">Verified Only</option>
+              <option value="UNVERIFIED">Pending Verification</option>
             </select>
 
             {/* District Filter */}
@@ -554,8 +565,9 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {paginatedRequests.map((req) => {
                   const isUrgent = req.isUrgentRescue;
-                  const isInProgress = req.status === 'In Progress';
-                  const isRescued = req.status === 'Rescued' || req.status === 'Fulfilled';
+                  const statusLower = (req.status || '').toLowerCase();
+                  const isInProgress = statusLower === 'in progress' || statusLower === 'partially completed';
+                  const isRescued = statusLower === 'rescued' || statusLower === 'fulfilled' || statusLower === 'completed' || statusLower === 'resolved';
 
                   return (
                     <div 
@@ -589,7 +601,7 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                               ? 'bg-amber-50 text-amber-700 border border-amber-200'
                               : 'bg-slate-100 text-slate-700 border border-slate-200'
                           }`}>
-                            {req.status || 'Pending'}
+                            {isRescued ? 'Completed' : isInProgress ? 'In Progress' : 'Pending'}
                           </span>
                         </div>
 
@@ -647,65 +659,86 @@ export default function NGODashboard({ victimRequests = [], ngos = [] }) {
                       </div>
 
                       {/* Action Row */}
-                      <div className="pt-3 border-t border-slate-100 space-y-2">
-                        <div className="grid grid-cols-2 gap-2">
-                          {isAuthorizedUser ? (
-                            <>
-                              <a
-                                href={`tel:${req.phone}`}
-                                className="py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-colors"
-                              >
-                                <Phone className="w-3.5 h-3.5" />
-                                <span>Call Contact</span>
-                              </a>
+                      <div className="pt-3 border-t border-slate-100">
+                        {isRescued ? (
+                          /* Completed Requests ONLY have option to View Updates */
+                          <button
+                            onClick={() => setActiveTreeRequest(req)}
+                            className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                          >
+                            <Activity className="w-4 h-4 text-blue-600" />
+                            <span>View Updates</span>
+                            {(() => {
+                              const updateCount = (deliveryLogs || []).filter(l => (l.requestId || l.request_id) === req.id).length;
+                              return updateCount > 0 ? (
+                                <span className="px-2 py-0.5 text-[10px] font-black bg-blue-600 text-white rounded-full leading-none">
+                                  {updateCount}
+                                </span>
+                              ) : null;
+                            })()}
+                          </button>
+                        ) : (
+                          /* Active / In-Progress Requests Action Buttons */
+                          <div className="space-y-2">
+                            <div className="grid grid-cols-2 gap-2">
+                              {isAuthorizedUser ? (
+                                <>
+                                  <a
+                                    href={`tel:${req.phone}`}
+                                    className="py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-colors"
+                                  >
+                                    <Phone className="w-3.5 h-3.5" />
+                                    <span>Call Contact</span>
+                                  </a>
 
-                              <a
-                                href={getWhatsAppLink(req.phone, `Hello ${req.name}, this is ${ngoUserDetail.name} Relief Team regarding your request.`)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="py-2 px-3 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-colors"
-                              >
-                                <MessageSquare className="w-3.5 h-3.5" />
-                                <span>WhatsApp</span>
-                              </a>
-                            </>
-                          ) : (
-                            <div className="col-span-2 py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-500 text-center">
-                              Log in to view contact details
+                                  <a
+                                    href={getWhatsAppLink(req.phone, `Hello ${req.name}, this is ${ngoUserDetail.name} Relief Team regarding your request.`)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="py-2 px-3 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-colors"
+                                  >
+                                    <MessageSquare className="w-3.5 h-3.5" />
+                                    <span>WhatsApp</span>
+                                  </a>
+                                </>
+                              ) : (
+                                <div className="col-span-2 py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-500 text-center">
+                                  Log in to view contact details
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
 
-                        <div className="grid grid-cols-2 gap-2">
-                          {isAuthorizedUser && (
-                            <button
-                              onClick={() => setActiveLogRequest(req)}
-                              className="py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1 shadow-sm transition-colors"
-                            >
-                              <Plus className="w-3.5 h-3.5" />
-                              <span>Post Update</span>
-                            </button>
-                          )}
+                            <div className="grid grid-cols-2 gap-2">
+                              {isAuthorizedUser && (
+                                <button
+                                  onClick={() => setActiveLogRequest(req)}
+                                  className="py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1 shadow-sm transition-colors"
+                                >
+                                  <Plus className="w-3.5 h-3.5" />
+                                  <span>Post Update</span>
+                                </button>
+                              )}
 
-                          {(() => {
-                            const updateCount = (deliveryLogs || []).filter(l => (l.requestId || l.request_id) === req.id).length;
-                            return (
-                              <button
-                                onClick={() => setActiveTreeRequest(req)}
-                                className="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                              >
-                                <Activity className="w-3.5 h-3.5 text-blue-600" />
-                                <span>Updates</span>
-                                {updateCount > 0 && (
-                                  <span className="px-1.5 py-0.5 text-[10px] font-black bg-red-600 text-white rounded-full leading-none shadow-2xs animate-pulse">
-                                    {updateCount}
-                                  </span>
-                                )}
-                              </button>
-                            );
-                          })()}
-                        </div>
-
+                              {(() => {
+                                const updateCount = (deliveryLogs || []).filter(l => (l.requestId || l.request_id) === req.id).length;
+                                return (
+                                  <button
+                                    onClick={() => setActiveTreeRequest(req)}
+                                    className="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                                  >
+                                    <Activity className="w-3.5 h-3.5 text-blue-600" />
+                                    <span>Updates</span>
+                                    {updateCount > 0 && (
+                                      <span className="px-1.5 py-0.5 text-[10px] font-black bg-red-600 text-white rounded-full leading-none shadow-2xs animate-pulse">
+                                        {updateCount}
+                                      </span>
+                                    )}
+                                  </button>
+                                );
+                              })()}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
