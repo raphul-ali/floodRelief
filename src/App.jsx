@@ -148,7 +148,12 @@ export default function App() {
 
   const handleLogout = () => {
     authService.logout();
-    setActiveTab('public_requests');
+    if (window.location.pathname === '/raphul-admin' || window.location.hash.includes('raphul-admin')) {
+      window.history.pushState(null, '', '/');
+      setIsAdminPath(false);
+    }
+    window.location.hash = '';
+    setActiveTab('home');
   };
 
   const handleSecretAdminLogin = async (e) => {

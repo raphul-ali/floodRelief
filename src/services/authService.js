@@ -418,6 +418,11 @@ export const authService = {
    */
   logout: () => {
     localStorage.removeItem(AUTH_SESSION_KEY);
+    localStorage.removeItem('flood_relief_session');
+    localStorage.removeItem('flood_relief_auth');
+    localStorage.removeItem('ngo_user');
+    localStorage.removeItem('volunteer_user');
+    sessionStorage.clear();
     notifyAuthChanged();
     return { role: 'GUEST', user: null };
   }
